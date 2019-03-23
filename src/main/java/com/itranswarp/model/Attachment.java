@@ -1,0 +1,37 @@
+package com.itranswarp.model;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Table;
+
+/**
+ * Store attachment which links resources with article, wiki or wikipages.
+ * 
+ * @author liaoxuefeng
+ */
+@Entity
+@Table(name = "attachments")
+public class Attachment extends AbstractEntity {
+
+	@Column(nullable = false, updatable = false, length = VAR_ID)
+	public String userId;
+
+	@Column(nullable = false, updatable = false, length = VAR_ID)
+	public String resourceId;
+
+	@Column(nullable = false, updatable = false)
+	public long size;
+
+	@Column(nullable = false, updatable = false)
+	public int width;
+
+	@Column(nullable = false, updatable = false)
+	public int height;
+
+	@Column(nullable = false, updatable = false, length = VAR_CHAR_NAME)
+	public String name;
+
+	@Column(nullable = false, updatable = false, length = VAR_CHAR_MIME)
+	public String mime;
+
+}

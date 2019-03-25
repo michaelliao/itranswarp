@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 
 import com.itranswarp.oauth.OAuthAuthentication;
 import com.itranswarp.oauth.provider.WeiboOAuthProvider;
+import com.itranswarp.oauth.provider.WeiboOAuthProvider.OAuthConfiguration;
 import com.itranswarp.util.JsonUtil;
 
 public class WeiboOAuthProviderTest {
@@ -16,8 +17,9 @@ public class WeiboOAuthProviderTest {
 	@BeforeEach
 	void setUp() throws Exception {
 		provider = new WeiboOAuthProvider();
-		provider.clientId = "1391944217";
-		provider.clientSecret = System.getenv("TEST_WEIBO_CLIENT_SECRET");
+		provider.configuration = new OAuthConfiguration();
+		provider.configuration.setClientId("1391944217");
+		provider.configuration.setClientSecret(System.getenv("TEST_WEIBO_CLIENT_SECRET"));
 	}
 
 	@Test

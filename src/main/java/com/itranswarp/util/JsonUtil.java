@@ -63,8 +63,11 @@ public class JsonUtil {
 
 	public static String writeJson(ApiException obj) {
 		try {
-			return OBJECT_MAPPER
-					.writeValueAsString(Map.of("error", obj.error, "data", obj.data, "message", obj.getMessage()));
+			Map<String, Object> map = new HashMap<>();
+			map.put("error", obj.error);
+			map.put("data", obj.data);
+			map.put("message", obj.getMessage());
+			return OBJECT_MAPPER.writeValueAsString(map);
 		} catch (JsonProcessingException e) {
 			throw new RuntimeException(e);
 		}

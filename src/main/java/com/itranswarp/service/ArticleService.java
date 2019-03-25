@@ -80,10 +80,10 @@ public class ArticleService extends AbstractService<Article> {
 	public Category updateCategory(Long id, CategoryBean bean) {
 		Category category = this.getCategoryById(id);
 		if (bean.name != null) {
-			category.name = checkName(category.name);
+			category.name = checkName(bean.name);
 		}
 		if (bean.description != null) {
-			category.description = checkDescription(category.description);
+			category.description = checkDescription(bean.description);
 		}
 		this.db.update(category);
 		return category;
@@ -109,7 +109,7 @@ public class ArticleService extends AbstractService<Article> {
 		List<Article> articles = this.redisService.get(KEY_RECENT_ARTICLES, TYPE_LIST_ARTICLE);
 		if (articles == null) {
 			articles = db.from(Article.class).where("publishAt < ?", System.currentTimeMillis()).orderBy("publishAt")
-					.desc().limit(maxResults).list();
+					.desc().orderBy("id").desc().limit(maxResults).list();
 			this.redisService.set(KEY_RECENT_ARTICLES, articles);
 		}
 		return articles;
@@ -123,7 +123,7 @@ public class ArticleService extends AbstractService<Article> {
 		}
 		if (articles == null) {
 			articles = this.db.from(Article.class).where("categoryId = ? AND publishAt < ?", category.id, ts)
-					.orderBy("publishAt").desc().list(pageIndex, ITEMS_PER_PAGE);
+					.orderBy("publishAt").desc().orderBy("id").desc().list(pageIndex, ITEMS_PER_PAGE);
 			if (pageIndex == 1) {
 				this.redisService.set(KEY_ARTICLES_FIRST_PAGE + category.id, articles, CACHE_ARTICLES_SECONDS);
 			}
@@ -131,8 +131,14 @@ public class ArticleService extends AbstractService<Article> {
 		return articles;
 	}
 
+	public PagedResults<Article> getArticles(int pageIndex) {
+		return this.db.from(Article.class).orderBy("publishAt").desc().orderBy("id").desc().list(pageIndex,
+				ITEMS_PER_PAGE);
+	}
+
 	public PagedResults<Article> getArticles(Category category, int pageIndex) {
-		return this.db.from(Article.class).where("categoryId = ?", category.id).list(pageIndex, ITEMS_PER_PAGE);
+		return this.db.from(Article.class).where("categoryId = ?", category.id).orderBy("publishAt").desc()
+				.orderBy("id").desc().list(pageIndex, ITEMS_PER_PAGE);
 	}
 
 	public Article getPublishedById(Long id) {
@@ -148,6 +154,7 @@ public class ArticleService extends AbstractService<Article> {
 		getCategoryById(bean.categoryId);
 		Article article = new Article();
 		article.id = IdUtil.nextId();
+		article.userId = user.id;
 		article.categoryId = bean.categoryId;
 		article.name = checkName(bean.name);
 		article.description = checkDescription(bean.description);

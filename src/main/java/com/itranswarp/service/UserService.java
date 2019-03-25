@@ -1,11 +1,15 @@
 package com.itranswarp.service;
 
+import java.util.Arrays;
 import java.util.List;
+import java.util.StringJoiner;
 import java.util.concurrent.TimeUnit;
 
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.itranswarp.common.ApiException;
+import com.itranswarp.enums.ApiError;
 import com.itranswarp.enums.Role;
 import com.itranswarp.model.AbstractEntity;
 import com.itranswarp.model.LocalAuth;
@@ -46,6 +50,22 @@ public class UserService extends AbstractService<User> {
 			this.redisService.hset(KEY_USERS, id, user);
 		}
 		return user;
+	}
+
+	public List<User> getUsersByIds(long... ids) {
+		if (ids.length == 0) {
+			return List.of();
+		}
+		if (ids.length > 100) {
+			throw new ApiException(ApiError.PARAMETER_INVALID, "id", "Too many ids.");
+		}
+		StringJoiner sj = new StringJoiner(" OR ");
+		for (int i = 0; i < ids.length; i++) {
+			sj.add("id=?");
+		}
+		String where = sj.toString();
+		Object[] params = Arrays.stream(ids).mapToObj(id -> id).toArray();
+		return this.db.from(User.class).where(where, params).list();
 	}
 
 	public PagedResults<User> getUsers(int pageIndex) {

@@ -44,7 +44,12 @@ public class ApiFilterRegistrationBean extends FilterRegistrationBean<Filter> {
 			} catch (ApiException e) {
 				sendApiError(httpResponse, e);
 			} catch (Exception e) {
-				sendApiError(httpResponse, new ApiException(ApiError.INTERNAL_SERVER_ERROR, null, e.getMessage()));
+				Throwable cause = e.getCause();
+				if (cause instanceof ApiException) {
+					sendApiError(httpResponse, (ApiException) cause);
+				} else {
+					sendApiError(httpResponse, new ApiException(ApiError.INTERNAL_SERVER_ERROR, null, e.getMessage()));
+				}
 			}
 		}
 

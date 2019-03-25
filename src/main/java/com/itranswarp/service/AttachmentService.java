@@ -50,6 +50,7 @@ public class AttachmentService extends AbstractService<Attachment> {
 			r = new Resource();
 			r.id = IdUtil.nextId();
 			r.encoding = ResourceEncoding.BASE64;
+			r.hash = HashUtil.sha256(data);
 			r.content = bean.data;
 			this.db.insert(r);
 		}

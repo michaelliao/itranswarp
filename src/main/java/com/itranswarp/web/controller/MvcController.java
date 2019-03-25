@@ -7,13 +7,16 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.LocaleResolver;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.itranswarp.Application;
 import com.itranswarp.common.ApiException;
 import com.itranswarp.enums.ApiError;
 import com.itranswarp.markdown.Markdown;
@@ -37,18 +40,39 @@ import com.itranswarp.util.HashUtil;
 import com.itranswarp.util.HttpUtil;
 import com.itranswarp.warpdb.PagedResults;
 import com.itranswarp.web.filter.HttpContext;
+import com.itranswarp.web.view.i18n.Translators;
 
+/**
+ * Mvc controller for all page views.
+ * 
+ * @author liaoxuefeng
+ */
 @Controller
-public class IndexController extends AbstractMvcController {
+public class MvcController extends AbstractController {
+
+	@Value("#{applicationConfiguration.name}")
+	String name;
+
+	@Value("#{applicationConfiguration.cdn}")
+	String cdn;
+
+	@Value("#{applicationConfiguration.profiles eq 'native'}")
+	Boolean dev;
 
 	@Autowired
-	ViewService viewService;
+	Translators translators;
+
+	@Autowired
+	LocaleResolver localeResolver;
 
 	@Autowired
 	Markdown markdown;
 
 	@Autowired
 	OAuthProviders oauthProviders;
+
+	@Autowired
+	ViewService viewService;
 
 	///////////////////////////////////////////////////////////////////////////////////////////////
 	// index
@@ -246,6 +270,43 @@ public class IndexController extends AbstractMvcController {
 	public String signOut(HttpServletRequest request, HttpServletResponse response) {
 		CookieUtil.deleteSessionCookie(request, response);
 		return "redirect:" + HttpUtil.getReferer(request);
+	}
+
+	///////////////////////////////////////////////////////////////////////////////////////////////
+	// utility method
+	///////////////////////////////////////////////////////////////////////////////////////////////
+
+	ModelAndView prepareModelAndView(String view) {
+		ModelAndView mv = new ModelAndView(view);
+		appendGlobalModel(mv);
+		return mv;
+	}
+
+	ModelAndView prepareModelAndView(String view, Map<String, Object> model) {
+		ModelAndView mv = new ModelAndView(view, model);
+		appendGlobalModel(mv);
+		return mv;
+	}
+
+	ModelAndView notFound() {
+		ModelAndView mv = new ModelAndView("/404.html");
+		appendGlobalModel(mv);
+		return mv;
+	}
+
+	private void appendGlobalModel(ModelAndView mv) {
+		@SuppressWarnings("resource")
+		HttpContext ctx = HttpContext.getContext();
+		mv.addObject("__name__", this.name);
+		mv.addObject("__cdn__", this.cdn);
+		mv.addObject("__dev__", this.dev);
+		mv.addObject("__website__", settingService.getWebsiteFromCache());
+		mv.addObject("__user__", ctx.user);
+		mv.addObject("__navigations__", navigationService.getNavigationsFromCache());
+		mv.addObject("__timestamp__", ctx.timestamp);
+		mv.addObject("__translator__", translators.getTranslator(localeResolver.resolveLocale(ctx.request)));
+		mv.addObject("__version__", Application.VERSION);
+		ctx.response.setHeader("X-Execution-Time", String.valueOf(System.currentTimeMillis() - ctx.timestamp));
 	}
 
 	private static final int LOCAL_EXPIRES_IN_SECONDS = 3600 * 24 * 7;

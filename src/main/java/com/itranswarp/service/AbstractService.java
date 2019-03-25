@@ -165,6 +165,6 @@ public class AbstractService<T extends AbstractEntity> {
 		return s;
 	}
 
-	private static final Pattern PATTERN_TAG = Pattern.compile("^.{" + AbstractEntity.VAR_ENUM + "}$");
+	private static final Pattern PATTERN_TAG = Pattern.compile("^[^\\,\\;]{1," + AbstractEntity.VAR_ENUM + "}$");
 	private static final Pattern PATTERN_HASHED_PASSWORD = Pattern.compile("^[a-f0-9]{64}$");
 }

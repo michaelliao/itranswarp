@@ -10,7 +10,6 @@ import com.itranswarp.bean.SinglePageBean;
 import com.itranswarp.common.ApiException;
 import com.itranswarp.enums.ApiError;
 import com.itranswarp.model.SinglePage;
-import com.itranswarp.model.User;
 
 @Component
 public class SinglePageService extends AbstractService<SinglePage> {
@@ -21,7 +20,7 @@ public class SinglePageService extends AbstractService<SinglePage> {
 	private static final String KEY_SINGLE_PAGES = "_singlepages";
 
 	public List<SinglePage> getAll() {
-		return this.db.from(SinglePage.class).orderBy("id").desc().list();
+		return this.db.from(SinglePage.class).orderBy("publishAt").desc().orderBy("id").desc().list();
 	}
 
 	public SinglePage getPublishedById(Long id) {
@@ -37,7 +36,7 @@ public class SinglePageService extends AbstractService<SinglePage> {
 	}
 
 	@Transactional
-	public SinglePage createSinglePage(User user, SinglePageBean bean) {
+	public SinglePage createSinglePage(SinglePageBean bean) {
 		SinglePage sp = new SinglePage();
 		sp.name = checkName(bean.name);
 		sp.publishAt = checkPublishAt(bean.publishAt);
@@ -70,5 +69,9 @@ public class SinglePageService extends AbstractService<SinglePage> {
 		}
 		this.db.update(sp);
 		return sp;
+	}
+
+	public void deleteSinglePageFromCache(Long id) {
+		this.redisService.hdel(KEY_SINGLE_PAGES, id);
 	}
 }

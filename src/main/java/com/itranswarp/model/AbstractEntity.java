@@ -6,10 +6,11 @@ import javax.persistence.MappedSuperclass;
 import javax.persistence.PrePersist;
 import javax.persistence.PreUpdate;
 
+import com.itranswarp.bean.AbstractBean;
 import com.itranswarp.util.IdUtil;
 
 @MappedSuperclass
-public abstract class AbstractEntity {
+public abstract class AbstractEntity extends AbstractBean {
 
 	public static final int VAR_ENUM = 32;
 

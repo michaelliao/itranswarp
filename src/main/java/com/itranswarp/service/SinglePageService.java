@@ -18,14 +18,18 @@ public class SinglePageService extends AbstractService<SinglePage> {
 	@Autowired
 	TextService textService;
 
-	static final String KEY_SINGLE_PAGES = "_singlepages";
+	private static final String KEY_SINGLE_PAGES = "_singlepages";
 
 	public List<SinglePage> getAll() {
 		return this.db.from(SinglePage.class).orderBy("id").desc().list();
 	}
 
-	public SinglePage getPublishedById(String id) {
-		SinglePage sp = getById(id);
+	public SinglePage getPublishedById(Long id) {
+		SinglePage sp = this.redisService.hget(KEY_SINGLE_PAGES, id, SinglePage.class);
+		if (sp == null) {
+			sp = getById(id);
+			this.redisService.hset(KEY_SINGLE_PAGES, id, sp);
+		}
 		if (sp.publishAt > System.currentTimeMillis()) {
 			throw new ApiException(ApiError.ENTITY_NOT_FOUND, "SinglePage", "SinglePage not found.");
 		}
@@ -44,13 +48,13 @@ public class SinglePageService extends AbstractService<SinglePage> {
 	}
 
 	@Transactional
-	public void deleteSinglePage(String id) {
+	public void deleteSinglePage(Long id) {
 		SinglePage sp = this.getById(id);
 		this.db.remove(sp);
 	}
 
 	@Transactional
-	public SinglePage updateSinglePage(String id, SinglePageBean bean) {
+	public SinglePage updateSinglePage(Long id, SinglePageBean bean) {
 		SinglePage sp = this.getById(id);
 		if (bean.name != null) {
 			sp.name = checkName(bean.name);

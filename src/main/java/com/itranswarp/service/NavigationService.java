@@ -45,7 +45,7 @@ public class NavigationService extends AbstractService<Navigation> {
 	}
 
 	@Transactional
-	public Navigation updateNavigation(String id, NavigationBean bean) {
+	public Navigation updateNavigation(Long id, NavigationBean bean) {
 		Navigation nav = this.getById(id);
 		if (bean.name != null) {
 			nav.name = checkName(bean.name);
@@ -64,13 +64,13 @@ public class NavigationService extends AbstractService<Navigation> {
 	}
 
 	@Transactional
-	public void deleteNavigation(String id) {
+	public void deleteNavigation(Long id) {
 		Navigation nav = this.getById(id);
 		this.db.remove(nav);
 	}
 
 	@Transactional
-	public void sortNavigations(List<String> ids) {
+	public void sortNavigations(List<Long> ids) {
 		List<Navigation> navs = getNavigations();
 		sortEntities(navs, ids);
 	}

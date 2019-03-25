@@ -6,7 +6,6 @@ import java.util.concurrent.TimeUnit;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.itranswarp.enums.AuthProviderType;
 import com.itranswarp.enums.Role;
 import com.itranswarp.model.AbstractEntity;
 import com.itranswarp.model.LocalAuth;
@@ -24,7 +23,7 @@ public class UserService extends AbstractService<User> {
 
 	static final String KEY_USERS = "_users";
 
-	public List<User> getUsersFromCache(String... ids) {
+	public List<User> getUsersFromCache(Object... ids) {
 		var kvs = this.redisService.hmget(KEY_USERS, ids);
 		kvs.stream().map(kv -> {
 			if (kv.hasValue()) {
@@ -32,7 +31,7 @@ public class UserService extends AbstractService<User> {
 				return JsonUtil.readJson(json, User.class);
 			} else {
 				String id = kv.getKey();
-				User user = getById(id);
+				User user = getById(Long.valueOf(id));
 				this.redisService.hset(KEY_USERS, id, user);
 				return user;
 			}
@@ -40,7 +39,7 @@ public class UserService extends AbstractService<User> {
 		return null;
 	}
 
-	public User getUserFromCache(String id) {
+	public User getUserFromCache(Long id) {
 		User user = this.redisService.hget(KEY_USERS, id, User.class);
 		if (user == null) {
 			user = getById(id);
@@ -58,11 +57,12 @@ public class UserService extends AbstractService<User> {
 	}
 
 	@Transactional
-	public OAuth getOAuth(AuthProviderType provider, OAuthAuthentication authentication) {
+	public OAuth getOAuth(String authProviderId, OAuthAuthentication authentication) {
 		OAuth oauth = this.db.from(OAuth.class)
-				.where("authProviderType = ? AND authId = ?", provider, authentication.getAuthenticationId()).first();
+				.where("authProviderId = ? AND authId = ?", authProviderId, authentication.getAuthenticationId())
+				.first();
 		if (oauth == null) {
-			return createOAuthUser(provider, authentication);
+			return createOAuthUser(authProviderId, authentication);
 		}
 		oauth.authToken = authentication.getAccessToken();
 		oauth.expiresAt = System.currentTimeMillis() + authentication.getExpires().toMillis();
@@ -70,20 +70,20 @@ public class UserService extends AbstractService<User> {
 		return oauth;
 	}
 
-	OAuth createOAuthUser(AuthProviderType provider, OAuthAuthentication authentication) {
-		if (!provider.supportOAuth) {
-			throw new RuntimeException("Invalid provider: " + provider);
+	OAuth createOAuthUser(String authProviderId, OAuthAuthentication authentication) {
+		if ("local".equals(authProviderId)) {
+			throw new RuntimeException("Invalid provider: " + authProviderId);
 		}
 		User user = new User();
 		user.id = IdUtil.nextId();
-		user.email = user.id + "@" + provider.name().toLowerCase();
+		user.email = user.id + "@" + authProviderId.toLowerCase();
 		user.name = this.checkName(authentication.getName());
 		user.imageUrl = this.checkUrl(authentication.getImageUrl());
 		user.role = Role.SUBSCRIBER;
 
 		OAuth auth = new OAuth();
 		auth.userId = user.id;
-		auth.authProviderType = provider;
+		auth.authProviderId = authProviderId;
 		auth.authId = authentication.getAuthenticationId();
 		auth.authToken = authentication.getAccessToken();
 		auth.expiresAt = System.currentTimeMillis() + authentication.getExpires().toMillis();
@@ -110,16 +110,16 @@ public class UserService extends AbstractService<User> {
 		return user;
 	}
 
-	public OAuth fetchOAuth(AuthProviderType type, String authId) {
-		return this.db.from(OAuth.class).where("authProviderType = ? AND authId = ?", type, authId).first();
+	public OAuth fetchOAuthById(String authProviderId, Long id) {
+		return this.db.from(OAuth.class).where("id = ? AND authProviderId = ?", id, authProviderId).first();
 	}
 
-	public LocalAuth fetchLocalAuthByAuthId(String localAuthId) {
-		return this.db.fetch(LocalAuth.class, localAuthId);
+	public LocalAuth fetchLocalAuthById(Long id) {
+		return this.db.fetch(LocalAuth.class, id);
 
 	}
 
-	public LocalAuth fetchLocalAuthByUserId(String userId) {
+	public LocalAuth fetchLocalAuthByUserId(Long userId) {
 		return this.db.from(LocalAuth.class).where("userId = ?", userId).first();
 
 	}
@@ -138,7 +138,7 @@ public class UserService extends AbstractService<User> {
 		clearUserFromCache(user.id);
 	}
 
-	void clearUserFromCache(String id) {
+	void clearUserFromCache(Long id) {
 		this.redisService.hdel(KEY_USERS, id);
 	}
 

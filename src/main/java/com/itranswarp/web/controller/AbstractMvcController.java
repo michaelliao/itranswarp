@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.servlet.LocaleResolver;
 import org.springframework.web.servlet.ModelAndView;
 
+import com.itranswarp.Application;
 import com.itranswarp.web.filter.HttpContext;
 import com.itranswarp.web.view.i18n.Translators;
 
@@ -56,6 +57,7 @@ public abstract class AbstractMvcController extends AbstractController {
 		mv.addObject("__navigations__", navigationService.getNavigationsFromCache());
 		mv.addObject("__timestamp__", ctx.timestamp);
 		mv.addObject("__translator__", translators.getTranslator(localeResolver.resolveLocale(ctx.request)));
+		mv.addObject("__version__", Application.VERSION);
 		ctx.response.setHeader("X-Execution-Time", String.valueOf(System.currentTimeMillis() - ctx.timestamp));
 	}
 

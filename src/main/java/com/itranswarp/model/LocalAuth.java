@@ -14,8 +14,8 @@ import javax.persistence.UniqueConstraint;
 @Table(name = "local_auths", uniqueConstraints = @UniqueConstraint(name = "UNI_UID", columnNames = { "userId" }))
 public class LocalAuth extends AbstractEntity {
 
-	@Column(nullable = false, updatable = false, length = VAR_ID)
-	public String userId;
+	@Column(nullable = false, updatable = false)
+	public long userId;
 
 	@Column(nullable = false, updatable = false, length = VAR_CHAR_HASH)
 	public String passwd;

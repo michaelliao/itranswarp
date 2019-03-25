@@ -51,7 +51,7 @@ public class ApiController extends AbstractController {
 
 	@PostMapping("/api/categories/" + ID)
 	@RoleWith(Role.ADMIN)
-	public Category categoryUpdate(@PathVariable("id") String id, @RequestBody CategoryBean bean) {
+	public Category categoryUpdate(@PathVariable("id") long id, @RequestBody CategoryBean bean) {
 		Category category = articleService.updateCategory(id, bean);
 		articleService.removeCategoryFromCache(id);
 		return category;
@@ -59,7 +59,7 @@ public class ApiController extends AbstractController {
 
 	@PostMapping("/api/categories/" + ID + "/delete")
 	@RoleWith(Role.ADMIN)
-	public Map<String, Boolean> categoryDelete(@PathVariable("id") String id) {
+	public Map<String, Boolean> categoryDelete(@PathVariable("id") long id) {
 		articleService.deleteCategory(id);
 		articleService.removeCategoryFromCache(id);
 		return API_RESULT_TRUE;
@@ -69,7 +69,7 @@ public class ApiController extends AbstractController {
 
 	@GetMapping("/api/articles/" + ID)
 	@RoleWith(Role.CONTRIBUTOR)
-	public Article article(@PathVariable("id") String id) {
+	public Article article(@PathVariable("id") long id) {
 		return articleService.getById(id);
 	}
 
@@ -81,13 +81,13 @@ public class ApiController extends AbstractController {
 
 	@PostMapping("/api/articles/" + ID)
 	@RoleWith(Role.CONTRIBUTOR)
-	public Article articleUpdate(@PathVariable("id") String id, @RequestBody ArticleBean bean) {
+	public Article articleUpdate(@PathVariable("id") long id, @RequestBody ArticleBean bean) {
 		return articleService.updateArticle(HttpContext.getRequiredCurrentUser(), id, bean);
 	}
 
 	@PostMapping("/api/articles/" + ID + "/delete")
 	@RoleWith(Role.CONTRIBUTOR)
-	public Map<String, Boolean> articleDelete(@PathVariable("id") String id) {
+	public Map<String, Boolean> articleDelete(@PathVariable("id") long id) {
 		articleService.deleteArticle(HttpContext.getRequiredCurrentUser(), id);
 		return API_RESULT_TRUE;
 	}
@@ -102,7 +102,7 @@ public class ApiController extends AbstractController {
 
 	@GetMapping("/api/attachments/" + ID)
 	@RoleWith(Role.CONTRIBUTOR)
-	public Attachment attachment(@PathVariable("id") String id) {
+	public Attachment attachment(@PathVariable("id") long id) {
 		return attachmentService.getById(id);
 	}
 
@@ -114,7 +114,7 @@ public class ApiController extends AbstractController {
 
 	@PostMapping("/api/attachments/" + ID + "/delete")
 	@RoleWith(Role.CONTRIBUTOR)
-	public Map<String, Boolean> attachmentDelete(@PathVariable("id") String id) {
+	public Map<String, Boolean> attachmentDelete(@PathVariable("id") long id) {
 		attachmentService.deleteAttachment(HttpContext.getRequiredCurrentUser(), id);
 		return API_RESULT_TRUE;
 	}
@@ -143,7 +143,7 @@ public class ApiController extends AbstractController {
 
 	@PostMapping("/api/navigations/" + ID)
 	@RoleWith(Role.ADMIN)
-	public Navigation navigationUpdate(@PathVariable("id") String id, @RequestBody NavigationBean bean) {
+	public Navigation navigationUpdate(@PathVariable("id") long id, @RequestBody NavigationBean bean) {
 		Navigation navigation = navigationService.updateNavigation(id, bean);
 		navigationService.removeNavigationsFromCache();
 		return navigation;
@@ -151,7 +151,7 @@ public class ApiController extends AbstractController {
 
 	@PostMapping("/api/navigations/" + ID + "/delete")
 	@RoleWith(Role.ADMIN)
-	public Map<String, Boolean> navigationDelete(@PathVariable("id") String id) {
+	public Map<String, Boolean> navigationDelete(@PathVariable("id") long id) {
 		navigationService.deleteNavigation(id);
 		navigationService.removeNavigationsFromCache();
 		return API_RESULT_TRUE;

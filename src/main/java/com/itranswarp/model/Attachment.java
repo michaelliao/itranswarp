@@ -13,11 +13,11 @@ import javax.persistence.Table;
 @Table(name = "attachments")
 public class Attachment extends AbstractEntity {
 
-	@Column(nullable = false, updatable = false, length = VAR_ID)
-	public String userId;
+	@Column(nullable = false, updatable = false)
+	public long userId;
 
-	@Column(nullable = false, updatable = false, length = VAR_ID)
-	public String resourceId;
+	@Column(nullable = false, updatable = false)
+	public long resourceId;
 
 	@Column(nullable = false, updatable = false)
 	public long size;

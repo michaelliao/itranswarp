@@ -9,20 +9,20 @@ import javax.persistence.Table;
 @Table(name = "articles", indexes = @Index(name = "IDX_CAT_PUB", columnList = "categoryId,publishAt"))
 public class Article extends AbstractEntity {
 
-	@Column(nullable = false, updatable = false, length = VAR_ID)
-	public String userId;
+	@Column(nullable = false, updatable = false)
+	public long userId;
 
-	@Column(nullable = false, length = VAR_ID)
-	public String categoryId;
+	@Column(nullable = false)
+	public long categoryId;
 
 	/**
 	 * Reference to attachment id.
 	 */
-	@Column(nullable = false, length = VAR_ID)
-	public String imageId;
+	@Column(nullable = false)
+	public long imageId;
 
-	@Column(nullable = false, length = VAR_ID)
-	public String textId;
+	@Column(nullable = false)
+	public long textId;
 
 	@Column(nullable = false)
 	public long views;

@@ -8,11 +8,11 @@ import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
-import com.itranswarp.enums.AuthProviderType;
 import com.itranswarp.oauth.OAuthAuthentication;
 import com.itranswarp.util.JsonUtil;
 
@@ -20,23 +20,31 @@ import com.itranswarp.util.JsonUtil;
 @ConditionalOnProperty(name = "spring.oauth.weibo.enabled", havingValue = "true")
 public class WeiboOAuthProvider extends AbstractOAuthProvider {
 
-	@Value("${spring.oauth.weibo.client-id:}")
-	String clientId;
+	@Component
+	@ConfigurationProperties("spring.oauth.weibo")
+	public static class OAuthConfiguration extends AbstractOAuthConfiguration {
 
-	@Value("${spring.oauth.weibo.client-secret:}")
-	String clientSecret;
+	}
+
+	@Autowired
+	OAuthConfiguration configuration;
+
+	@Override
+	public AbstractOAuthConfiguration getOAuthConfiguration() {
+		return this.configuration;
+	}
 
 	@Override
 	public String getAuthenticateUrl(String redirectUrl) {
 		return String.format("https://api.weibo.com/oauth2/authorize?client_id=%s&response_type=%s&redirect_uri=%s",
-				this.clientId, "code", URLEncoder.encode(redirectUrl, StandardCharsets.UTF_8));
+				this.configuration.getClientId(), "code", URLEncoder.encode(redirectUrl, StandardCharsets.UTF_8));
 	}
 
 	@Override
 	public OAuthAuthentication getAuthentication(String code, String redirectUrl) throws Exception {
 		String[] queries = new String[] { // request body
-				"client_id=" + this.clientId, // client id
-				"client_secret=" + this.clientSecret, // client secret
+				"client_id=" + this.configuration.getClientId(), // client id
+				"client_secret=" + this.configuration.getClientSecret(), // client secret
 				"grant_type=authorization_code", // grant type
 				"code=" + code, // code
 				"redirect_uri=" + URLEncoder.encode(redirectUrl, StandardCharsets.UTF_8) };
@@ -113,12 +121,6 @@ public class WeiboOAuthProvider extends AbstractOAuthProvider {
 		public String idstr;
 
 		public String profile_image_url;
-	}
-
-	@Override
-	public AuthProviderType getProvider() {
-		// TODO Auto-generated method stub
-		return AuthProviderType.WEIBO;
 	}
 
 }

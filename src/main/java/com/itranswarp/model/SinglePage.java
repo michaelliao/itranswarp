@@ -8,8 +8,8 @@ import javax.persistence.Table;
 @Table(name = "single_pages")
 public class SinglePage extends AbstractEntity {
 
-	@Column(nullable = false, length = VAR_ID)
-	public String textId;
+	@Column(nullable = false)
+	public long textId;
 
 	@Column(nullable = false, length = VAR_CHAR_TAGS)
 	public String tags;

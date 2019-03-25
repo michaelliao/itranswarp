@@ -30,7 +30,7 @@ public class AdSlot extends AbstractEntity {
 	@Column(nullable = false, updatable = false)
 	public long numSlots;
 
-	@Column(nullable = false, length = VAR_ID)
+	@Column(nullable = false)
 	public long numAutoFill;
 
 	@Column(nullable = false, columnDefinition = "TEXT")

@@ -11,8 +11,6 @@ import com.itranswarp.util.IdUtil;
 @MappedSuperclass
 public abstract class AbstractEntity {
 
-	public static final int VAR_ID = 12;
-
 	public static final int VAR_ENUM = 32;
 
 	public static final int VAR_CHAR_HASH = 64;
@@ -34,8 +32,8 @@ public abstract class AbstractEntity {
 	public static final int VAR_CHAR_URL = 1000;
 
 	@Id
-	@Column(nullable = false, updatable = false, length = VAR_ID)
-	public String id;
+	@Column(nullable = false, updatable = false)
+	public long id;
 
 	@Column(nullable = false, updatable = false)
 	public long createdAt;
@@ -49,12 +47,12 @@ public abstract class AbstractEntity {
 	// hook for pre-insert:
 	@PrePersist
 	void preInsert() {
-		if (this.id == null) {
+		if (this.id == 0L) {
 			this.id = IdUtil.nextId();
 		}
-		if (this.createdAt == 0) {
+		if (this.createdAt == 0L) {
 			this.createdAt = this.updatedAt = System.currentTimeMillis();
-		} else if (this.updatedAt == 0) {
+		} else if (this.updatedAt == 0L) {
 			this.updatedAt = System.currentTimeMillis();
 		}
 	}
@@ -62,7 +60,7 @@ public abstract class AbstractEntity {
 	// hook for pre-update:
 	@PreUpdate
 	void preUpdate() {
-		if (this.updatedAt == 0) {
+		if (this.updatedAt == 0L) {
 			this.updatedAt = System.currentTimeMillis();
 		}
 		this.version++;

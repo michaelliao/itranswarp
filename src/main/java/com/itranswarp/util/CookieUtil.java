@@ -11,7 +11,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.itranswarp.bean.SessionCookieBean;
-import com.itranswarp.enums.AuthProviderType;
 import com.itranswarp.model.LocalAuth;
 import com.itranswarp.model.OAuth;
 
@@ -22,11 +21,11 @@ public class CookieUtil {
 	static final String SESSION_COOKIE = "_session_";
 
 	public static String encodeSessionCookie(OAuth auth, String hmacKey) {
-		return encodeSessionCookie(auth.authProviderType, auth.id, auth.expiresAt, auth.authToken, hmacKey);
+		return encodeSessionCookie(auth.authProviderId, auth.id, auth.expiresAt, auth.authToken, hmacKey);
 	}
 
 	public static String encodeSessionCookie(LocalAuth auth, long expiresAt, String hmacKey) {
-		return encodeSessionCookie(AuthProviderType.LOCAL, auth.id, expiresAt, auth.passwd, hmacKey);
+		return encodeSessionCookie("local", auth.id, expiresAt, auth.passwd, hmacKey);
 	}
 
 	public static SessionCookieBean decodeSessionCookie(String str) {
@@ -40,7 +39,7 @@ public class CookieUtil {
 			if (expires <= System.currentTimeMillis()) {
 				return null;
 			}
-			return new SessionCookieBean(AuthProviderType.valueOf(ss[0]), ss[1], expires, ss[3]);
+			return new SessionCookieBean(ss[0], Long.parseLong(ss[1]), expires, ss[3]);
 		} catch (Exception e) {
 			return null;
 		}
@@ -55,9 +54,9 @@ public class CookieUtil {
 	 * 
 	 * cookie = base64(provider : authId : expiresAt : hash)
 	 */
-	static String encodeSessionCookie(AuthProviderType provider, String authId, long expiresAt, String token,
+	static String encodeSessionCookie(String authProviderId, long authId, long expiresAt, String token,
 			String hmacKey) {
-		String prefix = new StringBuilder(128).append(provider.name()).append(':').append(authId).append(':')
+		String prefix = new StringBuilder(128).append(authProviderId).append(':').append(authId).append(':')
 				.append(expiresAt).toString();
 		String payloadToHash = prefix + ":" + token;
 		String hash = HashUtil.hmacSha256(payloadToHash, hmacKey);

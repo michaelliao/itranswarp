@@ -12,14 +12,14 @@ import javax.persistence.Transient;
 @Table(name = "wikis")
 public class Wiki extends AbstractEntity {
 
-	@Column(nullable = false, length = VAR_ID)
-	public String imageId;
+	@Column(nullable = false)
+	public long imageId;
 
-	@Column(nullable = false, length = VAR_ID)
-	public String textId;
+	@Column(nullable = false)
+	public long textId;
 
-	@Column(nullable = false, length = VAR_ID)
-	public String userId;
+	@Column(nullable = false)
+	public long userId;
 
 	@Column(nullable = false, length = VAR_ENUM)
 	public String tag;

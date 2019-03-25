@@ -8,11 +8,11 @@ import javax.persistence.Table;
 @Table(name = "replies")
 public class Reply extends AbstractEntity {
 
-	@Column(nullable = false, updatable = false, length = VAR_ID)
-	public String topicId;
+	@Column(nullable = false, updatable = false)
+	public long topicId;
 
-	@Column(nullable = false, updatable = false, length = VAR_ID)
-	public String userId;
+	@Column(nullable = false, updatable = false)
+	public long userId;
 
 	@Column(nullable = false, length = VAR_CHAR_NAME)
 	public String userName;

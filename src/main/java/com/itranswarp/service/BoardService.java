@@ -52,7 +52,7 @@ public class BoardService extends AbstractService<Board> {
 		this.sqlDeleteReplies = "DELETE FROM " + replyTable + " WHERE topicId = ?";
 	}
 
-	public Board getBoardFromCache(String id) {
+	public Board getBoardFromCache(Long id) {
 		Board c = this.redisService.hget(KEY_BOARDS, id, Board.class);
 		if (c == null) {
 			c = getById(id);
@@ -86,7 +86,7 @@ public class BoardService extends AbstractService<Board> {
 	}
 
 	@Transactional
-	public Board updateBoard(String id, BoardBean bean) {
+	public Board updateBoard(Long id, BoardBean bean) {
 		Board board = this.getById(id);
 		if (board.name != null) {
 			board.name = checkName(board.name);
@@ -102,7 +102,7 @@ public class BoardService extends AbstractService<Board> {
 	}
 
 	@Transactional
-	public void deleteBoard(String id) {
+	public void deleteBoard(Long id) {
 		Board board = this.getById(id);
 		if (db.from(Topic.class).where("boardId = ?", id).first() == null) {
 			this.db.remove(board);
@@ -112,7 +112,7 @@ public class BoardService extends AbstractService<Board> {
 	}
 
 	@Transactional
-	public void sortBoards(List<String> ids) {
+	public void sortBoards(List<Long> ids) {
 		List<Board> boards = getBoards();
 		sortEntities(boards, ids);
 	}
@@ -132,18 +132,23 @@ public class BoardService extends AbstractService<Board> {
 	}
 
 	public PagedResults<Reply> getReplies(Topic topic, int pageIndex) {
+		// total = 1 + replies:
 		int totalItems = 1 + this.db.from(Reply.class).where("topicId = ?", topic.id).count();
 		int totalPages = totalItems / ITEMS_PER_PAGE + (totalItems % ITEMS_PER_PAGE > 0 ? 1 : 0);
-		int offset = pageIndex == 1 ? 0 : (pageIndex - 1) * ITEMS_PER_PAGE - 1;
-		int items = pageIndex == 1 ? ITEMS_PER_PAGE - 1 : ITEMS_PER_PAGE;
 		Page page = new Page(pageIndex, ITEMS_PER_PAGE, totalPages, totalItems);
-		List<Reply> list = this.db.from(Reply.class).where("topicId = ?", topic.id).orderBy("id").limit(offset, items)
-				.list();
+		List<Reply> list = List.of();
+		if (totalItems > 1) {
+			// if page index is 1: offset = 0, items = 9,
+			// else: offset = pageIndex * pageSize - 1
+			int offset = pageIndex == 1 ? 0 : (pageIndex - 1) * ITEMS_PER_PAGE - 1;
+			int items = pageIndex == 1 ? ITEMS_PER_PAGE - 1 : ITEMS_PER_PAGE;
+			list = this.db.from(Reply.class).where("topicId = ?", topic.id).orderBy("id").limit(offset, items).list();
+		}
 		return new PagedResults<>(page, list);
 	}
 
 	@Transactional
-	public Topic createTopic(User user, Board board, RefType refType, String refId, TopicBean bean) {
+	public Topic createTopic(User user, Board board, RefType refType, Long refId, TopicBean bean) {
 		Topic topic = new Topic();
 		topic.boardId = board.id;
 		topic.content = checkText(markdown.ugcToHtml(checkText(bean.content)));
@@ -157,7 +162,7 @@ public class BoardService extends AbstractService<Board> {
 	}
 
 	@Transactional
-	public void deleteTopic(User user, String id) {
+	public void deleteTopic(User user, Long id) {
 		Topic topic = getTopicById(id);
 		super.checkPermission(user, topic.userId);
 		this.db.remove(topic);
@@ -165,7 +170,7 @@ public class BoardService extends AbstractService<Board> {
 		this.db.updateSql(this.sqlUpdateBoardDecTopicNumber, topic.boardId);
 	}
 
-	public Topic getTopicById(String id) {
+	public Topic getTopicById(Long id) {
 		Topic topic = this.db.fetch(Topic.class, id);
 		if (topic == null) {
 			throw new ApiException(ApiError.PARAMETER_INVALID, "topic", "Topic not exist.");
@@ -173,7 +178,7 @@ public class BoardService extends AbstractService<Board> {
 		return topic;
 	}
 
-	public Reply getReplyById(String id) {
+	public Reply getReplyById(Long id) {
 		Reply reply = this.db.fetch(Reply.class, id);
 		if (reply == null) {
 			throw new ApiException(ApiError.PARAMETER_INVALID, "reply", "Reply not exist.");
@@ -193,7 +198,7 @@ public class BoardService extends AbstractService<Board> {
 	}
 
 	@Transactional
-	public void deleteReply(User user, String id) {
+	public void deleteReply(User user, Long id) {
 		Reply reply = getReplyById(id);
 		super.checkPermission(user, reply.userId);
 		this.db.remove(reply);

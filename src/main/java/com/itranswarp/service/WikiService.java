@@ -36,7 +36,7 @@ public class WikiService extends AbstractService<Wiki> {
 		this.redisService.del(KEY_WIKIS + id);
 	}
 
-	public Wiki getWikiTreeFromCache(String id) {
+	public Wiki getWikiTreeFromCache(Long id) {
 		Wiki wiki = this.redisService.get(KEY_WIKIS + id, Wiki.class);
 		if (wiki == null) {
 			wiki = getWikiTree(id, true);
@@ -45,14 +45,14 @@ public class WikiService extends AbstractService<Wiki> {
 		return wiki;
 	}
 
-	public Wiki getWikiTree(String id, boolean publishedOnly) {
+	public Wiki getWikiTree(Long id, boolean publishedOnly) {
 		Wiki wiki = getById(id);
 		long ts = System.currentTimeMillis();
 		if (publishedOnly && wiki.publishAt > ts) {
 			return null;
 		}
 		List<WikiPage> children = getWikiPages(id, publishedOnly);
-		Map<String, WikiPage> nodes = new LinkedHashMap<>();
+		Map<Long, WikiPage> nodes = new LinkedHashMap<>();
 		children.forEach(wp -> {
 			nodes.put(wp.id, wp);
 		});
@@ -66,7 +66,7 @@ public class WikiService extends AbstractService<Wiki> {
 		return wiki;
 	}
 
-	private List<WikiPage> getWikiPages(String wikiId, boolean publishedOnly) {
+	private List<WikiPage> getWikiPages(Long wikiId, boolean publishedOnly) {
 		if (publishedOnly) {
 			return this.db.from(WikiPage.class)
 					.where("wikiId = ? AND publishAt < ?", wikiId, System.currentTimeMillis()).orderBy("parentId")
@@ -76,11 +76,11 @@ public class WikiService extends AbstractService<Wiki> {
 				.orderBy("id").list();
 	}
 
-	void treeIterate(Wiki root, Map<String, WikiPage> nodes) {
-		List<String> toBeRemovedIds = new ArrayList<>();
-		for (String id : nodes.keySet()) {
+	void treeIterate(Wiki root, Map<Long, WikiPage> nodes) {
+		List<Long> toBeRemovedIds = new ArrayList<>();
+		for (Long id : nodes.keySet()) {
 			WikiPage node = nodes.get(id);
-			if (node.parentId.equals(root.id)) {
+			if (node.parentId == root.id) {
 				root.addChild(node);
 				toBeRemovedIds.add(id);
 			}
@@ -93,11 +93,11 @@ public class WikiService extends AbstractService<Wiki> {
 		});
 	}
 
-	void treeIterate(WikiPage root, Map<String, WikiPage> nodes) {
-		List<String> toBeRemovedIds = new ArrayList<>();
-		for (String id : nodes.keySet()) {
+	void treeIterate(WikiPage root, Map<Long, WikiPage> nodes) {
+		List<Long> toBeRemovedIds = new ArrayList<>();
+		for (Long id : nodes.keySet()) {
 			WikiPage node = nodes.get(id);
-			if (node.parentId.equals(root.id)) {
+			if (node.parentId == root.id) {
 				root.addChild(node);
 				toBeRemovedIds.add(id);
 			}
@@ -128,7 +128,7 @@ public class WikiService extends AbstractService<Wiki> {
 	}
 
 	@Transactional
-	public Wiki updateWiki(String id, WikiBean bean) {
+	public Wiki updateWiki(Long id, WikiBean bean) {
 		Wiki wiki = this.getById(id);
 		if (bean.name != null) {
 			wiki.name = checkName(bean.name);
@@ -147,7 +147,7 @@ public class WikiService extends AbstractService<Wiki> {
 	}
 
 	@Transactional
-	public WikiPage updateWikiPage(User user, String id, WikiPageBean bean) {
+	public WikiPage updateWikiPage(User user, Long id, WikiPageBean bean) {
 		WikiPage wikipage = getWikiPageById(id);
 		Wiki wiki = getById(wikipage.wikiId);
 		super.checkPermission(user, wiki.userId);
@@ -165,14 +165,14 @@ public class WikiService extends AbstractService<Wiki> {
 	}
 
 	@Transactional
-	public WikiPage createWikiPage(User user, Wiki wiki, String parentId, WikiPageBean bean) {
+	public WikiPage createWikiPage(User user, Wiki wiki, long parentId, WikiPageBean bean) {
 		super.checkPermission(user, wiki.userId);
 		WikiPage parent = null;
-		if (wiki.id.equals(parentId)) {
+		if (wiki.id == parentId) {
 			// append as top level:
 		} else {
 			parent = getWikiPageById(parentId);
-			if (!parent.wikiId.equals(wiki.id)) {
+			if (parent.wikiId != wiki.id) {
 				throw new IllegalArgumentException("Inconsist wikiId for node: " + parent);
 			}
 		}
@@ -190,13 +190,13 @@ public class WikiService extends AbstractService<Wiki> {
 	}
 
 	@Transactional
-	public WikiPage moveWikiPage(User user, String wikiPageId, String toParentId, int displayIndex) {
+	public WikiPage moveWikiPage(User user, long wikiPageId, long toParentId, int displayIndex) {
 		WikiPage wikiPage = getWikiPageById(wikiPageId);
 		Wiki wiki = getById(wikiPage.wikiId);
 		super.checkPermission(user, wiki.userId);
-		if (!wikiPage.parentId.equals(toParentId)) {
+		if (wikiPage.parentId != toParentId) {
 			// check to prevent recursive:
-			List<String> leafToRootIdList = getLeafToRootIds(wiki, toParentId);
+			List<Long> leafToRootIdList = getLeafToRootIds(wiki, toParentId);
 			if (leafToRootIdList.contains(wikiPage.id)) {
 				throw new ApiException(ApiError.OPERATION_FAILED, null, "Will cause recursive.");
 			}
@@ -207,7 +207,7 @@ public class WikiService extends AbstractService<Wiki> {
 		// sort:
 		List<WikiPage> pages = this.db.from(WikiPage.class).where("parentId = ?", toParentId).orderBy("displayOrder")
 				.list();
-		List<String> pageIds = new ArrayList<>(pages.stream().map(p -> p.id).collect(Collectors.toList()));
+		List<Long> pageIds = new ArrayList<>(pages.stream().map(p -> p.id).collect(Collectors.toList()));
 		pageIds.remove(wikiPageId);
 		if (displayIndex < 0 || displayIndex > pageIds.size()) {
 			pageIds.add(wikiPageId);
@@ -219,7 +219,7 @@ public class WikiService extends AbstractService<Wiki> {
 	}
 
 	@Transactional
-	public void deleteWiki(User user, String id) {
+	public void deleteWiki(User user, Long id) {
 		Wiki wiki = getById(id);
 		super.checkPermission(user, wiki.userId);
 		WikiPage child = this.db.from(WikiPage.class).where("parentId = ?", id).first();
@@ -231,7 +231,7 @@ public class WikiService extends AbstractService<Wiki> {
 	}
 
 	@Transactional
-	public void deleteWikiPage(User user, String id) {
+	public void deleteWikiPage(User user, Long id) {
 		WikiPage wikiPage = getWikiPageById(id);
 		Wiki wiki = getById(wikiPage.wikiId);
 		super.checkPermission(user, wiki.userId);
@@ -242,7 +242,7 @@ public class WikiService extends AbstractService<Wiki> {
 		this.db.remove(wikiPage);
 	}
 
-	public WikiPage getWikiPageById(String id) {
+	public WikiPage getWikiPageById(Long id) {
 		WikiPage wikipage = this.db.fetch(WikiPage.class, id);
 		if (wikipage == null) {
 			throw new ApiException(ApiError.PARAMETER_INVALID, null, "not found");
@@ -250,16 +250,16 @@ public class WikiService extends AbstractService<Wiki> {
 		return wikipage;
 	}
 
-	List<String> getLeafToRootIds(Wiki wiki, String leafId) {
+	List<Long> getLeafToRootIds(Wiki wiki, Long leafId) {
 		if (leafId.equals(wiki.id)) {
 			return List.of(leafId);
 		}
-		List<String> nodeIds = new ArrayList<>();
-		String currentId = leafId;
+		List<Long> nodeIds = new ArrayList<>();
+		Long currentId = leafId;
 		for (int i = 0; i < 100; i++) {
 			nodeIds.add(currentId);
 			WikiPage node = getWikiPageById(currentId);
-			if (node.parentId.equals(wiki.id)) {
+			if (node.parentId == wiki.id) {
 				nodeIds.add(wiki.id);
 				break;
 			}

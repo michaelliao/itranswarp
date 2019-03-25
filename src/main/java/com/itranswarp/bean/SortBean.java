@@ -4,6 +4,6 @@ import java.util.List;
 
 public class SortBean {
 
-	public List<String> ids;
+	public List<Long> ids;
 
 }

@@ -36,7 +36,7 @@ public class ArticleService extends AbstractService<Article> {
 
 	static final String KEY_CATEGORIES = "_categories";
 
-	public Category getCategoryFromCache(String id) {
+	public Category getCategoryFromCache(Long id) {
 		Category c = this.redisService.hget(KEY_CATEGORIES, id, Category.class);
 		if (c == null) {
 			c = getCategoryById(id);
@@ -49,7 +49,7 @@ public class ArticleService extends AbstractService<Article> {
 		this.redisService.del(KEY_CATEGORIES);
 	}
 
-	public void removeCategoryFromCache(String id) {
+	public void removeCategoryFromCache(Long id) {
 		this.redisService.hdel(KEY_CATEGORIES, id);
 	}
 
@@ -57,7 +57,7 @@ public class ArticleService extends AbstractService<Article> {
 		return this.db.from(Category.class).orderBy("displayOrder").list();
 	}
 
-	public Category getCategoryById(String id) {
+	public Category getCategoryById(Long id) {
 		Category cat = db.fetch(Category.class, id);
 		if (cat == null) {
 			throw new ApiException(ApiError.ENTITY_NOT_FOUND, "Category", "Category not found.");
@@ -77,7 +77,7 @@ public class ArticleService extends AbstractService<Article> {
 	}
 
 	@Transactional
-	public Category updateCategory(String id, CategoryBean bean) {
+	public Category updateCategory(Long id, CategoryBean bean) {
 		Category category = this.getCategoryById(id);
 		if (bean.name != null) {
 			category.name = checkName(category.name);
@@ -90,7 +90,7 @@ public class ArticleService extends AbstractService<Article> {
 	}
 
 	@Transactional
-	public void deleteCategory(String id) {
+	public void deleteCategory(Long id) {
 		Category category = this.getCategoryById(id);
 		if (getArticles(category, 1).page.isEmpty) {
 			this.db.remove(category);
@@ -100,7 +100,7 @@ public class ArticleService extends AbstractService<Article> {
 	}
 
 	@Transactional
-	public void sortCategories(List<String> ids) {
+	public void sortCategories(List<Long> ids) {
 		List<Category> categories = getCategories();
 		sortEntities(categories, ids);
 	}
@@ -135,7 +135,7 @@ public class ArticleService extends AbstractService<Article> {
 		return this.db.from(Article.class).where("categoryId = ?", category.id).list(pageIndex, ITEMS_PER_PAGE);
 	}
 
-	public Article getPublishedById(String id) {
+	public Article getPublishedById(Long id) {
 		Article article = getById(id);
 		if (article.publishAt > System.currentTimeMillis()) {
 			throw new ApiException(ApiError.ENTITY_NOT_FOUND, "Article", "Article not found.");
@@ -166,14 +166,14 @@ public class ArticleService extends AbstractService<Article> {
 	}
 
 	@Transactional
-	public void deleteArticle(User user, String id) {
+	public void deleteArticle(User user, Long id) {
 		Article article = this.getById(id);
 		checkPermission(user, article.userId);
 		this.db.remove(article);
 	}
 
 	@Transactional
-	public Article updateArticle(User user, String id, ArticleBean bean) {
+	public Article updateArticle(User user, Long id, ArticleBean bean) {
 		Article article = this.getById(id);
 		checkPermission(user, article.userId);
 		if (bean.categoryId != null) {

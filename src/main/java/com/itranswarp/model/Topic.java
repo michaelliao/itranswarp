@@ -10,11 +10,11 @@ import com.itranswarp.enums.RefType;
 @Table(name = "topics")
 public class Topic extends AbstractEntity {
 
-	@Column(nullable = false, updatable = false, length = VAR_ID)
-	public String boardId;
+	@Column(nullable = false, updatable = false)
+	public long boardId;
 
-	@Column(nullable = false, updatable = false, length = VAR_ID)
-	public String userId;
+	@Column(nullable = false, updatable = false)
+	public long userId;
 
 	@Column(nullable = false, length = VAR_CHAR_NAME)
 	public String userName;
@@ -25,8 +25,8 @@ public class Topic extends AbstractEntity {
 	@Column(nullable = false, updatable = false, length = VAR_ENUM)
 	public RefType refType;
 
-	@Column(nullable = false, updatable = false, length = VAR_ID)
-	public String refId;
+	@Column(nullable = false, updatable = false)
+	public long refId;
 
 	@Column(nullable = false)
 	public long replyNumber;

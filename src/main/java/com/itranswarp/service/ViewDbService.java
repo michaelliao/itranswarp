@@ -28,33 +28,33 @@ public class ViewDbService {
 		this.sqlUpdateWikiPageView = "UPDATE " + db.getTable(WikiPage.class) + " SET views = views + ? WHERE id = ?";
 	}
 
-	public long getArticleViews(String id) {
+	public long getArticleViews(Long id) {
 		Article entity = db.fetch(Article.class, id);
 		return entity == null ? 0 : entity.views;
 	}
 
-	public long getWikiViews(String id) {
+	public long getWikiViews(Long id) {
 		Wiki entity = db.fetch(Wiki.class, id);
 		return entity == null ? 0 : entity.views;
 	}
 
-	public long getWikiPageViews(String id) {
+	public long getWikiPageViews(Long id) {
 		WikiPage entity = db.fetch(WikiPage.class, id);
 		return entity == null ? 0 : entity.views;
 	}
 
 	@Transactional
-	public void updateArticleViews(String id, Long views) {
+	public void updateArticleViews(Long id, Long views) {
 		this.db.updateSql(this.sqlUpdateArticleView, views, id);
 	}
 
 	@Transactional
-	public void updateWikiViews(String id, Long views) {
+	public void updateWikiViews(Long id, Long views) {
 		this.db.updateSql(this.sqlUpdateWikiView, views, id);
 	}
 
 	@Transactional
-	public void updateWikiPageViews(String id, Long views) {
+	public void updateWikiPageViews(Long id, Long views) {
 		this.db.updateSql(this.sqlUpdateWikiPageView, views, id);
 	}
 

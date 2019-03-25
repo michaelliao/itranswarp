@@ -1,5 +1,6 @@
 package com.itranswarp.redis;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -110,9 +111,9 @@ public class RedisService {
 		});
 	}
 
-	public String hget(String key, String field) {
+	public String hget(String key, Object field) {
 		return executeSync(commands -> {
-			String str = commands.hget(key, field);
+			String str = commands.hget(key, field.toString());
 			if (str == null) {
 				return null;
 			}
@@ -120,15 +121,16 @@ public class RedisService {
 		});
 	}
 
-	public List<KeyValue<String, String>> hmget(String key, String... fields) {
+	public List<KeyValue<String, String>> hmget(String key, Object... fields) {
 		return executeSync(commands -> {
-			return commands.hmget(key, fields);
+			String[] strs = Arrays.stream(fields).map(f -> f.toString()).toArray(String[]::new);
+			return commands.hmget(key, strs);
 		});
 	}
 
-	public <T> T hget(String key, String field, Class<T> clazz) {
+	public <T> T hget(String key, Object field, Class<T> clazz) {
 		return executeSync(commands -> {
-			String str = commands.hget(key, field);
+			String str = commands.hget(key, field.toString());
 			if (str == null) {
 				return null;
 			}
@@ -136,9 +138,9 @@ public class RedisService {
 		});
 	}
 
-	public <T> T hget(String key, String field, TypeReference<T> type) {
+	public <T> T hget(String key, Object field, TypeReference<T> type) {
 		return executeSync(commands -> {
-			String str = commands.hget(key, field);
+			String str = commands.hget(key, field.toString());
 			if (str == null) {
 				return null;
 			}
@@ -146,16 +148,16 @@ public class RedisService {
 		});
 	}
 
-	public void hdel(String key, String field) {
+	public void hdel(String key, Object field) {
 		executeSync(commands -> {
-			commands.hdel(key, field);
+			commands.hdel(key, field.toString());
 			return null;
 		});
 	}
 
-	public void hset(String key, String field, Object obj) {
+	public void hset(String key, Object field, Object obj) {
 		executeSync(commands -> {
-			commands.hset(key, field, obj instanceof String ? (String) obj : JsonUtil.writeJson(obj));
+			commands.hset(key, field.toString(), obj instanceof String ? (String) obj : JsonUtil.writeJson(obj));
 			return null;
 		});
 	}
@@ -180,15 +182,15 @@ public class RedisService {
 		});
 	}
 
-	public long hincrby(String key, String field) {
+	public long hincrby(String key, Object field) {
 		return executeSync(commands -> {
-			return commands.hincrby(key, field, 1);
+			return commands.hincrby(key, field.toString(), 1);
 		});
 	}
 
-	public CompletableFuture<Long> hincrbyAsync(String key, String field) {
+	public CompletableFuture<Long> hincrbyAsync(String key, Object field) {
 		return executeAsync(commands -> {
-			return commands.hincrby(key, field, 1).toCompletableFuture();
+			return commands.hincrby(key, field.toString(), 1).toCompletableFuture();
 		});
 	}
 

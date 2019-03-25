@@ -21,7 +21,7 @@ public class ViewService {
 
 	ExecutorService executor = Executors.newSingleThreadExecutor();
 
-	public long increaseArticleViews(String id) {
+	public long increaseArticleViews(Long id) {
 		long value = this.redisService.hincrby(KEY_VIEWS, id);
 		if (value % 1000 == 0) {
 			executor.submit(() -> {
@@ -31,7 +31,7 @@ public class ViewService {
 		return value;
 	}
 
-	public long increaseWikiViews(String id) {
+	public long increaseWikiViews(Long id) {
 		long value = this.redisService.hincrby(KEY_VIEWS, id);
 		if (value % 1000 == 0) {
 			executor.submit(() -> {
@@ -41,7 +41,7 @@ public class ViewService {
 		return value;
 	}
 
-	public long increaseWikiPageViews(String id) {
+	public long increaseWikiPageViews(Long id) {
 		long value = this.redisService.hincrby(KEY_VIEWS, id);
 		if (value % 1000 == 0) {
 			executor.submit(() -> {
@@ -51,7 +51,7 @@ public class ViewService {
 		return value;
 	}
 
-	public long[] getViews(String... ids) {
+	public long[] getViews(Object... ids) {
 		var kvs = this.redisService.hmget(KEY_VIEWS, ids);
 		if (kvs == null) {
 			return new long[ids.length];
@@ -65,17 +65,17 @@ public class ViewService {
 		}).toArray();
 	}
 
-	public long getArticleViews(String id) {
+	public long getArticleViews(Long id) {
 		String value = this.redisService.hget(KEY_VIEWS, id);
 		return value == null ? 0 : Long.parseLong(value);
 	}
 
-	public long getWikiViews(String id) {
+	public long getWikiViews(Long id) {
 		String value = this.redisService.hget(KEY_VIEWS, id);
 		return value == null ? 0 : Long.parseLong(value);
 	}
 
-	public long getWikiPageViews(String id) {
+	public long getWikiPageViews(Long id) {
 		String value = this.redisService.hget(KEY_VIEWS, id);
 		return value == null ? 0 : Long.parseLong(value);
 	}

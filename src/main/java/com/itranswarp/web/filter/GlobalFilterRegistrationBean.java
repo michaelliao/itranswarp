@@ -21,7 +21,6 @@ import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.stereotype.Component;
 
 import com.itranswarp.bean.SessionCookieBean;
-import com.itranswarp.enums.AuthProviderType;
 import com.itranswarp.enums.Role;
 import com.itranswarp.model.LocalAuth;
 import com.itranswarp.model.OAuth;
@@ -79,13 +78,13 @@ public class GlobalFilterRegistrationBean extends FilterRegistrationBean<Filter>
 				if (session == null) {
 					CookieUtil.deleteSessionCookie(request, response);
 				} else {
-					if (session.provider == AuthProviderType.LOCAL) {
-						LocalAuth auth = userService.fetchLocalAuthByAuthId(session.authId);
+					if ("local".equals(session.authProvider)) {
+						LocalAuth auth = userService.fetchLocalAuthById(session.id);
 						if (session.validate(auth.passwd, encryptService.getSessionHmacKey())) {
 							user = userService.getById(auth.userId);
 						}
 					} else {
-						OAuth auth = userService.fetchOAuth(session.provider, session.authId);
+						OAuth auth = userService.fetchOAuthById(session.authProvider, session.id);
 						if (session.validate(auth.authToken, encryptService.getSessionHmacKey())) {
 							user = userService.getById(auth.userId);
 						}

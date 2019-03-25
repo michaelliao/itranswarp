@@ -8,14 +8,14 @@ import javax.persistence.Table;
 @Table(name = "ad_materials")
 public class AdMaterials extends AbstractEntity {
 
-	@Column(nullable = false, updatable = false, length = VAR_ID)
-	public String userId;
+	@Column(nullable = false, updatable = false)
+	public long userId;
 
-	@Column(nullable = false, updatable = false, length = VAR_ID)
-	public String adPeriodId;
+	@Column(nullable = false, updatable = false)
+	public long adPeriodId;
 
-	@Column(nullable = false, updatable = false, length = VAR_ID)
-	public String imageId;
+	@Column(nullable = false, updatable = false)
+	public long imageId;
 
 	@Column(nullable = false)
 	public long weight;

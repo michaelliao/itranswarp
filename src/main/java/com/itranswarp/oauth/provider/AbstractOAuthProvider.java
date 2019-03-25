@@ -6,7 +6,6 @@ import java.time.Duration;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.itranswarp.enums.AuthProviderType;
 import com.itranswarp.oauth.OAuthAuthentication;
 
 public abstract class AbstractOAuthProvider {
@@ -15,7 +14,18 @@ public abstract class AbstractOAuthProvider {
 
 	protected static final Duration DEFAULT_TIMEOUT = Duration.ofSeconds(5);
 
-	public abstract AuthProviderType getProvider();
+	/**
+	 * Get lower-case provider id as unique identity.
+	 */
+	public final String getProviderId() {
+		String className = getClass().getSimpleName();
+		if (className.endsWith("OAuthProvider")) {
+			return className.substring(0, className.length() - "OAuthProvider".length()).toLowerCase();
+		}
+		throw new IllegalArgumentException("Could not get provider name from class name: " + className);
+	}
+
+	public abstract AbstractOAuthConfiguration getOAuthConfiguration();
 
 	public abstract String getAuthenticateUrl(String redirectUrl);
 

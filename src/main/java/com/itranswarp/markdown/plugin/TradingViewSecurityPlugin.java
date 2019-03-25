@@ -179,7 +179,7 @@ class TradingViewNodeRenderer implements NodeRenderer {
 			return;
 		}
 		final String symbol = ((Text) child).getLiteral();
-		final String containerId = IdUtil.nextId();
+		final String containerId = "tv" + IdUtil.nextId();
 		final Map<String, String> containerAttrs = Map.of("id", containerId, "style", this.cssStyle);
 		html.tag("script", SCRIPT_ATTRS);
 		html.tag("/script");

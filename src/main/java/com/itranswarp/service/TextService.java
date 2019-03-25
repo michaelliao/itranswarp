@@ -15,8 +15,8 @@ public class TextService extends AbstractService<Text> {
 	@Autowired
 	Markdown markdown;
 
-	static final long EXPIRES_IN_SECONDS = 3600 * 24;
-	static final String KEY_TEXT_PREFIEX = "_text_";
+	private static final long EXPIRES_IN_SECONDS = 3600 * 24;
+	private static final String KEY_TEXT_PREFIEX = "_text_";
 
 	@Transactional
 	public Text createText(String content) {
@@ -34,7 +34,7 @@ public class TextService extends AbstractService<Text> {
 		return t;
 	}
 
-	public String getTextFromCache(String textId) {
+	public String getTextFromCache(Long textId) {
 		final String key = KEY_TEXT_PREFIEX + textId;
 		String content = this.redisService.get(key);
 		if (content == null) {
@@ -44,7 +44,7 @@ public class TextService extends AbstractService<Text> {
 		return content;
 	}
 
-	public String getHtmlFromCache(String textId) {
+	public String getHtmlFromCache(Long textId) {
 		final String key = KEY_TEXT_PREFIEX + textId;
 		String content = this.redisService.get(key);
 		if (content == null) {

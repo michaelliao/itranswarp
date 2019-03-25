@@ -41,7 +41,7 @@ public class AbstractService<T extends AbstractEntity> {
 		this.entityClass = ClassUtil.getParameterizedType(this.getClass());
 	}
 
-	public T getById(String id) {
+	public T getById(Long id) {
 		T t = this.db.fetch(entityClass, id);
 		if (t == null) {
 			throw new ApiException(ApiError.ENTITY_NOT_FOUND, entityClass.getSimpleName(),
@@ -50,17 +50,17 @@ public class AbstractService<T extends AbstractEntity> {
 		return t;
 	}
 
-	public T fetchById(String id) {
+	public T fetchById(Long id) {
 		return this.db.fetch(entityClass, id);
 	}
 
-	protected void checkPermission(User user, String entityUserId) {
-		if (user.role != Role.ADMIN && !user.id.equals(entityUserId)) {
+	protected void checkPermission(User user, long entityUserId) {
+		if (user.role != Role.ADMIN && user.id != entityUserId) {
 			throw new ApiException(ApiError.PERMISSION_DENIED);
 		}
 	}
 
-	protected void sortEntities(List<? extends AbstractSortableEntity> entities, List<String> ids) {
+	protected void sortEntities(List<? extends AbstractSortableEntity> entities, List<Long> ids) {
 		if (ids == null) {
 			throw new ApiException(ApiError.PARAMETER_INVALID, "ids", "Invalid ids.");
 		}

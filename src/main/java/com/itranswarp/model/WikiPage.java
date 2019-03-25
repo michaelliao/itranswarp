@@ -13,14 +13,14 @@ import javax.persistence.Transient;
 @Table(name = "wiki_pages", indexes = @Index(name = "IDX_WIKIID", columnList = "wikiId"))
 public class WikiPage extends AbstractSortableEntity {
 
-	@Column(nullable = false, length = VAR_ID)
-	public String parentId;
+	@Column(nullable = false)
+	public long parentId;
 
-	@Column(nullable = false, length = VAR_ID)
-	public String textId;
+	@Column(nullable = false)
+	public long textId;
 
-	@Column(nullable = false, length = VAR_ID)
-	public String wikiId;
+	@Column(nullable = false)
+	public long wikiId;
 
 	@Column(nullable = false, length = VAR_CHAR_NAME)
 	public String name;

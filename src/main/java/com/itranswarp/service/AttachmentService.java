@@ -37,10 +37,8 @@ public class AttachmentService extends AbstractService<Attachment> {
 
 	@Transactional
 	public Attachment createAttachment(User user, AttachmentBean bean) {
-		bean.name = checkName(bean.name);
-		if (bean.data == null || bean.data.isEmpty()) {
-			throw new ApiException(ApiError.PARAMETER_INVALID, "data", "Invalid data.");
-		}
+		bean.validate(true);
+		bean.name = bean.name;
 		byte[] data = Base64.getDecoder().decode(bean.data);
 		ImageBean image = ImageUtil.readImage(data);
 

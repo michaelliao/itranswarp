@@ -80,13 +80,17 @@ public class GlobalFilterRegistrationBean extends FilterRegistrationBean<Filter>
 				} else {
 					if ("local".equals(session.authProvider)) {
 						LocalAuth auth = userService.fetchLocalAuthById(session.id);
-						if (session.validate(auth.passwd, encryptService.getSessionHmacKey())) {
+						if (auth != null && session.validate(auth.passwd, encryptService.getSessionHmacKey())) {
 							user = userService.getById(auth.userId);
+						} else {
+							CookieUtil.deleteSessionCookie(request, response);
 						}
 					} else {
 						OAuth auth = userService.fetchOAuthById(session.authProvider, session.id);
-						if (session.validate(auth.authToken, encryptService.getSessionHmacKey())) {
+						if (auth != null && session.validate(auth.authToken, encryptService.getSessionHmacKey())) {
 							user = userService.getById(auth.userId);
+						} else {
+							CookieUtil.deleteSessionCookie(request, response);
 						}
 					}
 				}
@@ -97,7 +101,7 @@ public class GlobalFilterRegistrationBean extends FilterRegistrationBean<Filter>
 			}
 			if (uri.startsWith("/manage/")) {
 				if (user == null) {
-					response.sendRedirect("/auth/");
+					response.sendRedirect("/auth/signin");
 					return;
 				}
 				if (user.role.value > Role.CONTRIBUTOR.value) {

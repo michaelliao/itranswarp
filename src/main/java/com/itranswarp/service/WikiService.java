@@ -112,12 +112,13 @@ public class WikiService extends AbstractService<Wiki> {
 
 	@Transactional
 	public Wiki createWiki(User user, WikiBean bean) {
+		bean.validate(true);
 		Wiki wiki = new Wiki();
 		wiki.id = IdUtil.nextId();
-		wiki.description = checkDescription(bean.description);
-		wiki.name = checkName(bean.name);
-		wiki.publishAt = checkPublishAt(bean.publishAt);
-		wiki.tag = checkTag(bean.tag);
+		wiki.name = bean.name;
+		wiki.tag = bean.tag;
+		wiki.description = bean.description;
+		wiki.publishAt = bean.publishAt;
 		wiki.textId = this.textService.createText(bean.content).id;
 
 		AttachmentBean atta = new AttachmentBean();
@@ -128,19 +129,21 @@ public class WikiService extends AbstractService<Wiki> {
 	}
 
 	@Transactional
-	public Wiki updateWiki(Long id, WikiBean bean) {
+	public Wiki updateWiki(User user, Long id, WikiBean bean) {
+		bean.validate(false);
 		Wiki wiki = this.getById(id);
-		if (bean.name != null) {
-			wiki.name = checkName(bean.name);
+		wiki.name = bean.name;
+		wiki.tag = bean.tag;
+		wiki.description = bean.description;
+		wiki.publishAt = bean.publishAt;
+		if (bean.content != null) {
+			wiki.textId = this.textService.createText(bean.content).id;
 		}
-		if (bean.description != null) {
-			wiki.description = checkDescription(bean.description);
-		}
-		if (bean.tag != null) {
-			wiki.tag = checkTag(bean.tag);
-		}
-		if (bean.publishAt != null) {
-			wiki.publishAt = checkPublishAt(bean.publishAt);
+		if (bean.image != null) {
+			AttachmentBean atta = new AttachmentBean();
+			atta.name = wiki.name;
+			atta.data = bean.image;
+			wiki.imageId = this.attachmentService.createAttachment(user, atta).id;
 		}
 		this.db.update(wiki);
 		return wiki;
@@ -148,17 +151,14 @@ public class WikiService extends AbstractService<Wiki> {
 
 	@Transactional
 	public WikiPage updateWikiPage(User user, Long id, WikiPageBean bean) {
+		bean.validate(false);
 		WikiPage wikipage = getWikiPageById(id);
 		Wiki wiki = getById(wikipage.wikiId);
 		super.checkPermission(user, wiki.userId);
-		if (bean.name != null) {
-			wikipage.name = checkName(bean.name);
-		}
+		wikipage.name = bean.name;
+		wikipage.publishAt = bean.publishAt;
 		if (bean.content != null) {
 			wikipage.textId = this.textService.createText(bean.content).id;
-		}
-		if (bean.publishAt != null) {
-			wikipage.publishAt = checkPublishAt(bean.publishAt);
 		}
 		this.db.update(wikipage);
 		return wikipage;
@@ -166,6 +166,7 @@ public class WikiService extends AbstractService<Wiki> {
 
 	@Transactional
 	public WikiPage createWikiPage(User user, Wiki wiki, long parentId, WikiPageBean bean) {
+		bean.validate(true);
 		super.checkPermission(user, wiki.userId);
 		WikiPage parent = null;
 		if (wiki.id == parentId) {
@@ -181,8 +182,8 @@ public class WikiService extends AbstractService<Wiki> {
 		WikiPage newChild = new WikiPage();
 		newChild.wikiId = wiki.id;
 		newChild.parentId = parentId;
-		newChild.name = checkName(bean.name);
-		newChild.publishAt = checkPublishAt(bean.publishAt);
+		newChild.name = bean.name;
+		newChild.publishAt = bean.publishAt;
 		newChild.textId = textService.createText(bean.content).id;
 		newChild.displayOrder = lastChild == null ? 0 : lastChild.displayOrder + 1;
 		this.db.insert(newChild);

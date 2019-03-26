@@ -13,8 +13,6 @@ import org.springframework.web.servlet.ModelAndView;
 
 import com.itranswarp.Application;
 import com.itranswarp.markdown.Markdown;
-import com.itranswarp.model.Article;
-import com.itranswarp.warpdb.PagedResults;
 import com.itranswarp.web.filter.HttpContext;
 import com.itranswarp.web.view.i18n.Translators;
 
@@ -46,8 +44,7 @@ public class ManageController extends AbstractController {
 
 	@GetMapping("/article/")
 	public ModelAndView articleList(@RequestParam(value = "page", defaultValue = "1") int pageIndex) {
-		PagedResults<Article> pr = articleService.getArticles(pageIndex);
-		return prepareModelAndView("manage/article/article_list.html", Map.of("page", pr.page, "articles", pr.results));
+		return prepareModelAndView("manage/article/article_list.html", Map.of("page", pageIndex));
 	}
 
 	@GetMapping("/article/category_list")
@@ -98,6 +95,40 @@ public class ManageController extends AbstractController {
 		return prepareModelAndView("manage/single/singlepage_form.html",
 				Map.of("id", id, "action", "/api/singlePages/" + id));
 	}
+
+	///////////////////////////////////////////////////////////////////////////////////////////////
+	// boards, topics and replies
+	///////////////////////////////////////////////////////////////////////////////////////////////
+
+	@GetMapping("/board/")
+	public ModelAndView boardList() {
+		var boards = this.boardService.getBoards();
+		return prepareModelAndView("manage/board/board_list.html", Map.of("boards", boards));
+	}
+
+	@GetMapping("/board/board_create")
+	public ModelAndView boardCreate() {
+		return prepareModelAndView("manage/board/board_form.html", Map.of("id", 0, "action", "/api/boards"));
+	}
+
+	@GetMapping("/board/board_update")
+	public ModelAndView boardUpdate(@RequestParam("id") long id) {
+		return prepareModelAndView("manage/board/board_form.html", Map.of("id", id, "action", "/api/boards/" + id));
+	}
+
+	@GetMapping("/board/topic")
+	public ModelAndView topicList(@RequestParam(value = "page", defaultValue = "1") int pageIndex) {
+		return prepareModelAndView("manage/board/topic_list.html", Map.of("page", pageIndex));
+	}
+
+	@GetMapping("/board/reply")
+	public ModelAndView replyList(@RequestParam(value = "page", defaultValue = "1") int pageIndex) {
+		return prepareModelAndView("manage/board/reply_list.html", Map.of("page", pageIndex));
+	}
+
+	///////////////////////////////////////////////////////////////////////////////////////////////
+	// utility
+	///////////////////////////////////////////////////////////////////////////////////////////////
 
 	private ModelAndView prepareModelAndView(String view) {
 		ModelAndView mv = new ModelAndView(view);

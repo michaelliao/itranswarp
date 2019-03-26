@@ -20,7 +20,6 @@ public class TextService extends AbstractService<Text> {
 
 	@Transactional
 	public Text createText(String content) {
-		content = checkText(content);
 		String hash = HashUtil.sha256(content);
 		Text t = this.db.from(Text.class).where("hash = ?", hash).first();
 		if (t != null) {

@@ -33,11 +33,12 @@ public class NavigationService extends AbstractService<Navigation> {
 
 	@Transactional
 	public Navigation createNavigation(NavigationBean bean) {
+		bean.validate(true);
 		long maxDisplayOrder = getNavigations().stream().mapToLong(c -> c.displayOrder).max().orElseGet(() -> 0);
 		Navigation nav = new Navigation();
-		nav.name = checkName(bean.name);
-		nav.icon = checkIcon(bean.icon);
-		nav.url = checkUrl(bean.url);
+		nav.name = bean.name;
+		nav.icon = bean.icon;
+		nav.url = bean.url;
 		nav.blank = bean.blank;
 		nav.displayOrder = maxDisplayOrder + 1;
 		this.db.insert(nav);
@@ -46,19 +47,12 @@ public class NavigationService extends AbstractService<Navigation> {
 
 	@Transactional
 	public Navigation updateNavigation(Long id, NavigationBean bean) {
+		bean.validate(false);
 		Navigation nav = this.getById(id);
-		if (bean.name != null) {
-			nav.name = checkName(bean.name);
-		}
-		if (bean.icon != null) {
-			nav.icon = checkIcon(bean.icon);
-		}
-		if (bean.url != null) {
-			nav.url = checkUrl(bean.url);
-		}
-		if (bean.blank != null) {
-			nav.blank = bean.blank;
-		}
+		nav.name = bean.name;
+		nav.icon = bean.icon;
+		nav.url = bean.url;
+		nav.blank = bean.blank;
 		this.db.update(nav);
 		return nav;
 	}

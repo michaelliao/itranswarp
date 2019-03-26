@@ -37,10 +37,11 @@ public class SinglePageService extends AbstractService<SinglePage> {
 
 	@Transactional
 	public SinglePage createSinglePage(SinglePageBean bean) {
+		bean.validate(true);
 		SinglePage sp = new SinglePage();
-		sp.name = checkName(bean.name);
-		sp.publishAt = checkPublishAt(bean.publishAt);
-		sp.tags = checkTags(bean.tags);
+		sp.name = bean.name;
+		sp.publishAt = bean.publishAt;
+		sp.tags = bean.tags;
 		sp.textId = textService.createText(bean.content).id;
 		this.db.insert(sp);
 		return sp;
@@ -54,16 +55,11 @@ public class SinglePageService extends AbstractService<SinglePage> {
 
 	@Transactional
 	public SinglePage updateSinglePage(Long id, SinglePageBean bean) {
+		bean.validate(false);
 		SinglePage sp = this.getById(id);
-		if (bean.name != null) {
-			sp.name = checkName(bean.name);
-		}
-		if (bean.tags != null) {
-			sp.tags = checkTags(bean.tags);
-		}
-		if (bean.publishAt != null) {
-			sp.publishAt = checkPublishAt(bean.publishAt);
-		}
+		sp.name = bean.name;
+		sp.publishAt = bean.publishAt;
+		sp.tags = bean.tags;
 		if (bean.content != null) {
 			sp.textId = textService.createText(bean.content).id;
 		}

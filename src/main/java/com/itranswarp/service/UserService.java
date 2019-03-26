@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.StringJoiner;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.commons.validator.routines.EmailValidator;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -97,8 +98,8 @@ public class UserService extends AbstractService<User> {
 		User user = new User();
 		user.id = IdUtil.nextId();
 		user.email = user.id + "@" + authProviderId.toLowerCase();
-		user.name = this.checkName(authentication.getName());
-		user.imageUrl = this.checkUrl(authentication.getImageUrl());
+		user.name = checkName(authentication.getName());
+		user.imageUrl = checkImageUrl(authentication.getImageUrl());
 		user.role = Role.SUBSCRIBER;
 
 		OAuth auth = new OAuth();
@@ -117,9 +118,9 @@ public class UserService extends AbstractService<User> {
 	public User createLocalUser(String email, String password, String name, String imageUrl) {
 		User user = new User();
 		user.id = IdUtil.nextId();
-		user.email = this.checkEmail(email);
-		user.name = this.checkName(name);
-		user.imageUrl = this.checkUrl(imageUrl);
+		user.email = checkEmail(email);
+		user.name = checkName(name);
+		user.imageUrl = checkImageUrl(imageUrl);
 		user.role = Role.SUBSCRIBER;
 		LocalAuth auth = new LocalAuth();
 		auth.userId = user.id;
@@ -162,4 +163,45 @@ public class UserService extends AbstractService<User> {
 		this.redisService.hdel(KEY_USERS, id);
 	}
 
+	String checkName(String name) {
+		if (name == null) {
+			return "(unamed)";
+		}
+		name = name.strip();
+		if (name.length() > AbstractEntity.VAR_CHAR_NAME) {
+			name = name.substring(0, AbstractEntity.VAR_CHAR_NAME);
+		}
+		return name;
+	}
+
+	String checkEmail(String value) {
+		if (value == null) {
+			throw new ApiException(ApiError.PARAMETER_INVALID, "email", "Invalid email address.");
+		}
+		String email = value.strip().toLowerCase();
+		if (email.length() > AbstractEntity.VAR_CHAR_EMAIL) {
+			throw new ApiException(ApiError.PARAMETER_INVALID, "email", "Email address is too long.");
+		}
+		if (!EmailValidator.getInstance(true).isValid(email)) {
+			throw new ApiException(ApiError.PARAMETER_INVALID, "email", "Invalid email address.");
+		}
+		return email;
+	}
+
+	String checkImageUrl(String url) {
+		if (url == null) {
+			return "about:blank";
+		}
+		url = url.strip();
+		if (url.isEmpty()) {
+			return "about:blank";
+		}
+		if (url.length() > AbstractEntity.VAR_CHAR_URL) {
+			throw new ApiException(ApiError.PARAMETER_INVALID, "url", "url is too long.");
+		}
+		if (url.startsWith("/") || url.startsWith("https://") || url.startsWith("http://")) {
+			return url;
+		}
+		throw new ApiException(ApiError.PARAMETER_INVALID, "url", "Invalid url.");
+	}
 }

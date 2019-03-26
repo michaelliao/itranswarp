@@ -1,13 +1,34 @@
 package com.itranswarp.bean;
 
-public class ArticleBean {
+public class ArticleBean extends AbstractRequestBean {
 
-	public Long categoryId;
+	public long categoryId;
+
 	public String name;
+
 	public String tags;
+
 	public String description;
+
 	public String content;
+
 	public String image;
-	public Long publishAt;
+
+	public long publishAt;
+
+	@Override
+	public void validate(boolean createMode) {
+		checkId("categoryId", categoryId);
+		this.name = checkName(this.name);
+		this.tags = checkTags(this.tags);
+		this.description = checkDescription(this.description);
+		if (createMode || this.content != null) {
+			this.content = checkContent(this.content);
+		}
+		if (createMode || this.image != null) {
+			this.image = checkImage(this.image);
+		}
+		checkPublishAt(this.publishAt);
+	}
 
 }

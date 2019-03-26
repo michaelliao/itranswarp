@@ -21,6 +21,9 @@ import org.commonmark.renderer.html.HtmlWriter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import com.itranswarp.common.ApiException;
+import com.itranswarp.enums.ApiError;
+
 @Component
 public class Markdown {
 
@@ -56,6 +59,14 @@ public class Markdown {
 	public String ugcToHtml(String md) {
 		Node document = this.parser.parse(md);
 		return this.ugcRenderer.render(document);
+	}
+
+	public String ugcToHtml(String md, int maxLength) {
+		String html = ugcToHtml(md);
+		if (html.length() > maxLength) {
+			throw new ApiException(ApiError.PARAMETER_INVALID, "content", "Content is too long.");
+		}
+		return html;
 	}
 
 }

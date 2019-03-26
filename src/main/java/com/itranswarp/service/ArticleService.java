@@ -67,10 +67,11 @@ public class ArticleService extends AbstractService<Article> {
 
 	@Transactional
 	public Category createCategory(CategoryBean bean) {
+		bean.validate(true);
 		long maxDisplayOrder = getCategories().stream().mapToLong(c -> c.displayOrder).max().orElseGet(() -> 0);
 		Category category = new Category();
-		category.name = checkName(bean.name);
-		category.description = checkDescription(bean.description);
+		category.name = bean.name;
+		category.description = bean.description;
 		category.displayOrder = maxDisplayOrder + 1;
 		this.db.insert(category);
 		return category;
@@ -78,13 +79,10 @@ public class ArticleService extends AbstractService<Article> {
 
 	@Transactional
 	public Category updateCategory(Long id, CategoryBean bean) {
+		bean.validate(false);
 		Category category = this.getCategoryById(id);
-		if (bean.name != null) {
-			category.name = checkName(bean.name);
-		}
-		if (bean.description != null) {
-			category.description = checkDescription(bean.description);
-		}
+		category.name = bean.name;
+		category.description = bean.description;
 		this.db.update(category);
 		return category;
 	}
@@ -151,15 +149,16 @@ public class ArticleService extends AbstractService<Article> {
 
 	@Transactional
 	public Article createArticle(User user, ArticleBean bean) {
+		bean.validate(true);
 		getCategoryById(bean.categoryId);
 		Article article = new Article();
 		article.id = IdUtil.nextId();
 		article.userId = user.id;
 		article.categoryId = bean.categoryId;
-		article.name = checkName(bean.name);
-		article.description = checkDescription(bean.description);
-		article.publishAt = checkPublishAt(bean.publishAt);
-		article.tags = checkTags(bean.tags);
+		article.name = bean.name;
+		article.description = bean.description;
+		article.publishAt = bean.publishAt;
+		article.tags = bean.tags;
 
 		AttachmentBean atta = new AttachmentBean();
 		atta.name = article.name;
@@ -181,24 +180,14 @@ public class ArticleService extends AbstractService<Article> {
 
 	@Transactional
 	public Article updateArticle(User user, Long id, ArticleBean bean) {
+		bean.validate(false);
 		Article article = this.getById(id);
 		checkPermission(user, article.userId);
-		if (bean.categoryId != null) {
-			getCategoryById(bean.categoryId);
-			article.categoryId = bean.categoryId;
-		}
-		if (bean.name != null) {
-			article.name = checkName(bean.name);
-		}
-		if (bean.description != null) {
-			article.description = checkDescription(bean.description);
-		}
-		if (bean.tags != null) {
-			article.tags = checkTags(bean.tags);
-		}
-		if (bean.publishAt != null) {
-			article.publishAt = checkPublishAt(bean.publishAt);
-		}
+		article.categoryId = bean.categoryId;
+		article.name = bean.name;
+		article.description = bean.description;
+		article.publishAt = bean.publishAt;
+		article.tags = bean.tags;
 		if (bean.image != null) {
 			AttachmentBean atta = new AttachmentBean();
 			atta.name = article.name;

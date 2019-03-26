@@ -13,16 +13,24 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.itranswarp.bean.ArticleBean;
 import com.itranswarp.bean.AttachmentBean;
+import com.itranswarp.bean.BoardBean;
 import com.itranswarp.bean.CategoryBean;
 import com.itranswarp.bean.NavigationBean;
 import com.itranswarp.bean.SinglePageBean;
 import com.itranswarp.bean.SortBean;
+import com.itranswarp.bean.TopicBean;
+import com.itranswarp.common.ApiException;
+import com.itranswarp.enums.ApiError;
+import com.itranswarp.enums.RefType;
 import com.itranswarp.enums.Role;
 import com.itranswarp.model.Article;
 import com.itranswarp.model.Attachment;
+import com.itranswarp.model.Board;
 import com.itranswarp.model.Category;
 import com.itranswarp.model.Navigation;
+import com.itranswarp.model.Reply;
 import com.itranswarp.model.SinglePage;
+import com.itranswarp.model.Topic;
 import com.itranswarp.model.User;
 import com.itranswarp.model.Wiki;
 import com.itranswarp.model.WikiPage;
@@ -153,6 +161,117 @@ public class ApiController extends AbstractController {
 	public Map<String, Boolean> singlePageDelete(@PathVariable("id") long id) {
 		this.singlePageService.deleteSinglePage(id);
 		this.singlePageService.deleteSinglePageFromCache(id);
+		return API_RESULT_TRUE;
+	}
+
+	///////////////////////////////////////////////////////////////////////////////////////////////
+	// board
+	///////////////////////////////////////////////////////////////////////////////////////////////
+
+	@GetMapping("/api/boards")
+	@RoleWith(Role.CONTRIBUTOR)
+	public Map<String, List<Board>> boards() {
+		return Map.of("results", this.boardService.getBoards());
+	}
+
+	@GetMapping("/api/boards/" + ID)
+	@RoleWith(Role.CONTRIBUTOR)
+	public Board board(@PathVariable("id") long id) {
+		return this.boardService.getById(id);
+	}
+
+	@PostMapping("/api/boards/sort")
+	@RoleWith(Role.ADMIN)
+	public Map<String, Boolean> boardsSort(@RequestBody SortBean bean) {
+		this.boardService.sortBoards(bean.ids);
+		this.boardService.deleteBoardsFromCache();
+		return API_RESULT_TRUE;
+	}
+
+	@PostMapping("/api/boards")
+	@RoleWith(Role.ADMIN)
+	public Board boardCreate(@RequestBody BoardBean bean) {
+		return this.boardService.createBoard(bean);
+	}
+
+	@PostMapping("/api/boards/" + ID)
+	@RoleWith(Role.ADMIN)
+	public Board boardUpdate(@PathVariable("id") long id, @RequestBody BoardBean bean) {
+		Board board = this.boardService.updateBoard(id, bean);
+		this.boardService.deleteBoardsFromCache();
+		return board;
+	}
+
+	@PostMapping("/api/boards/" + ID + "/delete")
+	@RoleWith(Role.ADMIN)
+	public Map<String, Boolean> boardDelete(@PathVariable("id") long id) {
+		this.boardService.deleteBoard(id);
+		this.boardService.deleteBoardFromCache(id);
+		return API_RESULT_TRUE;
+	}
+
+	///////////////////////////////////////////////////////////////////////////////////////////////
+	// topic
+	///////////////////////////////////////////////////////////////////////////////////////////////
+
+	@GetMapping("/api/topics")
+	@RoleWith(Role.CONTRIBUTOR)
+	public PagedResults<Topic> topics(@RequestParam(value = "page", defaultValue = "1") int pageIndex) {
+		return this.boardService.getTopics(pageIndex);
+	}
+
+	@PostMapping("/api/boards/" + ID + "/topics")
+	@RoleWith(Role.SUBSCRIBER)
+	public Topic topicCreate(@PathVariable("id") long id, @RequestBody TopicBean bean) {
+		Board board = this.boardService.getBoardFromCache(id);
+		if (board.locked) {
+			throw new ApiException(ApiError.OPERATION_FAILED, "board", "Board is locked.");
+		}
+		if (bean.refType != RefType.NONE && bean.refId == 0) {
+			throw new ApiException(ApiError.PARAMETER_INVALID, "refId", "refId cannot be zero.");
+		}
+		switch (bean.refType) {
+		case ARTICLE:
+			this.articleService.getPublishedById(bean.refId);
+			break;
+		case WIKI:
+			this.wikiService.getById(bean.refId);
+			break;
+		case WIKIPAGE:
+			this.wikiService.getWikiPageById(bean.refId);
+			break;
+		case NONE:
+			break;
+		default:
+			throw new ApiException(ApiError.PARAMETER_INVALID, "refType", "Unsupported refType: " + bean.refType);
+		}
+		Topic topic = this.boardService.createTopic(HttpContext.getRequiredCurrentUser(), board, bean);
+		this.boardService.deleteBoardFromCache(topic.boardId);
+		return topic;
+	}
+
+	@PostMapping("/api/topics/" + ID + "/delete")
+	@RoleWith(Role.EDITOR)
+	public Map<String, Boolean> topicDelete(@PathVariable("id") long id) {
+		Topic topic = this.boardService.deleteTopic(HttpContext.getRequiredCurrentUser(), id);
+		this.boardService.deleteBoardFromCache(topic.boardId);
+		return API_RESULT_TRUE;
+	}
+
+	///////////////////////////////////////////////////////////////////////////////////////////////
+	// reply
+	///////////////////////////////////////////////////////////////////////////////////////////////
+
+	@GetMapping("/api/replies")
+	@RoleWith(Role.CONTRIBUTOR)
+	public PagedResults<Reply> replies(@RequestParam(value = "page", defaultValue = "1") int pageIndex) {
+		return this.boardService.getReplies(pageIndex);
+	}
+
+	@PostMapping("/api/replies/" + ID + "/delete")
+	@RoleWith(Role.EDITOR)
+	public Map<String, Boolean> replyDelete(@PathVariable("id") long id) {
+		this.boardService.deleteReply(HttpContext.getRequiredCurrentUser(), id);
 		return API_RESULT_TRUE;
 	}
 

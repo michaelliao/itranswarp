@@ -14,8 +14,8 @@ import com.itranswarp.bean.ReplyBean;
 import com.itranswarp.bean.TopicBean;
 import com.itranswarp.common.ApiException;
 import com.itranswarp.enums.ApiError;
-import com.itranswarp.enums.RefType;
 import com.itranswarp.markdown.Markdown;
+import com.itranswarp.model.AbstractEntity;
 import com.itranswarp.model.Board;
 import com.itranswarp.model.Reply;
 import com.itranswarp.model.Topic;
@@ -61,12 +61,13 @@ public class BoardService extends AbstractService<Board> {
 		return c;
 	}
 
-	public void removeBoardsFromCache() {
+	public void deleteBoardsFromCache() {
 		this.redisService.del(KEY_BOARDS);
 	}
 
-	public void removeBoardFromCache(String id) {
+	public void deleteBoardFromCache(Long id) {
 		this.redisService.hdel(KEY_BOARDS, id);
+		this.redisService.del(KEY_TOPICS_FIRST_PAGE + id);
 	}
 
 	public List<Board> getBoards() {
@@ -75,28 +76,24 @@ public class BoardService extends AbstractService<Board> {
 
 	@Transactional
 	public Board createBoard(BoardBean bean) {
+		bean.validate(true);
 		long maxDisplayOrder = getBoards().stream().mapToLong(c -> c.displayOrder).max().orElseGet(() -> 0);
 		Board board = new Board();
-		board.name = checkName(bean.name);
-		board.description = checkDescription(bean.description);
+		board.name = bean.name;
+		board.description = bean.description;
+		board.tag = bean.tag;
 		board.displayOrder = maxDisplayOrder + 1;
-		board.tag = checkTag(bean.tag);
 		this.db.insert(board);
 		return board;
 	}
 
 	@Transactional
 	public Board updateBoard(Long id, BoardBean bean) {
+		bean.validate(false);
 		Board board = this.getById(id);
-		if (board.name != null) {
-			board.name = checkName(board.name);
-		}
-		if (bean.tag != null) {
-			board.tag = checkTag(board.tag);
-		}
-		if (bean.description != null) {
-			board.description = checkDescription(board.description);
-		}
+		board.name = bean.name;
+		board.description = bean.description;
+		board.tag = bean.tag;
 		this.db.update(board);
 		return board;
 	}
@@ -117,18 +114,31 @@ public class BoardService extends AbstractService<Board> {
 		sortEntities(boards, ids);
 	}
 
-	public PagedResults<Topic> getTopics(Board board, int pageIndex) {
+	public PagedResults<Topic> getTopicsFromCache(Board board, int pageIndex) {
 		PagedResults<Topic> result = null;
 		if (pageIndex == 1) {
 			result = this.redisService.get(KEY_TOPICS_FIRST_PAGE + board.id, TYPE_PAGE_RESULTS_TOPIC);
 		}
 		if (result == null) {
-			result = this.db.from(Topic.class).where("boardId = ?", board.id).list(pageIndex, ITEMS_PER_PAGE);
+			result = getTopics(board, pageIndex);
 			if (pageIndex == 1) {
 				this.redisService.set(KEY_TOPICS_FIRST_PAGE + board.id, result, CACHE_TOPICS_SECONDS);
 			}
 		}
 		return result;
+	}
+
+	public PagedResults<Topic> getTopics(Board board, int pageIndex) {
+		return this.db.from(Topic.class).where("boardId = ?", board.id).orderBy("updatedAt").desc().orderBy("id").desc()
+				.list(pageIndex, ITEMS_PER_PAGE);
+	}
+
+	public PagedResults<Topic> getTopics(int pageIndex) {
+		return this.db.from(Topic.class).orderBy("id").desc().list(pageIndex, ITEMS_PER_PAGE);
+	}
+
+	public PagedResults<Reply> getReplies(int pageIndex) {
+		return this.db.from(Reply.class).orderBy("id").desc().list(pageIndex);
 	}
 
 	public PagedResults<Reply> getReplies(Topic topic, int pageIndex) {
@@ -148,13 +158,14 @@ public class BoardService extends AbstractService<Board> {
 	}
 
 	@Transactional
-	public Topic createTopic(User user, Board board, RefType refType, Long refId, TopicBean bean) {
+	public Topic createTopic(User user, Board board, TopicBean bean) {
+		bean.validate(true);
 		Topic topic = new Topic();
 		topic.boardId = board.id;
-		topic.content = checkText(markdown.ugcToHtml(checkText(bean.content)));
-		topic.name = checkName(bean.name);
-		topic.refId = refId;
-		topic.refType = refType;
+		topic.content = markdown.ugcToHtml(bean.content, AbstractEntity.TEXT);
+		topic.name = bean.name;
+		topic.refId = bean.refId;
+		topic.refType = bean.refType;
 		topic.userId = user.id;
 		this.db.insert(topic);
 		this.db.updateSql(this.sqlUpdateBoardIncTopicNumber, topic.boardId);
@@ -162,12 +173,13 @@ public class BoardService extends AbstractService<Board> {
 	}
 
 	@Transactional
-	public void deleteTopic(User user, Long id) {
+	public Topic deleteTopic(User user, Long id) {
 		Topic topic = getTopicById(id);
 		super.checkPermission(user, topic.userId);
 		this.db.remove(topic);
 		this.db.updateSql(this.sqlDeleteReplies, id);
 		this.db.updateSql(this.sqlUpdateBoardDecTopicNumber, topic.boardId);
+		return topic;
 	}
 
 	public Topic getTopicById(Long id) {
@@ -188,10 +200,11 @@ public class BoardService extends AbstractService<Board> {
 
 	@Transactional
 	public Reply createReply(User user, Topic topic, ReplyBean bean) {
+		bean.validate(true);
 		Reply reply = new Reply();
 		reply.userId = user.id;
 		reply.topicId = topic.id;
-		reply.content = checkText(markdown.ugcToHtml(checkText(bean.content)));
+		reply.content = markdown.ugcToHtml(bean.content, AbstractEntity.TEXT);
 		this.db.insert(reply);
 		this.db.updateSql(this.sqlUpdateTopicIncReplyNumber, reply.topicId);
 		return reply;

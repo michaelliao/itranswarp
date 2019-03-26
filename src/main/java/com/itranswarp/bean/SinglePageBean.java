@@ -1,10 +1,20 @@
 package com.itranswarp.bean;
 
-public class SinglePageBean {
+public class SinglePageBean extends AbstractRequestBean {
 
 	public String name;
 	public String tags;
 	public String content;
-	public Long publishAt;
+	public long publishAt;
+
+	@Override
+	public void validate(boolean createMode) {
+		this.name = checkName(this.name);
+		this.tags = checkTags(this.tags);
+		if (createMode || this.content != null) {
+			this.content = checkContent(this.content);
+		}
+		checkPublishAt(this.publishAt);
+	}
 
 }

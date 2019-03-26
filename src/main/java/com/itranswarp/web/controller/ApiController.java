@@ -1,5 +1,6 @@
 package com.itranswarp.web.controller;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -325,6 +326,24 @@ public class ApiController extends AbstractController {
 		return Map.of("results", this.navigationService.getNavigations());
 	}
 
+	@GetMapping("/api/navigations/urls")
+	@RoleWith(Role.CONTRIBUTOR)
+	public Map<String, List<NavigationMenu>> navigationUrls() {
+		List<NavigationMenu> list = new ArrayList<>();
+		this.articleService.getCategories().forEach(c -> {
+			list.add(new NavigationMenu(c.name, "/category/" + c.id));
+		});
+		this.wikiService.getWikis().forEach(w -> {
+			list.add(new NavigationMenu(w.name, "/wiki/" + w.id));
+		});
+		this.singlePageService.getAll().forEach(p -> {
+			list.add(new NavigationMenu(p.name, "/single/" + p.id));
+		});
+		list.add(new NavigationMenu("Discuss", "/discuss"));
+		list.add(new NavigationMenu("Custom", "http://"));
+		return Map.of("results", list);
+	}
+
 	@PostMapping("/api/navigations/sort")
 	@RoleWith(Role.ADMIN)
 	public Map<String, Boolean> navigationsSort(@RequestBody SortBean bean) {
@@ -401,6 +420,17 @@ public class ApiController extends AbstractController {
 			this.content = content;
 		}
 
+	}
+
+	public static class NavigationMenu {
+
+		public String name;
+		public String url;
+
+		public NavigationMenu(String name, String url) {
+			this.name = name;
+			this.url = url;
+		}
 	}
 
 }

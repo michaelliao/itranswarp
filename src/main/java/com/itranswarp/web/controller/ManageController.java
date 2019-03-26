@@ -38,6 +38,11 @@ public class ManageController extends AbstractController {
 	@Autowired
 	Markdown markdown;
 
+	@GetMapping("/")
+	public ModelAndView index() {
+		return prepareModelAndView("redirect:/manage/board/");
+	}
+
 	///////////////////////////////////////////////////////////////////////////////////////////////
 	// article and categories
 	///////////////////////////////////////////////////////////////////////////////////////////////
@@ -102,8 +107,7 @@ public class ManageController extends AbstractController {
 
 	@GetMapping("/board/")
 	public ModelAndView boardList() {
-		var boards = this.boardService.getBoards();
-		return prepareModelAndView("manage/board/board_list.html", Map.of("boards", boards));
+		return prepareModelAndView("manage/board/board_list.html");
 	}
 
 	@GetMapping("/board/board_create")
@@ -124,6 +128,27 @@ public class ManageController extends AbstractController {
 	@GetMapping("/board/reply")
 	public ModelAndView replyList(@RequestParam(value = "page", defaultValue = "1") int pageIndex) {
 		return prepareModelAndView("manage/board/reply_list.html", Map.of("page", pageIndex));
+	}
+
+	///////////////////////////////////////////////////////////////////////////////////////////////
+	// navigations
+	///////////////////////////////////////////////////////////////////////////////////////////////
+
+	@GetMapping("/navigation/")
+	public ModelAndView navigationList() {
+		return prepareModelAndView("manage/navigation/navigation_list.html");
+	}
+
+	@GetMapping("/navigation/navigation_create")
+	public ModelAndView navigationCreate() {
+		return prepareModelAndView("manage/navigation/navigation_form.html",
+				Map.of("id", 0, "action", "/api/navigations"));
+	}
+
+	@GetMapping("/navigation/navigation_update")
+	public ModelAndView navigationUpdate(@RequestParam("id") long id) {
+		return prepareModelAndView("manage/navigation/navigation_form.html",
+				Map.of("id", id, "action", "/api/navigations/" + id));
 	}
 
 	///////////////////////////////////////////////////////////////////////////////////////////////

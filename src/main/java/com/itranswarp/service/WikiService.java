@@ -110,6 +110,10 @@ public class WikiService extends AbstractService<Wiki> {
 		});
 	}
 
+	public List<Wiki> getWikis() {
+		return db.from(Wiki.class).orderBy("name").list();
+	}
+
 	@Transactional
 	public Wiki createWiki(User user, WikiBean bean) {
 		bean.validate(true);

@@ -1,0 +1,121 @@
+# configuration for itranswarp:
+
+spring:
+  profiles:
+    active: ${PROFILES:native}
+  application:
+    name: ${NAME:itranswarp}
+    timezone: ${TIMEZONE:}
+    cdn: ${CDN:}
+  # MySQL configuration:
+  datasource:
+    url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:it}?useSSL=${DB_SSL:false}&characterEncoding=utf8
+    username: ${DB_USERNAME:root}
+    password: ${DB_PASSWORD:password}
+    driver-class-name: com.mysql.jdbc.Driver
+    hikari:
+      pool-name: HikariCP
+      auto-commit: false
+      connection-timeout: ${DB_TIMEOUT:3000}
+      validation-timeout: ${DB_TIMEOUT:3000}
+      max-lifetime: ${DB_MAX_LIFETIME:600000}
+      maximum-pool-size: ${DB_POOL_SIZE:20}
+      minimum-idle: ${DB_MIN_IDLE:1}
+  # Redis configuration:
+  redis:
+    standalone:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      database: ${REDIS_DATABASE:0}
+      password: ${REDIS_PASSWORD:}
+      timeout: ${REDIS_TIMEOUT:1}
+  # Markdown plugins:
+  markdown:
+    plugins:
+      bilibili:
+        enabled: ${MARKDOWN_BILIBILI_ENABLED:true}
+        width:   ${MARKDOWN_BILIBILI_WIDTH:100%}
+        height:  ${MARKDOWN_BILIBILI_HEIGHT:480px}
+      qq-video:
+        enabled: ${MARKDOWN_QQ_VIDEO_ENABLED:true}
+        width:   ${MARKDOWN_QQ_VIDEO_WIDTH:100%}
+        height:  ${MARKDOWN_QQ_VIDEO_HEIGHT:480px}
+      youtube:
+        enabled: ${MARKDOWN_YOUTUBE_ENABLED:true}
+        width:   ${MARKDOWN_YOUTUBE_WIDTH:100%}
+        height:  ${MARKDOWN_YOUTUBE_HEIGHT:480px}
+      trading-view:
+        enabled: ${MARKDOWN_TRADING_VIEW_ENABLED:true}
+        width:   ${MARKDOWN_TRADING_VIEW_WIDTH:100%}
+        height:  ${MARKDOWN_TRADING_VIEW_HEIGHT:480px}
+  # OAuth authentication configuration:
+  oauth:
+    facebook:
+      enabled:       "${OAUTH_FACEBOOK_ENABLED:true}"
+      name:          "${OAUTH_FACEBOOK_NAME:Facebook}"
+      icon:          "${OAUTH_FACEBOOK_ICON:facebook}"
+      color:         "${OAUTH_FACEBOOK_COLOR:#3b5998}"
+      client-id:     "${OAUTH_FACEBOOK_CLIENT_ID:}"
+      client-secret: "${OAUTH_FACEBOOK_CLIENT_SECRET:}"
+    github:
+      enabled:       "${OAUTH_GITHUB_ENABLED:true}"
+      name:          "${OAUTH_GITHUB_NAME:Github}"
+      icon:          "${OAUTH_GITHUB_ICON:github}"
+      color:         "${OAUTH_GITHUB_COLOR:#666666}"
+      client-id:     "${OAUTH_GITHUB_CLIENT_ID:}"
+      client-secret: "${OAUTH_GITHUB_CLIENT_SECRET:}"
+    google:
+      enabled:       "${OAUTH_GOOGLE_ENABLED:true}"
+      name:          "${OAUTH_GOOGLE_NAME:Google}"
+      icon:          "${OAUTH_GOOGLE_ICON:google}"
+      color:         "${OAUTH_GOOGLE_COLOR:#4285f4}"
+      client-id:     "${OAUTH_GOOGLE_CLIENT_ID:}"
+      client-secret: "${OAUTH_GOOGLE_CLIENT_SECRET:}"
+    linkedin:
+      enabled:       "${OAUTH_LINKEDIN_ENABLED:true}"
+      name:          "${OAUTH_LINKEDIN_NAME:LinkedIn}"
+      icon:          "${OAUTH_LINKEDIN_ICON:linkedin}"
+      color:         "${OAUTH_LINKEDIN_COLOR:#007bb6}"
+      client-id:     "${OAUTH_LINKEDIN_CLIENT_ID:}"
+      client-secret: "${OAUTH_LINKEDIN_CLIENT_SECRET:}"
+    microsoft:
+      enabled:       "${OAUTH_MICROSOFT_ENABLED:true}"
+      name:          "${OAUTH_MICROSOFT_NAME:Microsoft}"
+      icon:          "${OAUTH_MICROSOFT_ICON:windows}"
+      color:         "${OAUTH_MICROSOFT_COLOR:#2672ec}"
+      client-id:     "${OAUTH_MICROSOFT_CLIENT_ID:}"
+      client-secret: "${OAUTH_MICROSOFT_CLIENT_SECRET:}"
+    qq:
+      enabled:       "${OAUTH_QQ_ENABLED:true}"
+      name:          "${OAUTH_QQ_NAME:QQ}"
+      icon:          "${OAUTH_QQ_ICON:qq}"
+      color:         "${OAUTH_QQ_COLOR:#00a8e6}"
+      client-id:     "${OAUTH_QQ_CLIENT_ID:}"
+      client-secret: "${OAUTH_QQ_CLIENT_SECRET:}"
+    twitter:
+      enabled:       "${OAUTH_TWITTER_ENABLED:true}"
+      name:          "${OAUTH_TWITTER_NAME:Twitter}"
+      icon:          "${OAUTH_TWITTER_ICON:facebook}"
+      color:         "${OAUTH_TWITTER_COLOR:#1da1f2}"
+      client-id:     "${OAUTH_TWITTER_CLIENT_ID:}"
+      client-secret: "${OAUTH_TWITTER_CLIENT_SECRET:}"
+    weibo:
+      enabled:       "${OAUTH_WEIBO_ENABLED:true}"
+      name:          "${OAUTH_WEIBO_NAME:Weibo}"
+      icon:          "${OAUTH_WEIBO_ICON:weibo}"
+      color:         "${OAUTH_WEIBO_COLOR:#e92b00}"
+      client-id:     "${OAUTH_WEIBO_CLIENT_ID:}"
+      client-secret: "${OAUTH_WEIBO_CLIENT_SECRET:}"
+    yahoo:
+      enabled:       "${OAUTH_YAHOO_ENABLED:true}"
+      name:          "${OAUTH_YAHOO_NAME:Yahoo}"
+      icon:          "${OAUTH_YAHOO_ICON:yahoo}"
+      color:         "${OAUTH_YAHOO_COLOR:#720e9e}"
+      client-id:     "${OAUTH_YAHOO_CLIENT_ID:}"
+      client-secret: "${OAUTH_YAHOO_CLIENT_SECRET:}"
+
+server:
+  port: ${SERVER_PORT:2019}
+
+encrypt:
+  key: ${ENCRYPT_KEY:ChangeTheKeyWhenDeployProduction}

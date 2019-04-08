@@ -11,7 +11,7 @@ public class Navigation extends AbstractSortableEntity {
 	@Column(nullable = false, length = VAR_CHAR_NAME)
 	public String name;
 
-	@Column(nullable = false, length = VAR_ENUM)
+	@Column(nullable = false, length = VAR_CHAR_SVG)
 	public String icon;
 
 	@Column(nullable = false, length = VAR_CHAR_URL)

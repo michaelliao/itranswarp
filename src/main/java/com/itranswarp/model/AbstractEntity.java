@@ -32,6 +32,8 @@ public abstract class AbstractEntity extends AbstractBean {
 
 	public static final int VAR_CHAR_URL = 1000;
 
+	public static final int VAR_CHAR_SVG = 8192; // 8K
+
 	public static final int TEXT = 65535; // 64K
 
 	public static final int MEDIUM_TEXT = 524287; // 512K

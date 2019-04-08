@@ -14,7 +14,7 @@ public class SinglePageBean extends AbstractRequestBean {
 		if (createMode || this.content != null) {
 			this.content = checkContent(this.content);
 		}
-		checkPublishAt(this.publishAt);
+		checkTimestamp("publishAt", this.publishAt);
 	}
 
 }

@@ -29,7 +29,7 @@ public class WikiBean extends AbstractRequestBean {
 		if (createMode || this.image != null) {
 			this.image = checkImage(this.image);
 		}
-		checkPublishAt(this.publishAt);
+		checkTimestamp("publishAt", this.publishAt);
 	}
 
 }

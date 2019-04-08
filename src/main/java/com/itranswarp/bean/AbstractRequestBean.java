@@ -32,9 +32,9 @@ public abstract class AbstractRequestBean {
 		}
 	}
 
-	protected void checkPublishAt(long value) {
+	protected void checkTimestamp(String name, long value) {
 		if (value < 0) {
-			throw new ApiException(ApiError.PARAMETER_INVALID, "publishAt", "Invalid publishAt.");
+			throw new ApiException(ApiError.PARAMETER_INVALID, name, "Invalid timestamp of " + name);
 		}
 	}
 
@@ -43,7 +43,7 @@ public abstract class AbstractRequestBean {
 	}
 
 	protected String checkIcon(String value) {
-		return checkString("icon", AbstractEntity.VAR_ENUM, value);
+		return checkString("icon", AbstractEntity.VAR_CHAR_SVG, value);
 	}
 
 	protected String checkDescription(String value) {

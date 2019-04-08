@@ -28,7 +28,7 @@ public class ArticleBean extends AbstractRequestBean {
 		if (createMode || this.image != null) {
 			this.image = checkImage(this.image);
 		}
-		checkPublishAt(this.publishAt);
+		checkTimestamp("publishAt", this.publishAt);
 	}
 
 }

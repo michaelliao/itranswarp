@@ -5,34 +5,34 @@ import com.itranswarp.enums.InputType;
 
 public class Snippet extends AbstractSettingBean {
 
-	@SettingInput(value = InputType.TEXTAREA, description = "Index top")
+	@SettingInput(value = InputType.TEXTAREA, order = 1, description = "Index top")
 	public String indexTop;
 
-	@SettingInput(value = InputType.TEXTAREA, description = "Index bottom")
+	@SettingInput(value = InputType.TEXTAREA, order = 2, description = "Index bottom")
 	public String indexBottom;
 
-	@SettingInput(value = InputType.TEXTAREA, description = "Body top")
+	@SettingInput(value = InputType.TEXTAREA, order = 3, description = "Body top")
 	public String bodyTop;
 
-	@SettingInput(value = InputType.TEXTAREA, description = "Body bottom")
+	@SettingInput(value = InputType.TEXTAREA, order = 4, description = "Body bottom")
 	public String bodyBottom;
 
-	@SettingInput(value = InputType.TEXTAREA, description = "Left side bar top")
-	public String leftSideBarTop;
-
-	@SettingInput(value = InputType.TEXTAREA, description = "Left side bar bottom")
-	public String leftSideBarBottom;
-
-	@SettingInput(value = InputType.TEXTAREA, description = "Right side bar top")
-	public String rightSideBarTop;
-
-	@SettingInput(value = InputType.TEXTAREA, description = "Right side bar bottom")
-	public String rightSideBarBottom;
-
-	@SettingInput(value = InputType.TEXTAREA, description = "Content top")
+	@SettingInput(value = InputType.TEXTAREA, order = 5, description = "Content top")
 	public String contentTop;
 
-	@SettingInput(value = InputType.TEXTAREA, description = "Content bottom")
+	@SettingInput(value = InputType.TEXTAREA, order = 6, description = "Content bottom")
 	public String contentBottom;
+
+	@SettingInput(value = InputType.TEXTAREA, order = 7, description = "Left side bar top")
+	public String leftSideBarTop;
+
+	@SettingInput(value = InputType.TEXTAREA, order = 8, description = "Left side bar bottom")
+	public String leftSideBarBottom;
+
+	@SettingInput(value = InputType.TEXTAREA, order = 9, description = "Right side bar top")
+	public String rightSideBarTop;
+
+	@SettingInput(value = InputType.TEXTAREA, order = 10, description = "Right side bar bottom")
+	public String rightSideBarBottom;
 
 }

@@ -14,6 +14,8 @@ public abstract class AbstractEntity extends AbstractBean {
 
 	public static final int VAR_ENUM = 32;
 
+	public static final int VAR_CHAR_DATE = 10;
+
 	public static final int VAR_CHAR_HASH = 64;
 
 	public static final int VAR_CHAR_EMAIL = 100;

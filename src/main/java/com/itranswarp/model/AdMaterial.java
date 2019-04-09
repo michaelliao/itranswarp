@@ -5,17 +5,17 @@ import javax.persistence.Entity;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "ad_periods")
-public class AdPeriods extends AbstractEntity {
+@Table(name = "ad_materials")
+public class AdMaterial extends AbstractEntity {
 
 	@Column(nullable = false, updatable = false)
-	public long userId;
+	public long adPeriodId;
 
 	@Column(nullable = false, updatable = false)
-	public long adSlotId;
+	public long imageId;
 
-	@Column(nullable = false, updatable = false)
-	public long displayOrder;
+	@Column(nullable = false)
+	public long weight;
 
 	/**
 	 * ISO date format like "2019-01-01".
@@ -29,4 +29,12 @@ public class AdPeriods extends AbstractEntity {
 	@Column(nullable = false, length = 10)
 	public String endAt;
 
+	@Column(nullable = false, length = VAR_ENUM)
+	public String geo;
+
+	@Column(nullable = false, length = VAR_CHAR_TAGS)
+	public String tags;
+
+	@Column(nullable = false, length = VAR_CHAR_URL)
+	public String url;
 }

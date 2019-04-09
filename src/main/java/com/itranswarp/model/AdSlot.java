@@ -3,14 +3,10 @@ package com.itranswarp.model;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
-import javax.persistence.UniqueConstraint;
 
 @Entity
-@Table(name = "ad_slots", uniqueConstraints = @UniqueConstraint(name = "UNI_ALIAS", columnNames = { "alias" }))
+@Table(name = "ad_slots")
 public class AdSlot extends AbstractEntity {
-
-	@Column(nullable = false, length = VAR_ENUM)
-	public String alias;
 
 	@Column(nullable = false, length = VAR_CHAR_NAME)
 	public String name;
@@ -27,7 +23,7 @@ public class AdSlot extends AbstractEntity {
 	@Column(nullable = false, updatable = false)
 	public long height;
 
-	@Column(nullable = false, updatable = false)
+	@Column(nullable = false)
 	public long numSlots;
 
 	@Column(nullable = false)

@@ -30,11 +30,11 @@ public class ArticleService extends AbstractService<Article> {
 	@Autowired
 	ViewService viewService;
 
-	static final String KEY_RECENT_ARTICLES = "_recent_articles_";
-	static final String KEY_ARTICLES_FIRST_PAGE = "_articles_";
+	static final String KEY_RECENT_ARTICLES = "__recent_articles__";
+	static final String KEY_ARTICLES_FIRST_PAGE = "__articles__";
 	static final long CACHE_ARTICLES_SECONDS = 3600;
 
-	static final String KEY_CATEGORIES = "_categories";
+	static final String KEY_CATEGORIES = "__categories__";
 
 	public Category getCategoryFromCache(Long id) {
 		Category c = this.redisService.hget(KEY_CATEGORIES, id, Category.class);
@@ -71,6 +71,7 @@ public class ArticleService extends AbstractService<Article> {
 		long maxDisplayOrder = getCategories().stream().mapToLong(c -> c.displayOrder).max().orElseGet(() -> 0);
 		Category category = new Category();
 		category.name = bean.name;
+		category.tag = bean.tag;
 		category.description = bean.description;
 		category.displayOrder = maxDisplayOrder + 1;
 		this.db.insert(category);
@@ -82,6 +83,7 @@ public class ArticleService extends AbstractService<Article> {
 		bean.validate(false);
 		Category category = this.getCategoryById(id);
 		category.name = bean.name;
+		category.tag = bean.tag;
 		category.description = bean.description;
 		this.db.update(category);
 		return category;

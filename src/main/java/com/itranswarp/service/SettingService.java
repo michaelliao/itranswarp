@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.itranswarp.bean.AbstractSettingBean;
+import com.itranswarp.bean.Follow;
 import com.itranswarp.bean.Snippet;
 import com.itranswarp.bean.Website;
 import com.itranswarp.model.Setting;
@@ -17,30 +18,46 @@ import com.itranswarp.model.Setting;
 @Component
 public class SettingService extends AbstractService<Setting> {
 
+	private static final String KEY_SETTING = "__setting__";
+
 	public void deleteWebsiteFromCache() {
-		this.redisService.del(Website.class.getSimpleName());
+		this.redisService.hdel(KEY_SETTING, Website.class.getSimpleName());
 	}
 
 	public void deleteSnippetFromCache() {
-		this.redisService.del(Snippet.class.getSimpleName());
+		this.redisService.hdel(KEY_SETTING, Snippet.class.getSimpleName());
+	}
+
+	public void deleteFollowFromCache() {
+		this.redisService.hdel(KEY_SETTING, Follow.class.getSimpleName());
 	}
 
 	public Website getWebsiteFromCache() {
 		String group = Website.class.getSimpleName();
-		Website bean = this.redisService.get(group, Website.class);
+		Website bean = this.redisService.hget(KEY_SETTING, group, Website.class);
 		if (bean == null) {
 			bean = getWebsite();
-			this.redisService.set(group, bean);
+			this.redisService.hset(KEY_SETTING, group, bean);
 		}
 		return bean;
 	}
 
 	public Snippet getSnippetFromCache() {
 		String group = Snippet.class.getSimpleName();
-		Snippet bean = this.redisService.get(group, Snippet.class);
+		Snippet bean = this.redisService.hget(KEY_SETTING, group, Snippet.class);
 		if (bean == null) {
 			bean = getSnippet();
-			this.redisService.set(group, bean);
+			this.redisService.hset(KEY_SETTING, group, bean);
+		}
+		return bean;
+	}
+
+	public Follow getFollowFromCache() {
+		String group = Follow.class.getSimpleName();
+		Follow bean = this.redisService.hget(KEY_SETTING, group, Follow.class);
+		if (bean == null) {
+			bean = getFollow();
+			this.redisService.hset(KEY_SETTING, group, bean);
 		}
 		return bean;
 	}
@@ -53,6 +70,10 @@ public class SettingService extends AbstractService<Setting> {
 		return getSettingBean(Snippet.class);
 	}
 
+	public Follow getFollow() {
+		return getSettingBean(Follow.class);
+	}
+
 	@Transactional
 	public void setWebsite(Website bean) {
 		setSettingBean(bean);
@@ -60,6 +81,11 @@ public class SettingService extends AbstractService<Setting> {
 
 	@Transactional
 	public void setSnippet(Snippet bean) {
+		setSettingBean(bean);
+	}
+
+	@Transactional
+	public void setFollow(Follow bean) {
 		setSettingBean(bean);
 	}
 

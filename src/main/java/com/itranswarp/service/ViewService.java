@@ -11,7 +11,7 @@ import com.itranswarp.redis.RedisService;
 @Component
 public class ViewService {
 
-	static final String KEY_VIEWS = "_views";
+	static final String KEY_VIEWS = "__views__";
 
 	@Autowired
 	RedisService redisService;

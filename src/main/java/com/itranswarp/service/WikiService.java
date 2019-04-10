@@ -29,35 +29,34 @@ public class WikiService extends AbstractService<Wiki> {
 	@Autowired
 	AttachmentService attachmentService;
 
-	static final String KEY_WIKIS = "_wikis_";
+	static final String KEY_WIKIS = "__wikis__";
 	static final long EXPIRES = 3600;
 
 	public void removeWikiFromCache(String id) {
 		this.redisService.del(KEY_WIKIS + id);
 	}
 
-	public Wiki getWikiTreeFromCache(Long id) {
+	public Wiki getPublishedWikiTreeFromCache(Long id) {
 		Wiki wiki = this.redisService.get(KEY_WIKIS + id, Wiki.class);
 		if (wiki == null) {
-			wiki = getWikiTree(id, true);
+			wiki = getWikiTree(id, System.currentTimeMillis());
 			this.redisService.set(KEY_WIKIS + id, wiki, EXPIRES);
 		}
 		return wiki;
 	}
 
-	public Wiki getWikiTree(Long id, boolean publishedOnly) {
+	public Wiki getWikiTree(Long id, Long publishAfter) {
 		Wiki wiki = getById(id);
-		long ts = System.currentTimeMillis();
-		if (publishedOnly && wiki.publishAt > ts) {
-			return null;
+		if (publishAfter != null && wiki.publishAt > publishAfter) {
+			throw new ApiException(ApiError.ENTITY_NOT_FOUND, "wiki", "Wiki not found");
 		}
-		List<WikiPage> children = getWikiPages(id, publishedOnly);
+		List<WikiPage> children = getWikiPages(id, publishAfter);
 		Map<Long, WikiPage> nodes = new LinkedHashMap<>();
 		children.forEach(wp -> {
 			nodes.put(wp.id, wp);
 		});
 		treeIterate(wiki, nodes);
-		if (!nodes.isEmpty() && !publishedOnly) {
+		if (!nodes.isEmpty() && publishAfter == null) {
 			// there is error for tree structure, append to root for fix:
 			nodes.forEach((nodeId, node) -> {
 				wiki.addChild(node);
@@ -66,11 +65,10 @@ public class WikiService extends AbstractService<Wiki> {
 		return wiki;
 	}
 
-	private List<WikiPage> getWikiPages(Long wikiId, boolean publishedOnly) {
-		if (publishedOnly) {
-			return this.db.from(WikiPage.class)
-					.where("wikiId = ? AND publishAt < ?", wikiId, System.currentTimeMillis()).orderBy("parentId")
-					.orderBy("displayOrder").orderBy("id").list();
+	private List<WikiPage> getWikiPages(Long wikiId, Long publishAfter) {
+		if (publishAfter != null) {
+			return this.db.from(WikiPage.class).where("wikiId = ? AND publishAt < ?", wikiId, publishAfter)
+					.orderBy("parentId").orderBy("displayOrder").orderBy("id").list();
 		}
 		return this.db.from(WikiPage.class).where("wikiId = ?", wikiId).orderBy("parentId").orderBy("displayOrder")
 				.orderBy("id").list();
@@ -129,6 +127,7 @@ public class WikiService extends AbstractService<Wiki> {
 		atta.name = wiki.name;
 		atta.data = bean.image;
 		wiki.imageId = this.attachmentService.createAttachment(user, atta).id;
+		this.db.insert(wiki);
 		return wiki;
 	}
 
@@ -169,10 +168,11 @@ public class WikiService extends AbstractService<Wiki> {
 	}
 
 	@Transactional
-	public WikiPage createWikiPage(User user, Wiki wiki, long parentId, WikiPageBean bean) {
+	public WikiPage createWikiPage(User user, Wiki wiki, WikiPageBean bean) {
 		bean.validate(true);
 		super.checkPermission(user, wiki.userId);
 		WikiPage parent = null;
+		long parentId = bean.parentId;
 		if (wiki.id == parentId) {
 			// append as top level:
 		} else {

@@ -17,7 +17,7 @@ public class SinglePageService extends AbstractService<SinglePage> {
 	@Autowired
 	TextService textService;
 
-	private static final String KEY_SINGLE_PAGES = "_singlepages";
+	private static final String KEY_SINGLE_PAGES = "__singlepages__";
 
 	public List<SinglePage> getAll() {
 		return this.db.from(SinglePage.class).orderBy("publishAt").desc().orderBy("id").desc().list();

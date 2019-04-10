@@ -48,7 +48,7 @@ public class AttachmentService extends AbstractService<Attachment> {
 			r = new Resource();
 			r.id = IdUtil.nextId();
 			r.encoding = ResourceEncoding.BASE64;
-			r.hash = HashUtil.sha256(data);
+			r.hash = hash;
 			r.content = bean.data;
 			this.db.insert(r);
 		}
@@ -71,7 +71,13 @@ public class AttachmentService extends AbstractService<Attachment> {
 		if (user.role != Role.ADMIN && user.id != a.userId) {
 			throw new ApiException(ApiError.PERMISSION_DENIED);
 		}
+		long resourceId = a.resourceId;
 		this.db.remove(a);
+		if (this.db.from(Attachment.class).where("resourceId = ?", resourceId).first() == null) {
+			Resource resource = new Resource();
+			resource.id = resourceId;
+			this.db.remove(resource);
+		}
 	}
 
 	public DownloadBean downloadAttachment(Long id, char size) {

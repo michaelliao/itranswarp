@@ -12,7 +12,7 @@ import com.itranswarp.model.Navigation;
 @Component
 public class NavigationService extends AbstractService<Navigation> {
 
-	static final String KEY_NAVIGATIONS = "_navigations";
+	static final String KEY_NAVIGATIONS = "__navigations__";
 
 	public List<Navigation> getNavigationsFromCache() {
 		List<Navigation> navs = this.redisService.get(KEY_NAVIGATIONS, TYPE_LIST_NAVIGATION);

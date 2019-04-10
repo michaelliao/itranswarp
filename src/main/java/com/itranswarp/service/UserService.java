@@ -26,7 +26,7 @@ import com.itranswarp.warpdb.PagedResults;
 @Component
 public class UserService extends AbstractService<User> {
 
-	static final String KEY_USERS = "_users";
+	static final String KEY_USERS = "__users__";
 
 	public List<User> getUsersFromCache(Object... ids) {
 		var kvs = this.redisService.hmget(KEY_USERS, ids);
@@ -69,8 +69,16 @@ public class UserService extends AbstractService<User> {
 		return this.db.from(User.class).where(where, params).list();
 	}
 
+	public List<User> searchUsers(String q) {
+		return this.db.from(User.class).where("name LIKE ?", q + "%").orderBy("id").desc().limit(ITEMS_PER_PAGE).list();
+	}
+
 	public PagedResults<User> getUsers(int pageIndex) {
 		return this.db.from(User.class).orderBy("id").desc().list(pageIndex, ITEMS_PER_PAGE);
+	}
+
+	public List<User> getUsersByRole(Role role, int maxResults) {
+		return this.db.from(User.class).where("role = ?", role).orderBy("id").limit(maxResults).list();
 	}
 
 	public User fetchUserByEmail(String email) {
@@ -146,20 +154,36 @@ public class UserService extends AbstractService<User> {
 	}
 
 	@Transactional
-	public void updateUserRole(User user, Role role) {
-		user.role = role;
-		this.db.updateProperties(user, "role");
-		clearUserFromCache(user.id);
+	public User updateUserRole(Long id, Role role) {
+		User user = getById(id);
+		if (user.role == Role.ADMIN) {
+			throw new ApiException(ApiError.OPERATION_FAILED, "role", "Could not change admin role.");
+		}
+		if (user.role != role) {
+			user.role = role;
+			this.db.updateProperties(user, "role");
+		}
+		return user;
+	}
+
+	@Transactional
+	public User updateUserLockedUntil(Long id, long ts) {
+		User user = getById(id);
+		if (user.role == Role.ADMIN) {
+			throw new ApiException(ApiError.OPERATION_FAILED, null, "Could not lock admin user.");
+		}
+		user.lockedUntil = ts;
+		this.db.updateProperties(user, "lockedUntil");
+		return user;
 	}
 
 	@Transactional
 	public void lockUser(User user, int days) {
 		user.lockedUntil = System.currentTimeMillis() + TimeUnit.DAYS.toMillis(days);
 		this.db.updateProperties(user, "lockedUntil");
-		clearUserFromCache(user.id);
 	}
 
-	void clearUserFromCache(Long id) {
+	public void clearUserFromCache(Long id) {
 		this.redisService.hdel(KEY_USERS, id);
 	}
 

@@ -1,6 +1,9 @@
 package com.itranswarp.service;
 
+import java.util.Collection;
 import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 
@@ -29,8 +32,8 @@ public class BoardService extends AbstractService<Board> {
 	@Autowired
 	Markdown markdown;
 
-	static final String KEY_BOARDS = "_boards";
-	static final String KEY_TOPICS_FIRST_PAGE = "_topics_";
+	static final String KEY_BOARDS = "__boards__";
+	static final String KEY_TOPICS_FIRST_PAGE = "__topics__";
 	static final long CACHE_TOPICS_SECONDS = 3600;
 
 	String sqlUpdateBoardIncTopicNumber;
@@ -50,6 +53,18 @@ public class BoardService extends AbstractService<Board> {
 		this.sqlUpdateTopicDecReplyNumber = "UPDATE " + topicTable + " SET replyNumber = replyNumber - 1 WHERE id = ?";
 
 		this.sqlDeleteReplies = "DELETE FROM " + replyTable + " WHERE topicId = ?";
+	}
+
+	public Board getBoardByTagFromCache(String tag) {
+		Collection<Board> boards = this.redisService.hgetAll(KEY_BOARDS, Board.class).values();
+		if (boards.isEmpty()) {
+			boards = this.getBoards();
+		}
+		Optional<Board> board = boards.stream().filter(b -> b.tag.equals(tag)).findFirst();
+		if (board.isEmpty()) {
+			throw new ApiException(ApiError.PARAMETER_INVALID, "tag", "Board not found by tag: " + tag);
+		}
+		return board.get();
 	}
 
 	public Board getBoardFromCache(Long id) {
@@ -133,12 +148,27 @@ public class BoardService extends AbstractService<Board> {
 				.list(pageIndex, ITEMS_PER_PAGE);
 	}
 
+	public List<TopicWithReplies> getTopicsByRefId(long refId) {
+		List<Topic> topics = this.db.from(Topic.class).where("refId = ?", refId).orderBy("updatedAt").desc()
+				.orderBy("id").desc().limit(20).list();
+		return topics.stream().map(topic -> {
+			TopicWithReplies tw = new TopicWithReplies();
+			tw.copyPropertiesFrom(topic);
+			tw.replies = getRecentReplies(topic);
+			return tw;
+		}).collect(Collectors.toList());
+	}
+
 	public PagedResults<Topic> getTopics(int pageIndex) {
 		return this.db.from(Topic.class).orderBy("id").desc().list(pageIndex, ITEMS_PER_PAGE);
 	}
 
 	public PagedResults<Reply> getReplies(int pageIndex) {
 		return this.db.from(Reply.class).orderBy("id").desc().list(pageIndex);
+	}
+
+	public List<Reply> getRecentReplies(Topic topic) {
+		return this.db.from(Reply.class).where("topicId = ?", topic.id).orderBy("id").limit(10).list();
 	}
 
 	public PagedResults<Reply> getReplies(Topic topic, int pageIndex) {
@@ -167,6 +197,8 @@ public class BoardService extends AbstractService<Board> {
 		topic.refId = bean.refId;
 		topic.refType = bean.refType;
 		topic.userId = user.id;
+		topic.userName = user.name;
+		topic.userImageUrl = user.imageUrl;
 		this.db.insert(topic);
 		this.db.updateSql(this.sqlUpdateBoardIncTopicNumber, topic.boardId);
 		return topic;
@@ -203,6 +235,8 @@ public class BoardService extends AbstractService<Board> {
 		bean.validate(true);
 		Reply reply = new Reply();
 		reply.userId = user.id;
+		reply.userName = user.name;
+		reply.userImageUrl = user.imageUrl;
 		reply.topicId = topic.id;
 		reply.content = markdown.ugcToHtml(bean.content, AbstractEntity.TEXT);
 		this.db.insert(reply);
@@ -216,6 +250,12 @@ public class BoardService extends AbstractService<Board> {
 		super.checkPermission(user, reply.userId);
 		this.db.remove(reply);
 		this.db.updateSql(this.sqlUpdateTopicDecReplyNumber, reply.topicId);
+	}
+
+	public static class TopicWithReplies extends Topic {
+
+		public List<Reply> replies;
+
 	}
 
 	static final TypeReference<PagedResults<Topic>> TYPE_PAGE_RESULTS_TOPIC = new TypeReference<>() {

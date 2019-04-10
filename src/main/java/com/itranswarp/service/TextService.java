@@ -16,7 +16,7 @@ public class TextService extends AbstractService<Text> {
 	Markdown markdown;
 
 	private static final long EXPIRES_IN_SECONDS = 3600 * 24;
-	private static final String KEY_TEXT_PREFIEX = "_text_";
+	private static final String KEY_TEXT_PREFIEX = "__text__";
 
 	@Transactional
 	public Text createText(String content) {

@@ -14,6 +14,8 @@ public @interface SettingInput {
 
 	InputType value();
 
+	int order();
+
 	String description() default "";
 
 }

@@ -97,6 +97,9 @@ public class WeiboOAuthProvider extends AbstractOAuthProvider {
 
 			@Override
 			public String getImageUrl() {
+				if (user.profile_image_url != null && user.profile_image_url.startsWith("http://")) {
+					return "https://" + user.profile_image_url.substring(7);
+				}
 				return user.profile_image_url;
 			}
 		};

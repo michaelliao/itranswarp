@@ -99,6 +99,6 @@ public final class IdUtil {
 			long serverId = Long.parseLong(matcher.group(3), 16);
 			return generateId(epoch, next, serverId);
 		}
-		throw new IllegalArgumentException("Invalid id.");
+		throw new IllegalArgumentException("Invalid id: " + stringId);
 	}
 }

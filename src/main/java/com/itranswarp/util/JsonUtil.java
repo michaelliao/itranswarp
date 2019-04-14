@@ -17,7 +17,6 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.itranswarp.common.ApiException;
 
 /**
  * Customize JSON serialization using Jackson.
@@ -56,18 +55,6 @@ public class JsonUtil {
 	public static String writeJson(Object obj) {
 		try {
 			return OBJECT_MAPPER.writeValueAsString(obj);
-		} catch (JsonProcessingException e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	public static String writeJson(ApiException obj) {
-		try {
-			Map<String, Object> map = new HashMap<>();
-			map.put("error", obj.error);
-			map.put("data", obj.data);
-			map.put("message", obj.getMessage());
-			return OBJECT_MAPPER.writeValueAsString(map);
 		} catch (JsonProcessingException e) {
 			throw new RuntimeException(e);
 		}

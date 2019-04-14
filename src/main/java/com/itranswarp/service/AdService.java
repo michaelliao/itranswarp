@@ -51,7 +51,7 @@ public class AdService extends AbstractService<AdSlot> {
 				List<AdPeriod> adPeriods = getActiveAdPeriodsByAdSlot(adSlot, todayStr);
 				adPeriods.forEach(period -> {
 					List<AdMaterial> adMaterials = getActiveAdMaterialsByAdPeriod(period, todayStr);
-					slot.addAdMaterials(adMaterials);
+					slot.addAdPeriodWithAdMaterials(adMaterials);
 				});
 			});
 			adInfo = ad;
@@ -113,7 +113,8 @@ public class AdService extends AbstractService<AdSlot> {
 	}
 
 	public List<AdPeriod> getAdPeriods() {
-		return this.db.from(AdPeriod.class).orderBy("adSlotId").orderBy("displayOrder").orderBy("id").list();
+		return this.db.from(AdPeriod.class).orderBy("endAt").desc().orderBy("startAt").desc().orderBy("displayOrder")
+				.orderBy("id").list();
 	}
 
 	@Transactional
@@ -157,6 +158,8 @@ public class AdService extends AbstractService<AdSlot> {
 		if (!isExpiredAdPeriod(ap)) {
 			throw new ApiException(ApiError.OPERATION_FAILED, "AdPeriod", "Could not delete non-expired AdPeriod.");
 		}
+		List<AdMaterial> ms = getAdMaterialsByAdPeriod(ap);
+		this.db.remove(ms);
 		this.db.remove(ap);
 	}
 
@@ -179,6 +182,7 @@ public class AdService extends AbstractService<AdSlot> {
 		}
 		AdMaterial m = new AdMaterial();
 		m.copyPropertiesFrom(bean);
+		m.adPeriodId = ap.id;
 
 		AttachmentBean atta = new AttachmentBean();
 		atta.name = user.name;
@@ -195,7 +199,7 @@ public class AdService extends AbstractService<AdSlot> {
 			throw new ApiException(ApiError.ENTITY_NOT_FOUND, "AdMaterial", "Entity not found by id.");
 		}
 		AdPeriod p = this.db.fetch(AdPeriod.class, m.adPeriodId);
-		if (p == null || p.userId != user.id) {
+		if (p == null || user.role != Role.ADMIN && p.userId != user.id) {
 			throw new ApiException(ApiError.ENTITY_NOT_FOUND, "AdMaterial", "Entity not found by id.");
 		}
 		this.db.remove(m);
@@ -205,9 +209,18 @@ public class AdService extends AbstractService<AdSlot> {
 		return this.db.from(AdPeriod.class).where("adSlotId = ?", slot.id).orderBy("endAt").desc().list();
 	}
 
+	public List<AdPeriod> getAdPeriodsByUser(User user) {
+		return this.db.from(AdPeriod.class).where("userId = ?", user.id).orderBy("adSlotId").orderBy("displayOrder")
+				.orderBy("endAt").desc().list();
+	}
+
 	private List<AdPeriod> getActiveAdPeriodsByAdSlot(AdSlot slot, String today) {
 		return this.db.from(AdPeriod.class).where("adSlotId = ? AND startAt <= ? AND endAt > ?", slot.id, today, today)
 				.orderBy("displayOrder").desc().list();
+	}
+
+	public List<AdMaterial> getAdMaterialsByAdPeriod(AdPeriod period) {
+		return this.db.from(AdMaterial.class).where("adPeriodId = ?", period.id).orderBy("endAt").desc().list();
 	}
 
 	private List<AdMaterial> getActiveAdMaterialsByAdPeriod(AdPeriod period, String today) {

@@ -1,6 +1,9 @@
 package com.itranswarp.bean;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 import java.util.Arrays;
+import java.util.function.LongPredicate;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -10,6 +13,8 @@ import com.itranswarp.model.AbstractEntity;
 
 public abstract class AbstractRequestBean {
 
+	private static final Pattern PATTERN_ALIAS = Pattern
+			.compile("^[a-z][a-z0-9]{0," + (AbstractEntity.VAR_ENUM - 1) + "}$");
 	private static final Pattern PATTERN_TAG = Pattern.compile("^[^\\,\\;]{1," + AbstractEntity.VAR_ENUM + "}$");
 	private static final Pattern PATTERN_HASH = Pattern.compile("^[a-f0-9]{64}$");
 
@@ -38,6 +43,17 @@ public abstract class AbstractRequestBean {
 		}
 	}
 
+	protected String checkLocalDate(String name, String value) {
+		if (value == null || value.isEmpty()) {
+			throw new ApiException(ApiError.PARAMETER_INVALID, name, "Invalid date of " + name);
+		}
+		try {
+			return LocalDate.parse(value.trim()).toString();
+		} catch (DateTimeParseException e) {
+			throw new ApiException(ApiError.PARAMETER_INVALID, name, "Invalid date of " + name);
+		}
+	}
+
 	protected String checkName(String value) {
 		return checkString("name", AbstractEntity.VAR_CHAR_NAME, value);
 	}
@@ -58,6 +74,18 @@ public abstract class AbstractRequestBean {
 		return checkString("image", 524287, value);
 	}
 
+	protected String checkAlias(String value) {
+		if (value == null) {
+			throw new ApiException(ApiError.PARAMETER_INVALID, "alias", "Invalid alias.");
+		}
+		value = value.trim();
+		Matcher matcher = PATTERN_ALIAS.matcher(value);
+		if (!matcher.matches()) {
+			throw new ApiException(ApiError.PARAMETER_INVALID, "alias", "Invalid alias.");
+		}
+		return value;
+	}
+
 	protected String checkTag(String value) {
 		if (value == null) {
 			return "";
@@ -70,12 +98,18 @@ public abstract class AbstractRequestBean {
 	}
 
 	protected String checkTags(String value) {
-		if (value == null) {
+		if (value == null || value.isBlank()) {
 			return "";
 		}
-		String[] ss = Arrays.stream(value.replaceAll("\\s+", " ").split("\\s?[\\,\\;]+\\s?")).map(String::strip)
+		String[] ss = Arrays.stream(value.strip().replaceAll("\\s+", " ").split("\\s?[\\,\\;]+\\s?")).map(String::strip)
 				.filter(s -> !s.isEmpty()).map(this::checkTag).toArray(String[]::new);
 		return checkString("tags", AbstractEntity.VAR_CHAR_TAGS, String.join(",", ss));
+	}
+
+	protected void checkLong(String name, long value, LongPredicate predicate) {
+		if (!predicate.test(value)) {
+			throw new ApiException(ApiError.PARAMETER_INVALID, name, "Invalid " + name);
+		}
 	}
 
 	protected String checkUrl(String url) {

@@ -44,6 +44,7 @@ public class ApiFilterRegistrationBean extends FilterRegistrationBean<Filter> {
 			} catch (ApiException e) {
 				sendApiError(httpResponse, e);
 			} catch (Exception e) {
+				logger.warn("exception.", e);
 				Throwable cause = e.getCause();
 				if (cause instanceof ApiException) {
 					sendApiError(httpResponse, (ApiException) cause);
@@ -61,7 +62,7 @@ public class ApiFilterRegistrationBean extends FilterRegistrationBean<Filter> {
 				httpResponse.setContentType("application/json");
 				@SuppressWarnings("resource")
 				PrintWriter pw = httpResponse.getWriter();
-				pw.write(JsonUtil.writeJson(e));
+				pw.write(JsonUtil.writeJson(e.toMap()));
 				pw.flush();
 			}
 		}

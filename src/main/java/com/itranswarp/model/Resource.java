@@ -20,6 +20,9 @@ import com.itranswarp.enums.ResourceEncoding;
 @Table(name = "resources", uniqueConstraints = @UniqueConstraint(name = "UNI_HASH", columnNames = { "hash" }))
 public class Resource extends AbstractEntity {
 
+	/**
+	 * Hash of the binary data.
+	 */
 	@Column(nullable = false, updatable = false, length = VAR_CHAR_HASH)
 	public String hash;
 

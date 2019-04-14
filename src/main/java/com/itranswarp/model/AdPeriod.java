@@ -20,7 +20,7 @@ public class AdPeriod extends AbstractEntity {
 	/**
 	 * ISO date format like "2019-01-01".
 	 */
-	@Column(nullable = false, length = VAR_CHAR_DATE)
+	@Column(nullable = false, updatable = false, length = VAR_CHAR_DATE)
 	public String startAt;
 
 	/**

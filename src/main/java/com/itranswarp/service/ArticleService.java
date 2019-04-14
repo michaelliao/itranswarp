@@ -45,11 +45,11 @@ public class ArticleService extends AbstractService<Article> {
 		return c;
 	}
 
-	public void removeCategoriesFromCache() {
+	public void deleteCategoriesFromCache() {
 		this.redisService.del(KEY_CATEGORIES);
 	}
 
-	public void removeCategoryFromCache(Long id) {
+	public void deleteCategoryFromCache(Long id) {
 		this.redisService.hdel(KEY_CATEGORIES, id);
 	}
 

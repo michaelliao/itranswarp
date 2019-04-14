@@ -29,12 +29,13 @@ public class Translators {
 	final Translator DEFAULT = new DefaultTranslator();
 
 	Map<String, Translator> translators;
-	List<String> names;
+	List<Language> languages;
 
 	@PostConstruct
 	public void init() throws IOException {
 		List<Translator> list = getTranslators("i18n");
-		this.names = list.stream().map(Translator::getDisplayName).collect(Collectors.toList());
+		this.languages = list.stream().map(t -> new Language(t.getDisplayName(), t.getLocaleName()))
+				.collect(Collectors.toList());
 		this.translators = list.stream().collect(Collectors.toMap(Translator::getLocaleName, t -> t));
 	}
 
@@ -56,8 +57,8 @@ public class Translators {
 		return t;
 	}
 
-	public List<String> getTranslatorNames() {
-		return this.names;
+	public List<Language> getLanguages() {
+		return this.languages;
 	}
 
 	private List<Translator> getTranslators(String basePackage) throws IOException {
@@ -102,4 +103,14 @@ public class Translators {
 	private static final Pattern PATTERN_LOCALE_1 = Pattern.compile("^([a-z]+)$");
 	private static final Pattern PATTERN_LOCALE_2 = Pattern.compile("^([a-z]+)\\_([A-Z]+)$");
 
+	public static class Language {
+
+		public final String name;
+		public final String locale;
+
+		public Language(String name, String locale) {
+			this.name = name;
+			this.locale = locale;
+		}
+	}
 }

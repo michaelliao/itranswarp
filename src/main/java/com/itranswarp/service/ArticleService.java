@@ -110,7 +110,7 @@ public class ArticleService extends AbstractService<Article> {
 		if (articles == null) {
 			articles = db.from(Article.class).where("publishAt < ?", System.currentTimeMillis()).orderBy("publishAt")
 					.desc().orderBy("id").desc().limit(maxResults).list();
-			this.redisService.set(KEY_RECENT_ARTICLES, articles);
+			this.redisService.set(KEY_RECENT_ARTICLES, articles, CACHE_ARTICLES_SECONDS);
 		}
 		return articles;
 	}

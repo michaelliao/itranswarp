@@ -196,12 +196,11 @@ class NoFollowLinkNodeRenderer implements NodeRenderer {
 		Map<String, String> attrs = new LinkedHashMap<>();
 		attrs.put("rel", "nofollow");
 		attrs.put("href", url);
+		attrs.put("target", "_blank");
 		if (title != null) {
 			attrs.put("title", title);
 		}
-		Map<String, String> extended = context.extendAttributes(node, "a", attrs);
-		extended.put("target", "_blank");
-		html.tag("a", extended);
+		html.tag("a", context.extendAttributes(node, "a", attrs));
 		visitChildren(link);
 		html.tag("/a");
 	}

@@ -199,7 +199,9 @@ class NoFollowLinkNodeRenderer implements NodeRenderer {
 		if (title != null) {
 			attrs.put("title", title);
 		}
-		html.tag("a", context.extendAttributes(node, "a", attrs));
+		Map<String, String> extended = context.extendAttributes(node, "a", attrs);
+		extended.put("target", "_blank");
+		html.tag("a", extended);
 		visitChildren(link);
 		html.tag("/a");
 	}

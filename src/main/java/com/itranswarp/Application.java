@@ -1,5 +1,7 @@
 package com.itranswarp;
 
+import java.time.Instant;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
@@ -23,9 +25,9 @@ public class Application {
 
 	static final Logger logger = LoggerFactory.getLogger(Application.class);
 
-	public static final String VERSION = "1.0."
-			+ (Application.class.getPackage().getImplementationVersion() == null ? "0"
-					: Application.class.getPackage().getImplementationVersion());
+	public static final String VERSION = "1.0." + (Application.class.getPackage().getImplementationVersion() == null
+			? String.valueOf(Instant.now().getEpochSecond())
+			: Application.class.getPackage().getImplementationVersion());
 
 	public static void main(String[] args) {
 		logger.info("start application version {}...", VERSION);

@@ -1,18 +1,27 @@
 package com.itranswarp.web.controller;
 
+import java.time.LocalDate;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.LocaleResolver;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.itranswarp.Application;
+import com.itranswarp.bean.AbstractSettingBean;
+import com.itranswarp.bean.SettingDefinition;
+import com.itranswarp.common.ApiException;
+import com.itranswarp.enums.ApiError;
+import com.itranswarp.enums.Role;
 import com.itranswarp.markdown.Markdown;
+import com.itranswarp.model.User;
 import com.itranswarp.web.filter.HttpContext;
 import com.itranswarp.web.view.i18n.Translators;
 
@@ -44,6 +53,42 @@ public class ManageController extends AbstractController {
 	}
 
 	///////////////////////////////////////////////////////////////////////////////////////////////
+	// ad
+	///////////////////////////////////////////////////////////////////////////////////////////////
+
+	@GetMapping("/ad/")
+	public ModelAndView adSlotList() {
+		return prepareModelAndView("manage/ad/adslot_list.html");
+	}
+
+	@GetMapping("/ad/adslot_create")
+	public ModelAndView adSlotCreate() {
+		return prepareModelAndView("manage/ad/adslot_form.html", Map.of("id", 0, "action", "/api/adSlots"));
+	}
+
+	@GetMapping("/ad/adslot_update")
+	public ModelAndView adSlotUpdate(@RequestParam("id") long id) {
+		return prepareModelAndView("manage/ad/adslot_form.html", Map.of("id", id, "action", "/api/adSlots/" + id));
+	}
+
+	@GetMapping("/ad/adperiod_list")
+	public ModelAndView adPeriodList() {
+		return prepareModelAndView("manage/ad/adperiod_list.html", Map.of("today", LocalDate.now().toString()));
+	}
+
+	@GetMapping("/ad/adperiod_create")
+	public ModelAndView adPeriodCreate() {
+		List<User> sponsors = this.userService.getUsersByRole(Role.SPONSOR, 100);
+		return prepareModelAndView("manage/ad/adperiod_form.html",
+				Map.of("today", LocalDate.now().toString(), "sponsors", sponsors));
+	}
+
+	@GetMapping("/ad/admaterial_list")
+	public ModelAndView adMaterialList(@RequestParam(value = "page", defaultValue = "1") int pageIndex) {
+		return prepareModelAndView("manage/ad/admaterial_list.html", Map.of("page", pageIndex));
+	}
+
+	///////////////////////////////////////////////////////////////////////////////////////////////
 	// article and categories
 	///////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -53,18 +98,18 @@ public class ManageController extends AbstractController {
 	}
 
 	@GetMapping("/article/category_list")
-	public ModelAndView categoryList() {
+	public ModelAndView articleCategoryList() {
 		var categories = articleService.getCategories();
 		return prepareModelAndView("manage/article/category_list.html", Map.of("categories", categories));
 	}
 
 	@GetMapping("/article/category_create")
-	public ModelAndView categoryCreate() {
+	public ModelAndView articleCategoryCreate() {
 		return prepareModelAndView("manage/article/category_form.html", Map.of("id", 0, "action", "/api/categories"));
 	}
 
 	@GetMapping("/article/category_update")
-	public ModelAndView categoryUpdate(@RequestParam("id") long id) {
+	public ModelAndView articleCategoryUpdate(@RequestParam("id") long id) {
 		return prepareModelAndView("manage/article/category_form.html",
 				Map.of("id", id, "action", "/api/categories/" + id));
 	}
@@ -78,6 +123,100 @@ public class ManageController extends AbstractController {
 	public ModelAndView articleUpdate(@RequestParam("id") long id) {
 		return prepareModelAndView("manage/article/article_form.html",
 				Map.of("id", id, "action", "/api/articles/" + id));
+	}
+
+	///////////////////////////////////////////////////////////////////////////////////////////////
+	// attachment
+	///////////////////////////////////////////////////////////////////////////////////////////////
+
+	@GetMapping("/attachment/")
+	public ModelAndView attachmentList(@RequestParam(value = "page", defaultValue = "1") int pageIndex) {
+		return prepareModelAndView("manage/attachment/attachment_list.html", Map.of("page", pageIndex));
+	}
+
+	///////////////////////////////////////////////////////////////////////////////////////////////
+	// boards, topics and replies
+	///////////////////////////////////////////////////////////////////////////////////////////////
+
+	@GetMapping("/board/")
+	public ModelAndView boardList() {
+		return prepareModelAndView("manage/board/board_list.html");
+	}
+
+	@GetMapping("/board/board_create")
+	public ModelAndView boardCreate() {
+		return prepareModelAndView("manage/board/board_form.html", Map.of("id", 0, "action", "/api/boards"));
+	}
+
+	@GetMapping("/board/board_update")
+	public ModelAndView boardUpdate(@RequestParam("id") long id) {
+		return prepareModelAndView("manage/board/board_form.html", Map.of("id", id, "action", "/api/boards/" + id));
+	}
+
+	@GetMapping("/board/topic")
+	public ModelAndView boardTopicList(@RequestParam(value = "page", defaultValue = "1") int pageIndex) {
+		return prepareModelAndView("manage/board/topic_list.html", Map.of("page", pageIndex));
+	}
+
+	@GetMapping("/board/reply")
+	public ModelAndView boardReplyList(@RequestParam(value = "page", defaultValue = "1") int pageIndex) {
+		return prepareModelAndView("manage/board/reply_list.html", Map.of("page", pageIndex));
+	}
+
+	///////////////////////////////////////////////////////////////////////////////////////////////
+	// navigations
+	///////////////////////////////////////////////////////////////////////////////////////////////
+
+	@GetMapping("/navigation/")
+	public ModelAndView navigationList() {
+		return prepareModelAndView("manage/navigation/navigation_list.html");
+	}
+
+	@GetMapping("/navigation/navigation_create")
+	public ModelAndView navigationCreate() {
+		return prepareModelAndView("manage/navigation/navigation_form.html",
+				Map.of("id", 0, "action", "/api/navigations"));
+	}
+
+	@GetMapping("/navigation/navigation_update")
+	public ModelAndView navigationUpdate(@RequestParam("id") long id) {
+		return prepareModelAndView("manage/navigation/navigation_form.html",
+				Map.of("id", id, "action", "/api/navigations/" + id));
+	}
+
+	///////////////////////////////////////////////////////////////////////////////////////////////
+	// settings
+	///////////////////////////////////////////////////////////////////////////////////////////////
+
+	@GetMapping("/setting/")
+	public String setting() {
+		return "redirect:/manage/setting/website";
+	}
+
+	@GetMapping("/setting/{group}")
+	public ModelAndView setting(@PathVariable("group") String group) {
+		final List<String> tabs = List.of("website", "snippet", "follow");
+		AbstractSettingBean settings = null;
+		String tab = null;
+		switch (group) {
+		case "website":
+			tab = "website";
+			settings = this.settingService.getWebsite();
+			break;
+		case "snippet":
+			tab = "snippet";
+			settings = this.settingService.getSnippet();
+			break;
+		case "follow":
+			tab = "follow";
+			settings = this.settingService.getFollow();
+			break;
+		default:
+			throw new ApiException(ApiError.PARAMETER_INVALID, "group", "Invalid group name: " + group);
+		}
+		List<SettingDefinition> definitions = settings.getSettingDefinitions();
+		return prepareModelAndView("manage/setting/setting_form.html",
+				Map.of("settings", settings, "definitions", definitions, "tab", tab, "tabs", tabs));
 	}
 
 	///////////////////////////////////////////////////////////////////////////////////////////////
@@ -102,53 +241,43 @@ public class ManageController extends AbstractController {
 	}
 
 	///////////////////////////////////////////////////////////////////////////////////////////////
-	// boards, topics and replies
+	// wikis
 	///////////////////////////////////////////////////////////////////////////////////////////////
 
-	@GetMapping("/board/")
-	public ModelAndView boardList() {
-		return prepareModelAndView("manage/board/board_list.html");
+	@GetMapping("/wiki/")
+	public ModelAndView wikiList() {
+		return prepareModelAndView("manage/wiki/wiki_list.html");
 	}
 
-	@GetMapping("/board/board_create")
-	public ModelAndView boardCreate() {
-		return prepareModelAndView("manage/board/board_form.html", Map.of("id", 0, "action", "/api/boards"));
+	@GetMapping("/wiki/wiki_create")
+	public ModelAndView wikiCreate() {
+		return prepareModelAndView("manage/wiki/wiki_form.html", Map.of("id", 0, "action", "/api/wikis"));
 	}
 
-	@GetMapping("/board/board_update")
-	public ModelAndView boardUpdate(@RequestParam("id") long id) {
-		return prepareModelAndView("manage/board/board_form.html", Map.of("id", id, "action", "/api/boards/" + id));
+	@GetMapping("/wiki/wiki_tree")
+	public ModelAndView wikiTree(@RequestParam("id") long id) {
+		return prepareModelAndView("manage/wiki/wiki_tree.html", Map.of("id", id));
 	}
 
-	@GetMapping("/board/topic")
-	public ModelAndView topicList(@RequestParam(value = "page", defaultValue = "1") int pageIndex) {
-		return prepareModelAndView("manage/board/topic_list.html", Map.of("page", pageIndex));
+	@GetMapping("/wiki/wiki_update")
+	public ModelAndView wikiUpdate(@RequestParam("id") long id) {
+		return prepareModelAndView("manage/wiki/wiki_form.html", Map.of("id", id, "action", "/api/wikis/" + id));
 	}
 
-	@GetMapping("/board/reply")
-	public ModelAndView replyList(@RequestParam(value = "page", defaultValue = "1") int pageIndex) {
-		return prepareModelAndView("manage/board/reply_list.html", Map.of("page", pageIndex));
+	@GetMapping("/wiki/wikipage_update")
+	public ModelAndView wikipageUpdate(@RequestParam("id") long id) {
+		return prepareModelAndView("manage/wiki/wikipage_form.html",
+				Map.of("id", id, "action", "/api/wikiPages/" + id));
 	}
 
 	///////////////////////////////////////////////////////////////////////////////////////////////
-	// navigations
+	// users
 	///////////////////////////////////////////////////////////////////////////////////////////////
 
-	@GetMapping("/navigation/")
-	public ModelAndView navigationList() {
-		return prepareModelAndView("manage/navigation/navigation_list.html");
-	}
-
-	@GetMapping("/navigation/navigation_create")
-	public ModelAndView navigationCreate() {
-		return prepareModelAndView("manage/navigation/navigation_form.html",
-				Map.of("id", 0, "action", "/api/navigations"));
-	}
-
-	@GetMapping("/navigation/navigation_update")
-	public ModelAndView navigationUpdate(@RequestParam("id") long id) {
-		return prepareModelAndView("manage/navigation/navigation_form.html",
-				Map.of("id", id, "action", "/api/navigations/" + id));
+	@GetMapping("/user/")
+	public ModelAndView userList(@RequestParam(value = "page", defaultValue = "1") int pageIndex,
+			@RequestParam(value = "q", defaultValue = "") String q) {
+		return prepareModelAndView("manage/user/user_list.html", Map.of("page", pageIndex, "q", q));
 	}
 
 	///////////////////////////////////////////////////////////////////////////////////////////////

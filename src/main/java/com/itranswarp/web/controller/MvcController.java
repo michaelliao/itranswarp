@@ -1,25 +1,36 @@
 package com.itranswarp.web.controller;
 
+import java.time.LocalDate;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
+import java.util.Optional;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.LocaleResolver;
 import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.view.RedirectView;
 
 import com.itranswarp.Application;
 import com.itranswarp.common.ApiException;
 import com.itranswarp.enums.ApiError;
+import com.itranswarp.enums.RefType;
+import com.itranswarp.enums.Role;
 import com.itranswarp.markdown.Markdown;
+import com.itranswarp.model.AdMaterial;
+import com.itranswarp.model.AdPeriod;
+import com.itranswarp.model.AdSlot;
 import com.itranswarp.model.Article;
 import com.itranswarp.model.Board;
 import com.itranswarp.model.Category;
@@ -77,10 +88,68 @@ public class MvcController extends AbstractController {
 	///////////////////////////////////////////////////////////////////////////////////////////////
 	// index
 	///////////////////////////////////////////////////////////////////////////////////////////////
+
 	@GetMapping("/")
 	public ModelAndView index() {
 		List<Article> recentArticles = this.articleService.getPublishedArticles(10);
 		return prepareModelAndView("index.html", Map.of("recentArticles", recentArticles));
+	}
+
+	@GetMapping("/locale/{lo}")
+	public String locale(@PathVariable("lo") String lo, HttpServletRequest request, HttpServletResponse response) {
+		this.localeResolver.setLocale(request, response, new Locale(lo));
+		return "redirect:" + HttpUtil.getReferer(request);
+	}
+
+	@GetMapping("/ref/{refType}/" + ID)
+	public ModelAndView refRedirect(@PathVariable("refType") RefType refType, @PathVariable("id") long id,
+			HttpServletResponse response) {
+		RedirectView rv = new RedirectView();
+		rv.setStatusCode(HttpStatus.MOVED_PERMANENTLY);
+		switch (refType) {
+		case ARTICLE:
+			rv.setUrl("/article/" + id);
+			return new ModelAndView(rv);
+		case WIKI:
+			rv.setUrl("/wiki/" + id);
+			return new ModelAndView(rv);
+		case WIKIPAGE:
+			WikiPage wikiPage = wikiService.getWikiPageById(id);
+			rv.setUrl("/wiki/" + wikiPage.wikiId + "/" + id);
+			return new ModelAndView(rv);
+		case NONE:
+		default:
+		}
+		return notFound();
+	}
+
+	///////////////////////////////////////////////////////////////////////////////////////////////
+	// ad
+	///////////////////////////////////////////////////////////////////////////////////////////////
+
+	@GetMapping("/sponsor/adperiod")
+	public ModelAndView adperiods(@RequestParam(value = "id", defaultValue = "0") long id) {
+		User user = HttpContext.getRequiredCurrentUser();
+		if (user.role != Role.SPONSOR) {
+			throw new ApiException(ApiError.PERMISSION_DENIED, null, "Permission denied.");
+		}
+		List<AdPeriod> adPeriods = this.adService.getAdPeriodsByUser(user);
+		List<AdMaterial> adMaterials = List.of();
+		final long adPeriodId = id == 0 && !adPeriods.isEmpty() ? adPeriods.get(0).id : id;
+		if (adPeriodId != 0) {
+			Optional<AdPeriod> opt = adPeriods.stream().filter(p -> p.id == adPeriodId).findFirst();
+			if (opt.isEmpty()) {
+				throw new ApiException(ApiError.ENTITY_NOT_FOUND, "AdPeriod", "AdPeriod not found.");
+			}
+			AdPeriod active = opt.get();
+			if (active.userId != user.id) {
+				throw new ApiException(ApiError.ENTITY_NOT_FOUND, "AdPeriod", "AdPeriod not found.");
+			}
+			adMaterials = this.adService.getAdMaterialsByAdPeriod(active);
+		}
+		List<AdSlot> adSlots = this.adService.getAdSlots();
+		return prepareModelAndView("sponsor.html", Map.of("adSlots", adSlots, "adPeriods", adPeriods, "adMaterials",
+				adMaterials, "today", LocalDate.now().toString(), "id", adPeriodId));
 	}
 
 	///////////////////////////////////////////////////////////////////////////////////////////////
@@ -122,7 +191,7 @@ public class MvcController extends AbstractController {
 
 	@GetMapping("/wiki/" + ID)
 	public ModelAndView wiki(@PathVariable("id") long id) {
-		Wiki wiki = wikiService.getWikiTreeFromCache(id);
+		Wiki wiki = wikiService.getPublishedWikiTreeFromCache(id);
 		wiki.views += viewService.increaseWikiViews(id);
 		String content = textService.getHtmlFromCache(wiki.textId);
 		return prepareModelAndView("wiki.html", Map.of("wiki", wiki, "current", wiki, "content", content));
@@ -130,7 +199,7 @@ public class MvcController extends AbstractController {
 
 	@GetMapping("/wiki/" + ID + "/" + ID2)
 	public ModelAndView wikiPage(@PathVariable("id") long id, @PathVariable("id2") long pid) {
-		Wiki wiki = wikiService.getWikiTreeFromCache(id);
+		Wiki wiki = wikiService.getPublishedWikiTreeFromCache(id);
 		WikiPage wikiPage = wikiService.getWikiPageById(pid);
 		if (wikiPage.wikiId != wiki.id) {
 			return notFound();
@@ -171,6 +240,12 @@ public class MvcController extends AbstractController {
 				Map.of("board", board, "topic", topic, "page", pr.page, "replies", pr.results));
 	}
 
+	@GetMapping("/discuss/" + ID + "/topics/create")
+	public ModelAndView discussNewTopic(@PathVariable("id") long id) {
+		Board board = boardService.getBoardFromCache(id);
+		return prepareModelAndView("topic_form.html", Map.of("board", board));
+	}
+
 	///////////////////////////////////////////////////////////////////////////////////////////////
 	// single page
 	///////////////////////////////////////////////////////////////////////////////////////////////
@@ -209,7 +284,7 @@ public class MvcController extends AbstractController {
 	}
 
 	@PostMapping("/auth/signin")
-	public ModelAndView localSignIn(@RequestParam("email") String email, @RequestParam("passwd") String password,
+	public ModelAndView signinLocal(@RequestParam("email") String email, @RequestParam("passwd") String password,
 			HttpServletRequest request, HttpServletResponse response) {
 		if (password.length() != 64) {
 			return passwordAuthFailed();
@@ -273,6 +348,21 @@ public class MvcController extends AbstractController {
 	}
 
 	///////////////////////////////////////////////////////////////////////////////////////////////
+	// exception handler
+	///////////////////////////////////////////////////////////////////////////////////////////////
+
+	@ExceptionHandler(ApiException.class)
+	public ModelAndView handleApiException(ApiException e) {
+		if (e.error == ApiError.AUTH_SIGNIN_REQUIRED) {
+			return new ModelAndView("redirect:/auth/signin");
+		}
+		if (e.error == ApiError.ENTITY_NOT_FOUND) {
+			return notFound();
+		}
+		return prepareModelAndView("500.html", Map.of("error", e.getMessage()));
+	}
+
+	///////////////////////////////////////////////////////////////////////////////////////////////
 	// utility method
 	///////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -289,7 +379,7 @@ public class MvcController extends AbstractController {
 	}
 
 	ModelAndView notFound() {
-		ModelAndView mv = new ModelAndView("/404.html");
+		ModelAndView mv = new ModelAndView("404.html");
 		appendGlobalModel(mv);
 		return mv;
 	}
@@ -297,15 +387,30 @@ public class MvcController extends AbstractController {
 	private void appendGlobalModel(ModelAndView mv) {
 		@SuppressWarnings("resource")
 		HttpContext ctx = HttpContext.getContext();
-		mv.addObject("__name__", this.name);
-		mv.addObject("__cdn__", this.cdn);
+		// development mode?
 		mv.addObject("__dev__", this.dev);
-		mv.addObject("__website__", settingService.getWebsiteFromCache());
-		mv.addObject("__user__", ctx.user);
-		mv.addObject("__navigations__", navigationService.getNavigationsFromCache());
-		mv.addObject("__timestamp__", ctx.timestamp);
-		mv.addObject("__translator__", translators.getTranslator(localeResolver.resolveLocale(ctx.request)));
+		// application name:
+		mv.addObject("__name__", this.name);
+		// application version:
 		mv.addObject("__version__", Application.VERSION);
+		// current user or null:
+		mv.addObject("__user__", ctx.user);
+		// full url:
+		mv.addObject("__url__", ctx.url);
+		// timestamp as millis:
+		mv.addObject("__timestamp__", ctx.timestamp);
+		// settings:
+		mv.addObject("__website__", settingService.getWebsiteFromCache());
+		mv.addObject("__snippet__", settingService.getSnippetFromCache());
+		mv.addObject("__follows__", settingService.getFollowFromCache().getFollows());
+		// navigation menus:
+		mv.addObject("__navigations__", navigationService.getNavigationsFromCache());
+		// ads:
+		mv.addObject("__ads__", adService.getAdInfoFromCache());
+		// supported languages:
+		mv.addObject("__languages__", translators.getLanguages());
+		// translator:
+		mv.addObject("__translator__", translators.getTranslator(localeResolver.resolveLocale(ctx.request)));
 		ctx.response.setHeader("X-Execution-Time", String.valueOf(System.currentTimeMillis() - ctx.timestamp));
 	}
 

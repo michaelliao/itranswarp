@@ -1,12 +1,12 @@
 package com.itranswarp.web.controller;
 
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RestController;
 
 import com.itranswarp.util.IdUtil;
 
-@RestController
+@Controller
 public class LongIdRedirectController {
 
 	private static final String STR_ID = "{id:[0-9a-f]{50}}";

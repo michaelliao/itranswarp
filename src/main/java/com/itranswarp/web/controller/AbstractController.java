@@ -1,11 +1,10 @@
 package com.itranswarp.web.controller;
 
-import java.util.Map;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import com.itranswarp.service.AdService;
 import com.itranswarp.service.ArticleService;
 import com.itranswarp.service.AttachmentService;
 import com.itranswarp.service.BoardService;
@@ -24,25 +23,26 @@ public abstract class AbstractController {
 	protected static final String ID = "{id:[0-9]{1,17}}";
 	protected static final String ID2 = "{id2:[0-9]{1,17}}";
 
-	public static final Map<String, Boolean> API_RESULT_TRUE = Map.of("result", Boolean.TRUE);
-
 	@Autowired
 	protected EncryptService encryptService;
 
 	@Autowired
-	protected UserService userService;
+	protected AdService adService;
 
 	@Autowired
 	protected ArticleService articleService;
 
 	@Autowired
-	protected WikiService wikiService;
+	protected AttachmentService attachmentService;
+
+	@Autowired
+	protected BoardService boardService;
 
 	@Autowired
 	protected NavigationService navigationService;
 
 	@Autowired
-	protected BoardService boardService;
+	protected SettingService settingService;
 
 	@Autowired
 	protected SinglePageService singlePageService;
@@ -51,9 +51,9 @@ public abstract class AbstractController {
 	protected TextService textService;
 
 	@Autowired
-	protected AttachmentService attachmentService;
+	protected UserService userService;
 
 	@Autowired
-	protected SettingService settingService;
+	protected WikiService wikiService;
 
 }

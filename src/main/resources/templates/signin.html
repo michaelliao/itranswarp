@@ -1,0 +1,139 @@
+{% extends '_base.html' %}
+
+{% block title %}{{ _('Sign In') }}{% endblock %}
+
+{% block head %}
+<script src="/static/js/3rdparty/sha256.min.js"></script>
+<style>
+div.x-signin-panel {
+	border-top-left-radius: 0;
+	border-top-right-radius: 0;
+	border-top: none;
+}
+
+div.x-oauth-signin-panel [class*=x-oauth-button-] {
+	width: 240px;
+	text-align: left;
+}
+
+div.x-oauth-signin-panel [class*=x-oauth-button-] i[class*=uk-icon-] {
+	width: 20px;
+}
+
+[class*=x-oauth-button-],[class*=x-oauth-button-]:hover,[class*=x-oauth-button-]:focus,[class*=x-oauth-button-]:active {
+	color: #fff;
+	box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.05);
+	text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.1);
+}
+
+[class*=x-oauth-button-]:hover,[class*=x-oauth-button-]:focus,[class*=x-oauth-button-]:active {
+	filter: brightness(90%);
+}
+
+{% for providerId in oauthConfigurations.keySet() %}
+    {% set config = oauthConfigurations[providerId] %}
+
+button.x-oauth-button-{{ providerId }}:hover,
+button.x-oauth-button-{{ providerId }}:active,
+button.x-oauth-button-{{ providerId }}:focus,
+button.x-oauth-button-{{ providerId }}
+{
+    background-color: {{ config.color }};
+}
+
+{% endfor %}
+
+</style>
+
+<script>
+function showOAuth() {
+	$('#x-tab-passauth').removeClass('uk-active');
+	$('#x-tab-oauth').addClass('uk-active');
+	$('#x-panel-passauth').hide();
+	$('#x-panel-oauth').show();
+}
+
+function showPasswordAuth() {
+	$('#x-tab-oauth').removeClass('uk-active');
+	$('#x-tab-passauth').addClass('uk-active');
+	$('#x-panel-oauth').hide();
+	$('#x-panel-passauth').show();
+}
+
+function onPasswordAuth() {
+	var
+		email = $('#email').val().trim().toLowerCase(),
+		pwd = $('#passwd').val();
+	$('#hashPasswd').val(sha256.hmac(email, pwd));
+	return true;
+}
+
+$(function () {
+	{% if oauthConfigurations.isEmpty() %}
+		$('#x-tab-oauth').addClass('uk-disabled');
+		showPasswordAuth();
+	{% elseif type == "passauth" %}
+		showPasswordAuth();
+	{% else %}
+		showOAuth();
+	{% endif %}
+	{% if error %}
+		$('div.uk-alert-danger').show();
+	{% endif %}
+});
+
+</script>
+{% endblock %}
+
+{% block content %}
+	<div style="width:480px; margin:0 auto;">
+    	<ul id="x-tab" class="uk-tab" data-uk-tab>
+    		<li id="x-tab-oauth"><a href="#0" onclick="showOAuth()">Sign in with 3rd Party</a></li>
+    		<li id="x-tab-passauth"><a href="#0" onclick="showPasswordAuth()">Sign in with Password</a></li>
+		</ul>
+		<div id="x-panel-oauth" style="display:none" class="uk-panel uk-panel-box uk-panel-box-secondary x-signin-panel x-oauth-signin-panel">
+			<h3>Please signin without registration:</h3>
+
+			{% for providerId in oauthConfigurations.keySet() %}
+			{% set config = oauthConfigurations[providerId] %}
+			<p><button class="uk-button uk-button-large x-oauth-button-{{ providerId }}" onclick="window.location.assign('/auth/from/{{ providerId }}')"><i class="uk-icon-{{ config.icon }}"></i> {{ _('Sign in with %1$s', config.name) }}</button></p>
+			{% endfor %}
+
+		</div>
+		<div id="x-panel-passauth" style="display:none" class="uk-panel uk-panel-box uk-panel-box-secondary x-signin-panel x-password-signin-panel">
+			<h3>Please signin with password:</h3>
+        	<form method="post" action="/auth/signin" onsubmit="return onPasswordAuth()" class="uk-form uk-form-stack">
+	            <div class="uk-alert uk-alert-danger" style="display:none">{{ _('Bad email or password.') }}</div>
+	            <div class="uk-form-row">
+	                <label class="uk-form-label" for="email">{{ _('Email') }}:</label>
+	                <div class="uk-form-controls">
+	                    <div class="uk-form-icon">
+	                        <i class="uk-icon-envelope-o"></i>
+	                        <input type="email" id="email" name="email" maxlength="50" style="width:300px" placeholder="email@example.com">
+	                    </div>
+	                </div>
+	            </div>
+	            <div class="uk-form-row">
+	                <label class="uk-form-label" for="passwd">{{ _('Password') }}:</label>
+	                <div class="uk-form-controls">
+	                    <div class="uk-form-icon">
+	                        <i class="uk-icon-lock"></i>
+	                        <input type="password" id="passwd" maxlength="50" style="width:300px" placeholder="password">
+	                        <input type="hidden" id="hashPasswd" name="passwd">
+	                    </div>
+	                </div>
+	            </div>
+	            <div class="uk-form-row">
+	                <div class="uk-form-controls">
+	                    <button type="submit" class="uk-button uk-button-primary"><i class="uk-icon-sign-in"></i> {{ _('Sign In') }}</button>
+	                </div>
+	            </div>
+	            <div class="uk-form-row">
+	                <div class="uk-form-controls">
+	                    <i class="uk-icon-question-circle"></i> <a href="/auth/forgot">{{ _('Forgot password') }}</a>
+	                </div>
+	            </div>
+	        </form>
+		</div>
+    </div>
+{% endblock %}

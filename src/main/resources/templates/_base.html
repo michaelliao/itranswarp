@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html xmlns:itranswarp="http://www.itranswarp.com/" {{ __website__.xmlns|raw }} lang="{{ __website__.lang }}">
+<!--
+{% macro pagination(url, page) %}
+	{% if page.isEmpty() %}
+		<ul class="uk-pagination">
+			<li><span>{{ _("No items available") }}</span></li>
+		</ul>
+	{% else %}
+		<ul class="uk-pagination">
+		{% set _start = max(1, page.pageIndex - 5) %}
+		{% set _end = min(page.pageIndex + 5, page.totalPages) %}
+		{% if _start > 1 %}
+			<li><a href="{{ url }}1">1</a></li>
+		{% endif %}
+		{% if _start > 2 %}
+			<li class="uk-disabled"><span>...</span></li>
+		{% endif %}
+		{% for _p in range(_start, _end) %}
+			{% if _p == page.pageIndex %}
+				<li class="uk-active"><span>{{ _p }}</span></li>
+			{% else %}
+				<li><a href="{{ url }}{{ _p }}">{{ _p }}</a></li>
+			{% endif %}
+		{% endfor %}		
+		{% if _end < page.totalPages - 1 %}
+			<li class="uk-disabled"><span>...</span></li>
+		{% endif %}		
+		{% if _end < page.totalPages %}
+			<li><a href="{{ url }}{{ page.totalPages }}">{{ page.totalPages }}</a></li>
+		{% endif %}
+		</ul>
+	{% endif %}
+{% endmacro %}
+-->
+<head>
+	<meta charset="utf-8" />
+	<title>{% block title %} ??? {% endblock %} - {{ __website__.name }}</title>
+	<meta name="viewport" content="width=device-width" />
+	<meta name="keywords" content="{{ __website__.keywords }}" />
+	<meta name="description" content="{{ __website__.description }}" />
+	<meta property="x-nav" content="{% block nav %}/{% endblock %}" />
+
+	{% set __sidebar_left__ = false %}
+	{% set __sidebar_right__ = false %}
+	{% set __offcanvas_left__ = false %}
+
+	{% block layout %}
+	{% endblock %}
+
+	{% block meta %}<!-- meta here -->{% endblock %}
+	{% if __dev__ %}
+	<!-- BEGIN CSS COMPRESS -->
+	<link rel="stylesheet" href="/static/css/codemirror.css" />
+	<link rel="stylesheet" href="/static/css/highlight.css" />
+	<link rel="stylesheet" href="/static/css/simditor.css" />
+	<link rel="stylesheet" href="/static/css/main.css" />
+	<!-- END CSS COMPRESS -->
+	{% else %}
+	<link rel="stylesheet" href="/static/css/all.css?v={{ __version__ }}" />
+	{% endif %}
+	{% if __dev__ %}
+	<!-- BEGIN JAVASCRIPT COMPRESS -->
+	<script src="/static/js/3rdparty/jquery.js"></script>
+	<script src="/static/js/3rdparty/underscore.js"></script>
+	<script src="/static/js/3rdparty/moment-with-locales.min.js"></script>
+	<script src="/static/js/3rdparty/marked.js"></script>
+	<script src="/static/js/3rdparty/codemirror.js"></script>
+	<script src="/static/js/3rdparty/highlight.js"></script>
+	<script src="/static/js/3rdparty/module.js"></script>
+	<script src="/static/js/3rdparty/hotkeys.js"></script>
+	<script src="/static/js/3rdparty/uploader.js"></script>
+	<script src="/static/js/3rdparty/simditor.js"></script>
+	<script src="/static/js/3rdparty/turndown.js"></script>
+	<script src="/static/js/uikit/uikit.js"></script>
+	<script src="/static/js/uikit/components/tooltip.js"></script>
+	<script src="/static/js/uikit/components/slideshow.js"></script>
+	<script src="/static/js/uikit/components/datepicker.js"></script>
+	<script src="/static/js/uikit/components/autocomplete.js"></script>
+	<script src="/static/js/uikit/components/notify.js"></script>
+	<script src="/static/js/uikit/components/lightbox.js"></script>
+	<script src="/static/js/uikit/components/htmleditor.js"></script>
+	<!-- END JAVASCRIPT COMPRESS -->
+	{% else %}
+	<script src="/static/js/all.js?v={{ __version__ }}"></script>
+	{% endif %}
+	<script src="/static/js/shared.js?v={{ __version__ }}"></script>
+	<script src="/static/js/itranswarp.js?v={{ __version__ }}"></script>
+	<script src="/static/js/extension.js?v={{ __version__ }}"></script>
+
+	{% include("_inc_comment.html") %}
+
+	<style id="x-doc-style">
+		.x-display-none { display: none; }
+{% if __user__ != null %}
+		.x-display-if-not-signin { display: none; }
+{% else %}
+		.x-display-if-signin { display: none; }
+{% endif %}
+		.x-can-delete {
+{% if __user__ != null and __user__.role.value() <= 10 %}
+			display: inline;
+{% else %}
+			display: none;
+{% endif %}
+		}
+	</style>
+
+	<script>
+		// global variables:
+		var g_time = parseFloat('{{ __timestamp__ }}');
+		var g_signins = JSON.parse('{{ __signins__|json|raw }}');
+{% if __user__ != null %}
+		var g_user = {
+			id: '{{ __user__.id }}',
+			name: JSON.parse('{{ __user__.name|json|raw }}'),
+			image_url: '{{ __user__.image_url }}'
+		};
+{% else %}
+		var g_user = null;
+{% endif %}
+
+	// init svg icons:
+	var g_icons = {
+{% for nav in __navigations__ %}
+	'{{ nav.id }}':{{ nav.icon|json|raw }},
+{% endfor %}
+	'END':''
+	};
+	$(function () {
+		$('span.x-icon').each(function () {
+			var
+				$span = $(this),
+				iconId = $span.attr('data-id');
+			if (iconId) {
+				$span.html(g_icons[iconId]);
+			}
+		});
+		$(window).trigger('resize');
+	});
+
+	// init ads:
+	var g_ads = JSON.parse(decodeURIComponent('{{ __ads__|json|url|raw }}'));
+	$(function () {
+		initSponsors(g_ads);
+	});
+	</script>
+
+{% block head %}<!-- head  -->{% endblock %}
+
+<script>
+	console.log('init itranswarp ok.');
+</script>
+
+<!-- BEGIN custom_header -->
+{{ __website__.custom_header|raw }}
+<!-- END custom_header -->
+
+<script>
+	console.log('init js ok.');
+</script>
+
+</head>
+
+<body>
+	<div class="x-goto-top">
+		<div class="x-arrow"></div>
+		<div class="x-stick"></div>
+	</div>
+
+	<div id="header" class="uk-navbar uk-navbar-attached">
+		<div class="uk-container x-container">
+			<div id="navbar" class="uk-navbar uk-navbar-attached">
+				{% if __offcanvas_left__ %}
+				<ul class="uk-navbar-nav uk-visible-small">
+					<li><a href="#0" onclick="UIkit.offcanvas.show('#x-offcanvas-left')">{{ _('Index') }}</a></li>
+				</ul>
+				{% endif %}
+				<a id="brand" href="/" class="uk-navbar-brand uk-visible-large">{{ __website__.name }}</a>
+				<a id="brand-small" href="/" class="uk-navbar-brand uk-hidden-large"><i class="uk-icon-home"></i></a>
+				<a class="uk-hidden" href="/blog/{{ __time__ }}">Blog</a>
+				<ul id="ul-navbar" class="uk-navbar-nav uk-hidden-small">
+					{% for nav in __navigations__ %}
+					<li class="x-nav"><a href="{{ nav.url }}" {% if nav.blank %}target="_blank"{% endif %}>{% if nav.icon %}<span class="x-icon" data-id="{{ nav.id }}"></span> {% endif %}{{ nav.name }}</a></li>
+					{% endfor %}
+					<li id="navbar-more" class="uk-parent" data-uk-dropdown style="display:none">
+						<a href="#0"><i class="uk-icon-chevron-down"></i> {{ _('More') }}</a>
+						<div class="uk-dropdown uk-dropdown-navbar">
+							<ul id="ul-navbar-more" class="uk-nav uk-nav-navbar">
+								{% for nav in __navigations__ %}
+								<li class="x-nav"><a href="{{ nav.url }}" {% if nav.blank %}target="_blank"{% endif %}>{% if nav.icon %}<span class="x-icon" data-id="{{ nav.id }}"></span> {% endif %}{{ nav.name }}</a></li>
+								{% endfor %}
+							</ul>
+						</div>
+					</li>
+				</ul>
+				<ul id="ul-navbar-small" class="uk-navbar-nav uk-visible-small">
+					<li class="uk-parent" data-uk-dropdown>
+						<a href="#0"><i class="uk-icon-navicon"></i></a>
+						<div class="uk-dropdown uk-dropdown-navbar">
+							<ul class="uk-nav uk-nav-navbar">
+								{% for nav in __navigations__ %}
+								<li><a href="{{ nav.url }}" {% if nav.blank %}target="_blank"{% endif %}>{{ nav.name }}</a></li>
+								{% endfor %}
+							</ul>
+						</div>
+					</li>
+				</ul>
+
+<!--
+				<div class="uk-navbar-content x-hidden-tiny">
+					<form id="form-search" class="uk-form uk-margin-remove uk-display-inline-block">
+						<div class="uk-form-icon">
+							<i class="uk-icon-search"></i>
+							<input type="text" placeholder="Search">
+						</div>
+					</form>
+				</div>
+-->
+
+				<div id="navbar-user-info" class="uk-navbar-flip">
+					<ul class="uk-navbar-nav">
+						<li class="uk-parent x-display-if-signin" data-uk-dropdown>
+							<a href="#0"><i class="uk-icon-user"></i><span class="x-hidden-tiny">&nbsp;</span><span class="x-user-name x-hidden-tiny">{% if __user__ != null %}{{ __user__.name }}{% endif %}</span></a>
+							<div class="uk-dropdown uk-dropdown-navbar">
+								<ul class="uk-nav uk-nav-navbar">
+									<li><a target="_blank" href="/me/profile"><i class="uk-icon-cog"></i> {{ _('Profile') }}</a></li>
+									<li class="uk-nav-divider"></li>
+								{% if __user__ != null and __user__.role.value <= 100 %}
+									<li><a target="_blank" href="/manage/"><i class="uk-icon-cogs"></i> {{ _('Manage') }}</a></li>
+									<li class="uk-nav-divider"></li>
+								{% endif %}
+								{% if __user__ != null and __user__.role.value == 1000 %}
+									<li><a target="_blank" href="/sponsor/adperiod"><i class="uk-icon-photo"></i> {{ _('Sponsor') }}</a></li>
+									<li class="uk-nav-divider"></li>
+								{% endif %}
+									<li><a href="/auth/signout"><i class="uk-icon-power-off"></i> {{ _('Sign Out') }}</a></li>
+								</ul>
+							</div>
+						</li>
+						<li class="x-display-if-not-signin uk-hidden-small"><a href="/auth/signin"><i class="uk-icon-sign-in"></i> {{ _('Sign In') }}</a></li>
+						<li class="x-display-if-not-signin uk-visible-small"><a href="/auth/signin"><i class="uk-icon-sign-in"></i></a></li>
+						<li class="uk-parent" data-uk-dropdown>
+							<a href="#0"><i class="uk-icon-globe"></i></a>
+							<div class="uk-dropdown uk-dropdown-navbar">
+								<ul class="uk-nav uk-nav-navbar">
+									{% for l in __languages__ %}
+									<li><a href="/locale/{{ l.locale }}">{{ l.name }}</a></li>
+									{% endfor %}
+								</ul>
+							</div>
+						</li>
+					</ul>
+				</div>
+			</div>
+		</div>
+	</div><!-- // header -->
+
+	<div id="main">
+		<div class="x-placeholder-50"><!-- placeholder --></div>
+		<div class="x-placeholder"><!-- placeholder --></div>
+		<div class="uk-container x-container">
+			<div class="uk-grid">
+				<div id="x-body-top" class="uk-width-1-1">
+					<!-- __snippet__.bodyTop -->
+					{{ __snippet__.bodyTop|raw }}
+					<!-- // __snippet__.bodyTop -->
+				</div>
+				<div class="uk-width-1-1">
+					<div class="uk-flex">
+						{% if __sidebar_left__ %}
+						<div class="uk-flex-item-none x-sidebar-left">
+							<div id="x-sidebar-left">
+								<div id="x-sidebar-left-top">
+									<!-- __snippet__.leftSideBarTop -->
+									{{ __snippet__.leftSideBarTop|raw }}
+									<!-- // __snippet__.leftSideBarTop -->
+								</div>
+								<div id="x-sidebar-left-content" class="x-sidebar-left-content">
+									{% block sidebar_left_content %}<p>override block "sidebar_left_content"</p>{% endblock %}
+								</div>
+								<div id="x-sidebar-left-bottom">
+									<!-- __snippet__.leftSideBarBottom -->
+									{{ __snippet__.leftSideBarBottom|raw }}
+									<!-- // __snippet__.leftSideBarBottom -->
+								</div>
+							</div>
+						</div>
+						{% endif %}
+						<div class="uk-flex-item-1" style="{% if __sidebar_left__ %}padding-left:15px;{% endif %} {% if __sidebar_right__ %}padding-right:15px;{% endif %}">
+							<div id="x-content-top">
+								<!-- __snippet__.contentTop -->
+								{{ __snippet__.contentTop|raw }}
+								<!-- // __snippet__.contentTop -->
+							</div>
+							<div id="x-content">
+								{% block content %}<p>override block "content"</p>{% endblock %}
+							</div>
+							<div id="x-content-bottom">
+								<!-- __snippet__.contentBottom -->
+								{{ __snippet__.contentBottom|raw }}
+								<!-- // __snippet__.contentBottom -->
+							</div>
+						</div>
+						{% if __sidebar_right__ %}
+						<div class="uk-flex-item-none x-sidebar-right">
+							<div id="x-sidebar-right">
+								<div id="x-sidebar-right-top">
+									<!-- __snippet__.rightSideBarTop -->
+									{{ __snippet__.rightSideBarTop|raw }}
+									<!-- // __snippet__.rightSideBarTop -->
+								</div>
+								<div id="x-sidebar-right-content" class="x-sidebar-right-content">
+									{% block sidebar_right_content %}<p>override block "sidebar_right_content"</p>{% endblock %}
+								</div>
+								<div id="x-sidebar-right-bottom">
+									<!-- __snippet__.rightSideBarBottom -->
+									{{ __snippet__.rightSideBarBottom|raw }}
+									<!-- // __snippet__.rightSideBarBottom -->
+								</div>
+							</div>
+						</div>
+						{% endif %}
+					</div>
+				</div>
+
+				<div id="x-body-bottom" class="uk-width-1-1">
+					<!-- __snippet__.bodyBottom -->
+					{{ __snippet__.bodyBottom|raw }}
+					<!-- // __snippet__.bodyBottom -->
+				</div>
+			</div>
+		</div>
+	</div>
+
+{% if __offcanvas_left__ %}
+	<div id="x-offcanvas-left" class="uk-offcanvas">
+		<div class="uk-offcanvas-bar">
+			<div class="uk-panel">
+				{% block offcanvas_left %}<p>TODO: override block <em>offcanvas_left</em></p>{% endblock %}
+			</div>
+		</div>
+	</div>
+{% endif %}
+
+	<div id="footer">
+		<div class="x-footer uk-container x-container">
+			<hr>
+			<div class="uk-grid">
+				<div class="x-footer-copyright uk-width-small-1-2 uk-width-medium-1-3">
+					<p>
+						<a href="/">{{ __website__.name }}</a>&copy;2017 v{{ __version__ }}
+						<br>
+						Powered by <a href="https://github.com/michaelliao/itranswarp" target="_blank">iTranswarp</a>
+					</p>
+				</div>
+				<div class="uk-width-small-1-2 uk-width-medium-1-3 x-hidden-tiny">
+				{% for f in __follows__ %}
+					<a href="{{ f[1] }}" target="_blank" class="uk-icon-button uk-icon-{{ f[0] }}"></a>
+				{% endfor %}
+				</div>
+				<div class="uk-width-medium-1-3 uk-hidden-small">
+					<p>
+						<a href="https://github.com/michaelliao/itranswarp/issues" target="_blank">{{ _('Feedback') }}</a>
+						<br>
+						<a href="https://github.com/michaelliao/itranswarp/blob/master/LICENSE" target="_blank">{{ _('License') }}</a>
+					</p>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div id="modal-signin" class="uk-modal">
+		<div class="uk-modal-dialog">
+			<a class="uk-modal-close uk-close"></a>
+			<div class="uk-modal-header">
+				<h2>{{ _('Please Sign In') }}</h2>
+			</div>
+			<p>You can sign in directly without register:</p>
+			{% for signin in __signins__ %}
+			<h3><a href="/auth/from/{{ signin.id }}"><i class="uk-icon-weibo"></i> {{ signin.name }}</a></h3>
+			{% endfor %}
+			<p>You need authorize to allow connect to your social passport for the first time.</p>
+		</div>
+	</div>
+</body>
+</html>

@@ -1,0 +1,79 @@
+<!-- comment template -->
+
+<script id="tplComment" type="text/plain">
+	<div class="uk-comment">
+		<div class="uk-comment-header" style="margin-bottom:0">
+			<a target="_blank" href="/user/{ userId }"><img class="uk-comment-avatar uk-border-circle x-avatar" src="{ userImageUrl }" width="50" height="50" alt=""></a>
+			<h4 class="uk-comment-title"><a target="_blank" href="/discuss/{ boardId }/{ id }">{ name }</a></h4>
+			<div class="uk-comment-meta">
+				<a target="_blank" href="/user/{ userId }">{ userName }</a>
+				created at { createdAt.toSmartDate() }, Last updated at { updatedAt.toSmartDate() }
+				<span class="x-can-delete">
+                	[<a href="javascript:deleteTopic('{ id }')" class="uk-text-danger">{{ _('Delete') }}</a>]
+                	[<a href="javascript:deleteTopicAndLockUser('{ id }', '{ userId }')" class="uk-text-danger">{{ _('Delete and Lock User') }}</a>]
+                </span>
+			</div>
+		</div>
+		<div class="uk-comment-body x-auto-content">
+			{ content|raw }
+		</div>
+	</div>
+</script>
+
+
+<script id="tplCommentReply" type="text/plain">
+	<div class="uk-comment">
+		<div class="uk-comment-header" style="margin-bottom:0">
+			<a target="_blank" href="/user/{ userId }"><img class="uk-comment-avatar uk-border-circle x-avatar" src="{ userImageUrl }" width="50" height="50" alt=""></a>
+			<div class="uk-comment-meta"><a target="_blank" href="/user/{ userId }">{ userName }</a></div>
+			<div class="uk-comment-meta">
+				Created at { createdAt.toSmartDate() }
+				<span class="x-can-delete">
+                	[<a href="javascript:deleteReply('{ id }')" class="uk-text-danger">{{ _('Delete') }}</a>]
+                	[<a href="javascript:deleteReplyAndLockUser('{ id }', '{ userId }')" class="uk-text-danger">{{ _('Delete and Lock User') }}</a>]
+                </span>
+			</div>
+		</div>
+		<div class="uk-comment-body x-auto-content">
+			{ content|raw }
+		</div>
+	</div>
+</script>
+
+<script id="tplCommentInfo" type="text/plain">
+	<li>
+		<div class="x-comment-info">
+			<hr>
+			<a target="_blank" class="uk-button uk-button-small" href="/discuss/{ boardId }/{ id }"><i class="uk-icon-list-ul"></i> {{ _('Full discussion') }}</a>
+			&nbsp;
+			<a target="_blank" class="uk-button uk-button-small" href="/discuss/{ boardId }/{ id }#reply"><i class="uk-icon-reply"></i> {{ _('Reply') }}</a>
+		</div>
+	</li>
+</script>
+
+<script id="tplCommentArea" type="text/plain">
+	<div class="x-display-if-signin">
+		<p><button id="comment-make-button" type="button" class="uk-button uk-button-primary"><i class="uk-icon-comment"></i> {{ _('Make a comment') }}</button></p>
+		<form id="comment-form" class="uk-form" style="display:none;">
+			<fieldset>
+				<div class="uk-alert uk-alert-danger" style="display:none"></div>
+				<div class="uk-form-row">
+					<label>{{ _('Title') }}:</label>
+				</div>
+				<div class="uk-form-row">
+					<input type="text" name="name" maxlength="100" style="width:100%">
+				</div>
+				<div class="uk-form-row">
+					<label>{{ _('Content') }}:</label>
+				</div>
+				<div class="uk-form-row x-textarea">
+				</div>
+				<div class="uk-form-row">
+					<button type="submit" class="uk-button uk-button-primary"><i class="uk-icon-check"></i> {{ _('Post') }}</button>
+					&nbsp;&nbsp;
+					<button type="button" class="uk-button x-cancel"><i class="uk-icon-close"></i> {{ _('Cancel') }}</button>
+				</div>
+			</fieldset>
+		</form>
+	</div>
+</script>

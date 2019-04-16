@@ -1,0 +1,82 @@
+{% extends '_base.html' %}
+
+{% block layout %}
+	{% set __sidebar_right__ = true %}
+{% endblock %}
+
+{% block nav %} /category/{{ article.category_id }} {% endblock %}
+
+{% block meta %}
+    <meta property="og:ad" content="true" />
+    <meta property="og:type" content="article" />
+    <meta property="og:url" content="http://{{ __request__.host }}/article/{{ article.id }}" />
+    <meta property="og:title" content="{{ article.name }}" />
+    <meta property="og:description" content="{{ article.name }}" />
+    <meta property="og:image" content="/files/attachments/{{ article.imageId }}/l" />
+    <meta property="og:tag" content="{{ article.tags }}" />
+{% endblock %}
+
+{% block title %}{{ article.name }}{% endblock %}
+
+{% block head %}
+
+<style>
+.x-article-visible {
+    display: block;
+}
+</style>
+
+<script>
+
+loadComments('{{ article.id }}');
+
+var
+    comment_type = 'article',
+    comment_ref_id = '{{ article.id }}',
+    comment_tag = '{{ category.tag }}';
+
+function onAuthSuccess() {
+    initCommentArea(comment_type, comment_ref_id, comment_tag);
+}
+
+$(function () {
+    if (g_user !== null) {
+        initCommentArea(comment_type, comment_ref_id, comment_tag);
+    }
+});
+
+</script>
+{% endblock %}
+
+{% block content %}
+
+    <h3>{{ article.name }}</h3>
+    <p><img src="/files/attachments/{{ article.imageId }}/l" class="uk-responsive-width"></p>
+    <p><a href="/user/{{ author.id }}">{{ author.name }}</a> / <a href="/category/{{ category.id }}">{{ category.name }}</a> / <span class="x-smart-datetime" data="{{ article.publishAt }}">...</span> / {{ _('Reads') }}: {{ article.views }}</p>
+    <div class="x-article-content x-main-content">
+        {{ content|raw }}
+    </div>
+
+    <div id="x-sponsor-a" class="uk-clearfix"><!-- sponsor A --></div>
+
+    <div class="x-anchor"><a name="comments"></a></div>
+
+    <h3>{{ _('Comments') }}</h3>
+
+    <ul id="x-comment-list" class="uk-comment-list">
+    </ul>
+
+    <h3>{{ _('Make a comment') }}</h3>
+
+    <div class="x-display-if-not-signin">
+        <p><button type="button" class="uk-button" onclick="showSignin()"><i class="uk-icon-signin"></i> {{ _('Sign in to make a comment') }}</button></p>
+    </div>
+
+    <div id="x-comment-area"></div>
+
+{% endblock %}
+
+{% block sidebar_right_content %}
+	<p>Author: <a href="/user/{{ author.id }}">{{ author.name }}</a></p>
+	<p>Publish at: <span class="x-smart-datetime">{{ article.publishAt }}</span></p>
+{% endblock %}

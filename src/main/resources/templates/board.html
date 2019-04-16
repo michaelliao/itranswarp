@@ -1,0 +1,75 @@
+{% extends '_base.html' %}
+
+{% block layout %}
+	{% set __sidebar_right__ = true %}
+{% endblock %}
+
+{% block nav %} /discuss {% endblock %}
+
+{% block title %}{{ board.name }}{% endblock %}
+
+{% block meta %}
+    <meta property="og:type" content="webpage" />
+    <meta property="og:url" content="http://{{ __request__.host }}/discuss/{{ board.id }}" />
+    <meta property="og:title" content="{{ board.name }}" />
+    <meta property="og:description" content="{{ board.description }}" />
+    <meta property="og:tag" content="{{ board.tag }}" />
+{% endblock %}
+
+{% block head %}
+
+<style>
+.x-discuss-visible {
+    display: block;
+}
+</style>
+
+{% endblock %}
+
+{% block content %}
+    <div class="uk-alert x-board-nav">
+        <a href="/discuss">{{ _('Discuss') }}</a> / {{ board.name }}
+    </div>
+
+    <div class="uk-margin uk-clearfix">
+        <a href="/discuss" class="uk-button uk-float-left"><i class="uk-icon-arrow-left"></i> {{ _('Back') }}</a>
+        <a href="/discuss/{{ board.id }}/topics/create" class="uk-button uk-button-success uk-float-right"><i class="uk-icon-plus"></i> {{ _('New Topic') }}</a>
+    </div>
+
+    <table class="uk-table uk-table-hover">
+        <thead>
+            <tr>
+                <th>{{ board.name }}</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for t in topics %}
+            <tr>
+                <td>
+                    <a href="/user/{{ t.userId }}" target="_blank"><img class="uk-comment-avatar uk-border-circle x-avatar" src="{{ t.userImageUrl }}" style="width:50px"></a>
+                    <div style="margin-left:70px;">
+                        <div class="uk-margin" style="font-size:16px;"><a href="/discuss/{{ board.id }}/{{ t.id }}">{{ t.name}}</a></div>
+                        <div>
+                            <a href="/user/{{ t.userId }}" target="_blank">{{ t.userName }}</a> {{ _('posted at') }} <span class="x-smart-datetime" data="{{ t.createdAt }}">...</span>
+                            {% if t.updatedAt > t.createdAt %}
+                            {{ _('Last replied at') }} <span class="x-smart-datetime" data="{{ t.updatedAt }}">...</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <div class="x-page">
+        {{ pagination("/discuss/" + board.id + "?page=", page) }}
+    </div>
+
+    <div id="x-sponsor-a" class="uk-clearfix"><!-- sponsor A --></div>
+
+{% endblock %}
+
+{% block sidebar_right_content %}
+
+{% endblock %}

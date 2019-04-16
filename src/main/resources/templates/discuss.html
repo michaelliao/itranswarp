@@ -1,0 +1,58 @@
+{% extends '_base.html' %}
+
+{% block layout %}
+	{% set __sidebar_right__ = true %}
+{% endblock %}
+
+{% block nav %} /discuss {% endblock %}
+
+{% block title %}{{ _('Discuss') }}{% endblock %}
+
+{% block meta %}
+    <meta property="og:type" content="webpage" />
+    <meta property="og:url" content="http://{{ __request__.host }}/discuss/" />
+    <meta property="og:title" content="{{ _('Discuss') }}" />
+{% endblock %}
+
+{% block head %}
+
+<style>
+.x-discuss-visible {
+    display: block;
+}
+</style>
+
+{% endblock %}
+
+{% block content %}
+    <div class="x-discuss-content">
+        <div class="uk-alert">
+            {{ _('Discuss') }}
+        </div>
+
+        <table class="uk-table uk-table-hover">
+            <thead>
+                <tr>
+                    <th>{{ _('Discuss') }}</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for b in boards %}
+                <tr>
+                    <td>
+                        <div class="uk-margin" style="font-size:16px;"><a href="/discuss/{{ b.id }}">{{ b.name}}</a></div>
+                        <div>{{ b.description }}</div>
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div id="x-sponsor-a" class="uk-clearfix"><!-- sponsor A --></div>
+
+{% endblock %}
+
+{% block sidebar_right_content %}
+
+{% endblock %}

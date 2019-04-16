@@ -1,0 +1,51 @@
+{% extends '_base.html' %}
+
+{% block layout %}
+	{% set __sidebar_right__ = true %}
+{% endblock %}
+
+{% block meta %}
+    <meta property="og:ad" content="true" />
+    <meta property="og:type" content="category" />
+    <meta property="og:url" content="{{ __url__ }}" />
+    <meta property="og:title" content="{{ category.name }}" />
+    <meta property="og:description" content="{{ category.description }}" />
+    <meta property="og:tag" content="" />
+{% endblock %}
+
+{% block nav %} /category/{{ category.id }} {% endblock %}
+
+{% block title %}
+    {{ category.name }}
+{% endblock %}
+
+{% block head %}
+
+<style>
+.x-category-visible {
+    display: block;
+}
+</style>
+
+{% endblock %}
+
+{% block content %}
+
+    <h3>{{ category.name }}</h3>
+
+    {% for a in articles %}
+    <div class="uk-article uk-clearfix">
+        <div>
+            <h3><a href="/article/{{ a.id }}">{{ a.name }}</a></h3>
+        </div>
+        <a class="x-cover-small" href="/article/{{ a.id }}"><img src="/files/attachments/{{ a.imageId }}/s" alt="{{ a.name }}" style="width:160px"></a>
+        <div>
+            <p><a href="/category/{{ a.categoryId }}">{{ category.name }}</a> / <span class="x-smart-datetime" data="{{ a.publishAt }}">...</span> / {{ _('Reads') }}: {{ a.views }}</p>
+            <p>{{ a.description }}</p>
+            <p><a href="/article/{{ a.id }}" class="uk-button uk-button-primary">{{ _('Read more') }} »</a></p>
+        </div>
+    </div>
+    {% endfor %}
+    {{ pagination("/category/" + category.id + "?page=", page) }}
+
+{% endblock %}

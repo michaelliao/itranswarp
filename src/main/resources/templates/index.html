@@ -1,0 +1,87 @@
+{% extends '_base.html' %}
+
+<!-- display sidebar on right -->
+{% set __sidebar_right__ = true %}
+
+{% block title %}{{ _('Home') }}{% endblock %}
+
+{% block meta %}
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content="http://{{ __request__.host }}/" />
+    <meta property="og:title" content="{{ __website__.name }}" />
+    <meta property="og:description" content="{{ __website__.name }}" />
+    <meta property="og:tag" content="index" />
+{% endblock %}
+
+{% block head %}
+
+{% set __sidebar_right__ = true %}
+
+<style>
+.x-index-visible {
+    display: block;
+}
+</style>
+
+{% endblock %}
+
+{% block content %}
+
+    <div class="uk-grid">
+        <div class="x-index-top uk-width-1-1">
+            {% block index_top %}{{ __snippets__.index_top|raw }}{% endblock %}
+        </div>
+    </div>
+
+    <h3>{{ _('Hot Articles') }}</h3>
+    <div style="max-width:640px;" class="uk-slidenav-position" data-uk-slideshow="{autoplay:true,pauseOnHover:false,kenburns:true}">
+        <ul class="uk-slideshow uk-overlay-active">
+            {% for a in hotArticles %}
+            <li>
+                <img src="/files/attachments/{{ a.imageId }}/l" width="640" height="360">
+                <div onclick="window.open('/article/{{ a.id }}')" style="cursor:pointer" class="uk-overlay-panel uk-overlay-background uk-overlay-bottom uk-overlay-slide-bottom">
+                    <h3>{{ a.name }}</h3>
+                    <p>{{ a.description }}</p>
+                </div>
+            </li>
+            {% endfor %}
+        </ul>
+        <a href="#0" class="uk-slidenav uk-slidenav-contrast uk-slidenav-previous" data-uk-slideshow-item="previous" style="color: rgba(255,255,255,0.4)"></a>
+        <a href="#0" class="uk-slidenav uk-slidenav-contrast uk-slidenav-next" data-uk-slideshow-item="next" style="color: rgba(255,255,255,0.4)"></a>
+    </div>
+
+    <h3>{{ _('Recent Articles') }}</h3>
+    {% for a in recentArticles %}
+    <div class="uk-margin uk-clearfix">
+        <div style="float:left">
+            <a href="/article/{{ a.id }}" target="_blank"><img src="/files/attachments/{{ a.imageId }}/s" /></a>
+        </div>
+        <div class="uk-margin" style="margin-left:180px;">
+            <h3><a href="/article/{{ a.id }}" target="_blank">{{ a.name }}</a></h3>
+            <p>{{ a.description }}</p>
+        </div>
+    </div>
+    {% endfor %}
+
+    <div class="uk-grid">
+        <div class="x-index-bottom uk-width-1-1">
+            {% block index_bottom %}{{ __snippets__.index_bottom|raw }}{% endblock %}
+        </div>
+    </div>
+
+    <div id="x-sponsor-a" class="uk-clearfix"><!-- sponsor A --></div>
+
+{% endblock %}
+
+{% block sidebar_right_content %}
+
+<div class="uk-margin">
+    <h3>{{ _('Recent Topics') }}</h3>
+    <ul class="uk-nav">
+        {% for t in recentTopics %}
+        <li><a href="/discuss/{{ t.board_id }}/{{ t.id }}" target="_blank">{{ t.user.name }}: {{ t.name }}</a></li>
+        {% endfor %}
+    </ul>
+</div>
+
+{% endblock %}

@@ -1,0 +1,175 @@
+{% extends '_base.html' %}
+
+<!-- display sidebar on right -->
+{% set __sidebar_right__ = true %}
+
+{% block nav %} /discuss {% endblock %}
+
+{% block title %}{{ _('Discuss') }}{% endblock %}
+
+{% block head %}
+
+<style>
+.x-topic-visible {
+    display: block;
+}
+</style>
+
+<script id="tplReplyArea" type="text/plain">
+        <div class="x-display-if-signin">
+            <p><button id="reply-make-button" type="button" class="uk-button uk-button-primary"><i class="uk-icon-reply"></i> {{ _('Reply') }}</button></p>
+            <form id="reply-form" class="uk-form" style="display:none; margin-bottom:15px;">
+                <fieldset>
+                    <div class="uk-alert uk-alert-danger" style="display:none"></div>
+                    <div class="uk-form-row">
+                        <label>{{ _('Reply') }}: {{ topic.name }}</label>
+                    </div>
+                    <div class="uk-form-row">
+                        <label>{{ _('Content') }}:</label>
+                    </div>
+                    <div class="uk-form-row x-textarea">
+                    </div>
+                    <div class="uk-form-row">
+                        <button type="submit" class="uk-button uk-button-primary"><i class="uk-icon-check"></i> {{ _('Reply') }}</button>
+                        &nbsp;&nbsp;
+                        <button type="button" class="uk-button x-cancel"><i class="uk-icon-close"></i> {{ _('Cancel') }}</button>
+                    </div>
+                </fieldset>
+            </form>
+        </div>
+</script>
+
+<script>
+
+function initReplyArea(topic_id) {
+    $('#x-reply-area').html($('#tplReplyArea').html());
+    var $makeReply = $('#reply-make-button');
+    var $replyForm = $('#reply-form');
+    var $postReply = $replyForm.find('button[type=submit]');
+    var $cancelReply = $replyForm.find('button.x-cancel');
+    $makeReply.click(function () {
+        $replyForm.showFormError();
+        $replyForm.show();
+        $replyForm.find('div.x-textarea').html('<textarea></textarea>');
+        var editor = new Simditor({
+			textarea: $replyForm.find('textarea'),
+			toolbarFloatOffset: 50,
+			toolbar: ['title', '|', 'bold', 'italic', 'strikethrough', '|', 'blockquote', 'code', 'link', '|', 'ol', 'ul', '|', 'hr']
+		});
+        $makeReply.hide();
+    });
+    $cancelReply.click(function () {
+        $replyForm.find('div.x-textarea').html('');
+        $replyForm.hide();
+        $makeReply.show();
+    });
+    $replyForm.submit(function (e) {
+        e.preventDefault();
+        $replyForm.postJSON('/api/topics/' + topic_id + '/replies', {
+            content: html2md($replyForm.find('textarea').val())
+        }, function (err, result) {
+            if (err) {
+                return;
+            }
+            gotoPage({{ page.totalItems % page.itemsPerPage }} > 0 ? {{ page.pageIndex }} : {{ page.pageIndex + 1 }});
+        });
+    });
+}
+
+function onAuthSuccess() {
+    initReplyArea('{{ topic.id }}');
+}
+
+$(function () {
+    if (g_user !== null) {
+        initReplyArea('{{ topic.id }}');
+    }
+});
+
+</script>
+
+{% endblock %}
+
+{% block content %}
+    <div class="uk-alert x-discuss-nav">
+        <a href="/discuss">{{ _('Discuss') }}</a>
+        /
+        <a href="/discuss/{{ board.id }}">{{ board.name }}</a>
+        /
+        {{ topic.name }}
+    </div>
+
+    <div class="uk-margin uk-clearfix">
+        <a href="/discuss/{{ board.id }}" class="uk-button uk-float-left"><i class="uk-icon-arrow-left"></i> {{ _('Back') }}</a>
+    </div>
+
+    <div class="uk-margin">
+        <h3 style="display:inline">{{ topic.name }}</h3>
+        {% if topic.refId > 0 %}
+        <a target="_blank" href="/ref/{{ topic.refType }}/{{ topic.refId }}" style="margin-left:1em;">{{ _('Topic source') }}</a>
+        {% endif %}
+    </div>
+
+{% if page.pageIndex == 1 %}
+    <div class="uk-comment">
+        <div class="x-anchor"><a name="{{ topic.id }}"></a></div>
+        <div class="uk-comment-header">
+            <a href="/user/{{ topic.userId }}"><img class="uk-comment-avatar uk-border-circle x-avatar" src="{{ topic.userImageUrl }}" width="50" height="50" alt=""></a>
+            <h4 class="uk-comment-title"><a href="/user/{{ topic.user.id }}">{{ topic.userName }}</a></h4>
+            <div class="uk-comment-meta">#1 Created at <span class="x-smart-datetime" data="{{ topic.createdAt }}">...</span>
+            	<span class="x-can-delete">
+                	[<a href="javascript:deleteTopic('{{ topic.id }}')" class="uk-text-danger">{{ _('Delete') }}</a>]
+                	[<a href="javascript:deleteTopicAndLockUser('{{ topic.id }}', '{{ topic.userId }}')" class="uk-text-danger">{{ _('Delete and Lock User') }}</a>]
+                </span>
+            </div>
+        </div>
+        <div class="uk-comment-body uk-margin">
+            {{ topic.content|raw }}
+        </div>
+    </div>
+{% endif %}
+
+{% set index = 1 + (page.pageIndex - 1) * page.itemsPerPage %}
+{% for r in replies %}
+    {% set index = index + 1 %}
+    <div class="uk-comment">
+        <div class="x-anchor"><a name="{{ r.id }}"></a></div>
+        <div class="uk-comment-header">
+            <a href="/user/{{ r.userId }}"><img class="uk-comment-avatar uk-border-circle x-avatar" src="{{ r.userImageUrl }}" width="50" height="50" alt=""></a>
+            <h4 class="uk-comment-title"><a href="/user/{{ r.userId }}">{{ r.userName }}</a></h4>
+            <div class="uk-comment-meta">#{{ index }} Created at <span class="x-smart-datetime" data="{{ r.createdAt }}">...</span>
+            	<span class="x-can-delete">
+	                [<a href="javascript:deleteReply('{{ r.id }}')" class="uk-text-danger">{{ _('Delete') }}</a>]
+    	            [<a href="javascript:deleteReplyAndLockUser('{{ r.id }}', '{{ r.userId }}')" class="uk-text-danger">{{ _('Delete and Lock User') }}</a>]
+    	        </span>
+            </div>
+        </div>
+        <div class="uk-comment-body uk-margin">
+            {{ r.content|raw }}
+        </div>
+    </div>
+{% endfor %}
+
+    <hr>
+
+    <div class="x-page">
+        {{ pagination("/discuss/" + board.id + "/" + topic.id + "?page=", page) }}
+    </div>
+
+    <div class="x-anchor"><a name="reply"></a></div>
+
+    <h3>{{ _('Reply') }}</h3>
+
+    <div class="x-display-if-not-signin">
+        <p><button type="button" class="uk-button" onclick="showSignin()"><i class="uk-icon-signin"></i> {{ _('Sign in to make a reply') }}</button></p>
+    </div>
+
+    <div id="x-reply-area"></div>
+
+    <div id="x-sponsor-a" class="uk-clearfix"><!-- sponsor A --></div>
+
+{% endblock %}
+
+{% block sidebar_right_content %}
+
+{% endblock %}

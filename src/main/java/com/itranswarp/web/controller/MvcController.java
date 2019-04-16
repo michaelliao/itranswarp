@@ -64,9 +64,6 @@ public class MvcController extends AbstractController {
 	@Value("#{applicationConfiguration.name}")
 	String name;
 
-	@Value("#{applicationConfiguration.cdn}")
-	String cdn;
-
 	@Value("#{applicationConfiguration.profiles eq 'native'}")
 	Boolean dev;
 

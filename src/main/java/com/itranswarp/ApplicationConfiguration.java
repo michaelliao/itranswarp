@@ -9,9 +9,6 @@ public class ApplicationConfiguration {
 	@Value("${spring.application.name:iTranswarp}")
 	public String name;
 
-	@Value("${spring.application.cdn:}")
-	public String cdn;
-
 	@Value("${spring.profiles.active:native}")
 	public String profiles;
 

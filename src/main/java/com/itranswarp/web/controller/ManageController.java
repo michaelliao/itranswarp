@@ -32,9 +32,6 @@ public class ManageController extends AbstractController {
 	@Value("#{applicationConfiguration.name}")
 	String name;
 
-	@Value("#{applicationConfiguration.cdn}")
-	String cdn;
-
 	@Value("#{applicationConfiguration.profiles eq 'native'}")
 	Boolean dev;
 
@@ -300,7 +297,6 @@ public class ManageController extends AbstractController {
 		@SuppressWarnings("resource")
 		HttpContext ctx = HttpContext.getContext();
 		mv.addObject("__name__", this.name);
-		mv.addObject("__cdn__", this.cdn);
 		mv.addObject("__dev__", this.dev);
 		mv.addObject("__website__", settingService.getWebsiteFromCache());
 		mv.addObject("__user__", ctx.user);

@@ -1,0 +1,191 @@
+{% extends '../_manage.html' %}
+
+{% block title %} {{ form.name }} {% endblock %}
+
+{% block head %}
+
+<script>
+$(function () {
+    getJSON('/api/categories', function (err, resp) {
+        if (err) {
+            return showError(err);
+        }
+        var categories = resp.results;
+        var id = parseInt('{{ id }}');
+        if (id > 0) {
+            getJSON('/api/articles/' + id, function (err, article) {
+                if (err) {
+                    return showError(err);
+                }
+                article.publishAtLocal = timestampToDateTimeLocal(article.publishAt);
+                initVM({
+                	title: 'Edit Article',
+                	article: article,
+                	categories: categories
+                });
+            });
+        }
+        else {
+            initVM({
+            	title: 'New Article',
+            	article: {
+            		publishAtLocal: timestampToDateTimeLocal(Date.now()),
+            		categoryId: categories.length > 0 ? categories[0].id : '',
+            		content: ''
+            	},
+            	categories: categories
+            });
+        }
+    });
+});
+
+function initVM(data) {
+    if (data.article.imageId) {
+        $('#image-preview').css('background-image', 'url(/files/attachments/' + data.article.imageId + '/l)');
+    }
+    window.vm = new Vue({
+        el: '#vm',
+        data: {
+        	title: data.title,
+            article: data.article,
+            categories: data.categories,
+            saved: true
+        },
+        created: function () {
+            $('#loading').hide();
+            $('#vm').show();
+        },
+        methods: {
+            submit: function () {
+                var that = this;
+                clearFormError();
+                this.article.publishAt = dateTimeLocalToTimestamp(this.article.publishAtLocal);
+                this.article.content = $('#content-editor').val();
+                that.$resource('{{ action }}').save(this.article).then(function (resp) {
+                    resp.json().then(function (result) {
+                        that.saved = true;
+                        location.assign('/manage/article/');
+                    });
+                }, onJsonFormError);
+            }
+        }
+    });
+
+    // check content when unload:
+    window.onbeforeunload = function() {
+        if (window.vm.saved) {
+            return;
+        }
+        if (window.vm.article.content !== $('#content-editor').val()) {
+            return "{{ _('Content has been changed.') }}";
+        }
+    };
+
+    $('#content-editor').val(window.vm.article.content || '');
+    var htmleditor = UIkit.htmleditor($('#content-editor').get(0), {
+        markdown: true,
+        maxsplitsize: 600
+    });
+    window.htmleditor = htmleditor;
+
+    // watch file change:
+    $('#file').change(function (evt) {
+        evt.preventDefault();
+        var f = $('#file').val();
+        if (f === '') {
+            // user cancelled selected file:
+            vm.article.image = null;
+            $('#image-preview').css('background-image', 'none');
+            return;
+        }
+        try {
+            var file = $('#file').get(0).files[0];
+            processImageFile(file, function (r) {
+                vm.article.image = r.data;
+                $('#image-preview').css('background-image', 'url(' + r.image + ')');
+            });
+        }
+        catch (e) {
+            UIkit.modal.alert('Error when process file: ' + e);
+        }
+    });
+}
+
+</script>
+
+{% endblock %}
+
+{% block main %}
+
+    <div id="loading" class="uk-width-1-1">
+        <i class="uk-icon-spinner uk-icon-spin"></i> {{ _('Loading') }}...
+    </div>
+
+    <div id="vm" class="uk-width-1-1">
+        <ul class="uk-tab" data-uk-tab>
+            <li class="uk-active"><a href="#0">{{ _('Articles') }}</a></li>
+            <li class="uk-disabled"><a href="#0">{{ _('Categories') }}</a></li>
+        </ul>
+
+        <form v-on:submit.prevent="submit" class="uk-form uk-form-stacked uk-margin">
+            <legend v-text="title"></legend>
+            <fieldset>
+                <div class="uk-alert uk-alert-danger uk-hidden"></div>
+                <div class="uk-form-row">
+                    <label class="uk-form-label">Image:</label>
+                    <div class="uk-form-controls">
+                        <div id="image-preview" style="border: 1px solid #ccc; width:642px; height:362px; background-size:cover;"></div>
+                    </div>
+                    <div class="uk-form-controls">
+                        <input id="file" type="file">
+                    </div>
+                </div>
+                <div class="uk-form-row">
+                    <label class="uk-form-label">{{ _('Name') }}:</label>
+                    <div class="uk-form-controls">
+                        <input v-model="article.name" name="name" type="text" maxlength="100" class="uk-width-1-1" placeholder="name">
+                    </div>
+                </div>
+                <div class="uk-form-row">
+                    <label class="uk-form-label">{{ _('Description') }}:</label>
+                    <div class="uk-form-controls">
+                        <textarea v-model="article.description" name="description" rows="6" class="uk-width-1-1" style="resize:none;"></textarea>
+                    </div>
+                </div>
+                <div class="uk-form-row">
+                    <label class="uk-form-label">{{ _('Category') }}:</label>
+                    <div class="uk-form-controls">
+                        <select v-model="article.categoryId" name="categoryId" class="uk-width-1-1">
+                            <option v-for="category in categories" v-bind:value="category.id" v-text="category.name"></option>
+                        </select>
+                    </div>
+                </div>
+                <div class="uk-form-row">
+                    <label class="control-label">Tags:</label>
+                    <div class="controls">
+                        <input v-model="article.tags" name="tags" type="text" class="uk-width-1-1" placeholder="tag1, tag2, tag3">
+                    </div>
+                </div>
+                <div class="uk-form-row">
+                    <label class="control-label">Publish At:</label>
+                    <div class="controls">
+                        <input v-model="article.publishAtLocal" name="publishAtLocal" type="datetime-local">
+                    </div>
+                </div>
+                <div class="uk-form-row">
+                    <label class="control-label">Content:</label>
+                    <div class="controls">
+                        <textarea id="content-editor" name="content" rows="20" style="width:100%; resize:none;"></textarea>
+                    </div>
+                </div>
+                <div class="uk-form-row">
+                    <div class="controls">
+                        <button type="submit" class="uk-button uk-button-primary"><i class="uk-icon-check"></i> {{ _('Save') }}</button>
+                        <button type="button" class="uk-button" onclick="location.assign('/manage/article/')"><i class="uk-icon-times"></i> {{ _('Cancel') }}</button>
+                    </div>
+                </div>
+            </fieldset>
+        </form>
+    </div>
+
+{% endblock %}

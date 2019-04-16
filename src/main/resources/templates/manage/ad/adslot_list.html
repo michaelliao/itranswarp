@@ -1,0 +1,110 @@
+{% extends '../_manage.html' %}
+
+{% block title %} {{ ('All Ad Slots') }} {% endblock %}
+
+{% block head %}
+<script>
+
+$(function() {
+    getJSON('/api/adSlots', function (err, data) {
+        if (err) {
+            return showError(err);
+        }
+        initVM(data.results);
+    });
+});
+
+function initVM(adSlots) {
+    window.vm = new Vue({
+        el: '#vm',
+        data: {
+            adSlots: adSlots
+        },
+        created: function () {
+            $('#loading').hide();
+            $('#vm').show();
+        },
+        methods: {
+            find: function (id) {
+            	return this.adSlots.findIndex(p => p.id === id);
+            },
+            editAdSlot: function (id) {
+                location.assign('/manage/ad/adslot_update?id=' + id);
+            },
+            deleteAdSlot: function (id) {
+                var p = this.adSlots[this.find(id)];
+                var that = this;
+                UIkit.modal.confirm('AdSlot \"' + p.name + '\" will be deleted. Continue?', function() {
+                    that.$resource('/api/adSlots/' + p.id + '/delete').save({}).then(function(resp) {
+                        resp.json().then(function (result) {
+                            refresh();
+                        });
+                    }, onJsonError);
+                });
+            }
+        }
+    });
+};
+
+</script>
+{% endblock %}
+
+{% block main %}
+
+    <div id="error" class="uk-width-1-1">
+    </div>
+
+    <div id="loading" class="uk-width-1-1">
+        <i class="uk-icon-spinner uk-icon-spin"></i> {{ _('Loading') }}...
+    </div>
+
+    <div id="vm" class="uk-width-1-1">
+        <ul class="uk-tab" data-uk-tab>
+            <li class="uk-active"><a href="#0">{{ _('Ad Slots') }}</a></li>
+            <li><a href="#0" onclick="location.assign('/manage/ad/adperiod_list')">{{ _('Ad Periods') }}</a></li>
+            <li><a href="#0" onclick="location.assign('/manage/ad/admaterial_list')">{{ _('Ad Materials') }}</a></li>
+        </ul>
+
+        <div class="uk-margin">
+            <a href="javascript:refresh()" class="uk-button"><i class="uk-icon-refresh"></i> {{ _('Refresh') }}</a>
+            <a href="/manage/ad/adslot_create" class="uk-button uk-button-primary uk-float-right"><i class="uk-icon-plus"></i> {{ _('New Ad Slot') }}</a>
+        </div>
+
+        <table class="uk-table uk-table-hover">
+            <thead>
+                <tr>
+                    <th width="55%">{{ _('Name') }}</th>
+                    <th width="10%">{{ _('Size') }}</th>
+                    <th width="10%">{{ _('Price') }}</th>
+                    <th width="15%">{{ _('Number') }} / Auto fill</th>
+                    <th width="10%">{{ _('Action') }}</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr v-for="p in adSlots">
+                    <td>
+                    	<p><span v-text="p.name"></span> (<span v-text="p.alias"></span>)</p>
+                    	<p v-text="p.description" class="uk-text-muted"></p>
+                    </td>
+                    <td>
+                        <span v-text="p.width"></span> x <span v-text="p.height"></span>
+                    </td>
+                    <td v-text="p.price"></td>
+                    <td>
+                        <span v-text="p.numSlots"></span>
+                        /
+                        <span v-text="p.numAutoFill"></span>
+                    </td>
+                    <td>
+                        <a v-on:click="editAdSlot(p.id)" title="Edit Ad Slot" href="#0" class="x-btn"><i class="uk-icon-edit"></i></a>
+                        <a v-on:click="deleteAdSlot(p.id)" title="Delete Ad Slot" href="#0" class="x-btn"><i class="uk-icon-trash"></i></a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <div v-if="adSlots.length===0" class="x-empty-list">
+            <p>No ad slot found.</p>
+        </div>
+    </div>
+
+{% endblock%}

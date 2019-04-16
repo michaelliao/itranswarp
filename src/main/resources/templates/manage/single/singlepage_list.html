@@ -1,0 +1,101 @@
+{% extends '../_manage.html' %}
+
+{% block title %} {{ ('All Single Pages') }} {% endblock %}
+
+{% block head %}
+<script>
+
+$(function() {
+    getJSON('/api/singlePages', function (err, data) {
+        if (err) {
+            return showError(err);
+        }
+        var singlePages = data.results;
+        singlePages.map(p => {
+        	p.tags = p.tags ? p.tags.split(',') : [];
+        });
+        initVM(singlePages);
+    });
+});
+
+function initVM(singlePages) {
+    window.vm = new Vue({
+        el: '#vm',
+        data: {
+            singlePages: singlePages
+        },
+        created: function () {
+            $('#loading').hide();
+            $('#vm').show();
+        },
+        methods: {
+            editWebpage: function (id) {
+                location.assign('/manage/single/update?id=' + id);
+            },
+            deleteWebpage: function (id) {
+                var p = this.singlePages.filter(p => p.id === id)[0];
+                var that = this;
+                UIkit.modal.confirm('Single page \"' + p.name + '\" will be deleted. Continue?', function() {
+                    that.$resource('/api/singlePages/' + p.id + '/delete').save({}).then(function(resp) {
+                        resp.json().then(function (result) {
+                            refresh();
+                        });
+                    }, onJsonError);
+                });
+            }
+        }
+    });
+};
+
+</script>
+{% endblock %}
+
+{% block main %}
+
+    <div id="error" class="uk-width-1-1">
+    </div>
+
+    <div id="loading" class="uk-width-1-1">
+        <i class="uk-icon-spinner uk-icon-spin"></i> {{ _('Loading') }}...
+    </div>
+
+    <div id="vm" class="uk-width-1-1">
+        <div class="uk-margin">
+            <a href="javascript:refresh()" class="uk-button"><i class="uk-icon-refresh"></i> {{ _('Refresh') }}</a>
+            <a href="/manage/single/create" class="uk-button uk-button-primary uk-float-right"><i class="uk-icon-plus"></i> {{ _('New Single Page') }}</a>
+        </div>
+
+        <table class="uk-table uk-table-hover">
+            <thead>
+                <tr>
+                    <th width="40%">{{ _('Name') }}</th>
+                    <th width="20%">{{ _('Tags') }}</th>
+                    <th width="15%">{{ _('Publish At') }}</th>
+                    <th width="15%">{{ _('Created At') }}</th>
+                    <th width="10%">{{ _('Action') }}</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr v-for="p in singlePages">
+                    <td>
+                        <a v-text="p.name" v-bind:href="'/single/'+p.id" target="_blank"></a>
+                    </td>
+                    <td><span v-for="t in p.tags" style="padding-right:1em;"><i class="uk-icon-tag"></i> <span v-text="t"></span></span></td>
+                    <td>
+                        <span v-text="p.publishAt.toDateTime()"></span>
+                    </td>
+                    <td>
+                    	<span v-text="p.createdAt.toDateTime()"></span></td>
+                    <td>
+                        <a v-on:click="editWebpage(p.id)" title="Edit Single Page" href="#0" class="x-btn"><i class="uk-icon-edit"></i></a>
+                        <a v-on:click="deleteWebpage(p.id)" title="Delete Single Page" href="#0" class="x-btn"><i class="uk-icon-trash"></i></a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <div v-if="singlePages.length===0" class="x-empty-list">
+            <p>No single page found.</p>
+        </div>
+    </div>
+
+{% endblock%}

@@ -1,0 +1,149 @@
+{% extends '../_manage.html' %}
+
+{% block title %} {{ _('All Boards') }} {% endblock %}
+
+{% block head %}
+<script>
+$(function() {
+    getJSON('/api/boards', function (err, data) {
+        if (err) {
+            return showError(err);
+        }
+        initVM(data.results);
+    });
+});
+
+function initVM(boards) {
+    var vm = new Vue({
+        el: '#vm',
+        data: {
+            boards: boards
+        },
+        created: function () {
+            $('#loading').hide();
+            $('#vm').show();
+        },
+        methods: {
+            find: function (id) {
+            	return this.boards.findIndex(b => b.id === id);
+            },
+            swap: function (index1, index2) {
+                var b = this.boards[index2];
+                this.boards.splice(index2, 1);
+                this.boards.splice(index1, 0, b);
+                $('#sort').show();
+            },
+            moveUp: function (id) {
+                var index = this.find(id);
+                if (index===(-1) || index===0) {
+                    return;
+                }
+                this.swap(index - 1, index);
+            },
+            moveDown: function (id) {
+                var index = this.find(id);
+                if (index===(-1) || index===(this.boards.length-1)) {
+                    return;
+                }
+                this.swap(index, index + 1);
+            },
+            sort: function () {
+                var ids = this.boards.map(b => b.id);
+                var that = this;
+                that.$resource('/api/boards/sort').save({ ids: ids }).then(function (resp) {
+                    resp.json().then(function (result) {
+                        refresh();
+                    });
+                }, onJsonError);
+            },
+            editBoard: function (id) {
+                location.assign('board_update?id=' + id);
+            },
+            deleteBoard: function (b) {
+                var that = this;
+                UIkit.modal.confirm('Board \"' + b.name + '\" will be deleted. Continue?', function () {
+                    that.$resource('/api/boards/' + b.id + '/delete').save({}).then(function (resp) {
+                        resp.json().then(function (result) {
+                            location.assign('/manage/board/');
+                        });
+                    }, onJsonError);
+                });
+            },
+            lockBoard: function(id, locked) {
+                var b = this.boards[this.find(id)];
+                var that = this;
+                UIkit.modal.confirm('Board \"' + b.name + '\" will be ' + (locked ? 'locked' : 'unlocked') + '. Continue?', function () {
+                    that.$resource('/api/boards/' + b.id + (locked ? '/lock' : '/unlock')).save({}).then(function (resp) {
+                        resp.json().then(function (result) {
+                            location.assign('/manage/board/');
+                        });
+                    }, onJsonFormError);
+                });
+            }
+        }
+    });
+}
+</script>
+{% endblock %}
+
+{% block main %}
+
+    <div id="error" class="uk-width-1-1">
+    </div>
+
+    <div id="loading" class="uk-width-1-1">
+        <i class="uk-icon-spinner uk-icon-spin"></i> {{ _('Loading') }}...
+    </div>
+
+    <div id="vm" class="uk-width-1-1">
+        <ul class="uk-tab" data-uk-tab>
+            <li class="uk-active"><a href="#0">{{ _('Boards') }}</a></li>
+            <li><a href="#0" onclick="location.assign('/manage/board/topic')">{{ _('Topics') }}</a></li>
+            <li><a href="#0" onclick="location.assign('/manage/board/reply')">{{ _('Replies') }}</a></li>
+        </ul>
+        <div class="uk-margin">
+            <a href="javascript:refresh()" class="uk-button"><i class="uk-icon-refresh"></i> {{ _('Refresh') }}</a>
+            <a href="board_create" class="uk-button uk-button-primary uk-float-right"><i class="uk-icon-plus"></i> {{ _('New Board') }}</a>
+        </div>
+
+        <table class="uk-table uk-table-hover">
+            <thead>
+                <tr>
+                    <th width="30%">{{ _('Name') }}</th>
+                    <th width="30%">{{ _('Description') }}</th>
+                    <th width="10%">{{ _('Tag') }}</th>
+                    <th width="10%">{{ _('Topic Number') }}</th>
+                    <th width="15%">{{ _('Action') }}</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr v-for="b in boards">
+                    <td>
+                        <a v-text="b.name" v-bind:href="'/discuss/' + b.id" target="_blank"></a>
+                        <i v-if="b.locked" class="uk-icon-lock"></i>
+                    </td>
+                    <td><span v-text="b.description"></span></td>
+                    <td><span v-text="b.tag"></span></td>
+                    <td><span v-text="b.topicNumber"></span></td>
+                    <td>
+                        <a v-on:click="moveUp(b.id)" title="Move this board up" href="#0" class="x-btn"><i class="uk-icon-arrow-up"></i></a>
+                        <a v-on:click="moveDown(b.id)" title="Move this board down" href="#0" class="x-btn"><i class="uk-icon-arrow-down"></i></a>
+                        <a v-on:click="editBoard(b.id)" title="Edit this board" href="#0" class="x-btn"><i class="uk-icon-edit"></i></a>
+                        <a v-on:click="deleteBoard(b)" title="Delete this board" href="#0" class="x-btn"><i class="uk-icon-trash"></i></a>
+                        <a v-if="!b.locked" v-on:click="lockBoard(b.id, true)" title="Lock this board" href="#0" class="x-btn"><i class="uk-icon-ban"></i></a>
+                        <a v-if="b.locked" v-on:click="lockBoard(b.id, false)" title="Unock this board" href="#0" class="x-btn"><i class="uk-icon-circle-o"></i></a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div v-if="boards.length===0" class="x-empty-list">
+            <p>No board found.</p>
+        </div>
+
+        <div id="sort" class="uk-margin" style="text-align:right; display:none">
+            <button v-on:click="sort" type="button" class="uk-button uk-button-success"><i class="uk-icon-list"></i> {{ _('Save Orders') }}</button>
+        </div>
+    </div>
+
+{% endblock %}

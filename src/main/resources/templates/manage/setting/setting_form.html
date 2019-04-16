@@ -1,0 +1,102 @@
+{% extends '../_manage.html' %}
+
+{% block title %} {{ _('Settings') }} {% endblock %}
+
+{% block head %}
+
+<script id="field-text" type="text/plain">
+    <div class="uk-form-row">
+        <label class="uk-form-label">{ description }:</label>
+        <div class="uk-form-controls">
+            <input v-model="{ name }" type="text" maxlength="100" class="uk-width-1-1" placeholder="{ description }">
+        </div>
+    </div>
+</script>
+
+<script id="field-textarea" type="text/plain">
+    <div class="uk-form-row">
+        <label class="uk-form-label">{ description }:</label>
+        <div class="uk-form-controls">
+            <textarea v-model="{ name }" class="uk-width-1-1 x-codearea" rows="16" placeholder="{ description }"></textarea>
+        </div>
+    </div>
+</script>
+
+<script>
+
+var definitions = {{ definitions|json|raw }};
+var settings = {{ settings|json|raw }};
+
+$(function () {
+	initVM();
+});
+
+function initVM() {
+    var templates = {
+        TEXT: new Template($('#field-text').html()),
+        TEXTAREA: new Template($('#field-textarea').html())
+    };
+    var fields = [];
+    definitions.forEach(definition => {
+        var html = templates[definition.type].render(definition);
+        fields.push(html);
+    });
+    $('#vm form .x-replace').after(fields.join(''));
+    window.vm = new Vue({
+        el: '#vm',
+        data: settings,
+        methods: {
+            submit: function(event) {
+                event.preventDefault();
+                $('#vm form .uk-alert-success').hide();
+                var that = this;
+                this.$resource('/api/setting/{{ tab }}').save(this.$data).then(function (resp) {
+                    resp.json().then(function (result) {
+                        $('#vm form .uk-alert-success').show();
+                    	location.assign('#');
+                    });
+                }, onJsonFormError);
+            }
+        }
+    });
+    $('#loading').hide();
+    $('#vm').show();
+}
+</script>
+{% endblock %}
+
+{% block main %}
+
+    <div id="loading" class="uk-width-1-1">
+        <i class="uk-icon-spinner uk-icon-spin"></i> {{ _('Loading') }}...
+    </div>
+
+    <div id="vm" class="uk-width-1-1">
+        <ul class="uk-tab" data-uk-tab>
+            {% for t in tabs %}
+            {% if t == tab %}
+            <li class="uk-active"><a href="#0">{{ t }}</a></li>
+            {% else %}
+            <li><a href="#0" onclick="location.assign('/manage/setting/{{ t }}')">{{ t }}</a></li>
+            {% endif %}
+            {% endfor %}
+        </ul>
+        <form v-on:submit.prevent="submit" class="uk-form uk-form-stacked uk-margin">
+            <legend>Settings</legend>
+            <fieldset>
+                <div class="uk-alert uk-alert-success" style="display:none">
+                    Settings saved.
+                </div>
+                <div class="uk-alert uk-alert-danger uk-hidden"></div>
+                <div class="x-replace"></div>
+                <div class="uk-form-row">
+                    <div class="controls">
+                        <button type="submit" class="uk-button uk-button-primary"><i class="uk-icon-check"></i> {{ _('Save') }}</button>
+                        <button type="button" class="uk-button" onclick="location.assign('{{ form.redirect }}')"><i class="uk-icon-times"></i> {{ _('Cancel') }}</button>
+                    </div>
+                </div>
+            </fieldset>
+        </form>
+    </div>
+
+{% endblock%}

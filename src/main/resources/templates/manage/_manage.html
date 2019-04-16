@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<!--
+{% macro pagination(url, page) %}
+    {% if page.isEmpty() %}
+        <ul class="uk-pagination">
+            <li><span>{{ _("No items available") }}</span></li>
+        </ul>
+    {% else %}
+        <ul class="uk-pagination">
+        {% set _start = max(1, page.pageIndex - 5) %}
+        {% set _end = min(page.pageIndex + 5, page.totalPages) %}
+        <li>page = {{page|json}}, range={{ _start }} ~ {{ _end }}</li>
+        {% if _start > 1 %}
+            <li><a href="{{ url }}1">1</a></li>
+        {% endif %}
+        {% if _start > 2 %}
+            <li class="uk-disabled"><span>...</span></li>
+        {% endif %}
+        {% for _p in range(_start, _end) %}
+            {% if _p == page.pageIndex %}
+                <li class="uk-active"><span>{{ _p }}</span></li>
+            {% else %}
+                <li><a href="{{ url }}{{ _p }}">{{ _p }}</a></li>
+            {% endif %}
+        {% endfor %}        
+        {% if _end < page.totalPages - 1 %}
+            <li class="uk-disabled"><span>...</span></li>
+        {% endif %}        
+        {% if _end < page.totalPages %}
+            <li><a href="{{ url }}{{ page.totalPages }}">{{ page.totalPages }}</a></li>
+        {% endif %}
+        </ul>
+    {% endif %}
+{% endmacro %}
+-->
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>{% block title %} ??? {% endblock %} - {{ _('Management Console') }}</title>
+    <link rel="stylesheet" href="/static/css/codemirror.css" />
+    <link rel="stylesheet" href="/static/css/main.css" />
+
+    <script src="/static/js/3rdparty/jquery.js"></script>
+    <script src="/static/js/3rdparty/underscore.js"></script>
+    <script src="/static/js/3rdparty/sha256.min.js"></script>
+    <script src="/static/js/3rdparty/qrcode.js"></script>
+    <script src="/static/js/3rdparty/jquery.qrcode.js"></script>
+    <script src="/static/js/3rdparty/codemirror.js"></script>
+    <script src="/static/js/3rdparty/moment-with-locales.min.js"></script>
+    <script src="/static/js/3rdparty/marked.js"></script>
+    <script src="/static/js/3rdparty/vue.js"></script>
+    <script src="/static/js/3rdparty/vue-resource.min.js"></script>
+
+    <script src="/static/js/uikit/uikit.js"></script>
+    <script src="/static/js/uikit/components/autocomplete.js"></script>
+    <script src="/static/js/uikit/components/sticky.js"></script>
+    <script src="/static/js/uikit/components/tooltip.js"></script>
+    <script src="/static/js/uikit/components/notify.js"></script>
+    <script src="/static/js/uikit/components/datepicker.js"></script>
+    <script src="/static/js/uikit/components/timepicker.js"></script>
+    <script src="/static/js/uikit/components/htmleditor.js"></script>
+
+    <script src="/static/js/shared.js?v={{__version__}}"></script>
+    <script src="/static/js/itranswarp.js?v={{__version__}}"></script>
+
+<script>
+
+var g_timestamp = parseInt('{{ __timestamp__ }}');
+
+function timestampToDateTimeLocal(ts) {
+	return moment(ts).format('YYYY-MM-DDTHH:mm');
+}
+
+function dateTimeLocalToTimestamp(s) {
+	return s ? moment(s, 'YYYY-MM-DDTHH:mm').valueOf() : Date.now();
+}
+
+// FIX: jQuery $(xxx).show() cannot display 'uk-hidden':
+(function () {
+    var _jShow = $.fn.show;
+    var _jHide = $.fn.hide;
+    $.fn.show = function() {
+        var r = _jShow.apply(this);
+        this.removeClass('uk-hidden');
+        return r;
+    };
+    $.fn.hide = function() {
+        var r = _jHide.apply(this);
+        this.addClass('uk-hidden');
+        return r;
+    };
+})();
+// END FIX
+
+// active nav-bar item:
+$(function () {
+    var p = location.pathname;
+    $('#ul-navbar>li>a').each(function (index, a) {
+        var href = $(a).attr('href');
+        if (p.startsWith(href)) {
+            $(a).parent().addClass('uk-active');
+        }
+    });
+});
+
+// wechat qrcode:
+$(function(){
+    $('#wechat-qrcode').qrcode({
+        width: 100,
+        height: 100,
+        text: 'http://weixin.qq.com/r/p0MOFu7EXbMirap19xa1'
+    });
+    $('#wechat-link').hover(function () {
+        $('#wechat').show();
+    }, function () {
+        $('#wechat').hide();
+    });
+});
+
+// find a jQuery form object that within a #vm scope:
+function findForm(vmId) {
+    var $form = $('#' + (vmId || 'vm'));
+    if (! $form.is('form')) {
+        $form = $form.find('form');
+    }
+    if (! $form.is('form')) {
+        console.log('WARN: findForm failed for: ' + vmId);
+    }
+    return $form;
+}
+
+// show form error whtin a #vm scope:
+function showFormError(err, vmId) {
+    var $form = findForm(vmId);
+    var $alert = $form.find('.uk-alert-danger');
+    $alert.text(err.message || err.error).show();
+    if (err.error === 'parameter:invalid') {
+        if (err.data) {
+            $form.find('input[name=' + err.data + ']').addClass('uk-form-danger');
+            $form.find('select[name=' + err.data + ']').addClass('uk-form-danger');
+        }
+    }
+    if (($alert.offset().top - 60) < $(window).scrollTop()) {
+        $('html,body').animate({ scrollTop: $alert.offset().top - 60 });
+    }
+}
+
+function clearFormError(vmId) {
+    var $form = findForm(vmId);
+    var $err = $form.find('.uk-alert-danger');
+    $err.text('').hide();
+    $form.find('input').removeClass('uk-form-danger');
+    $form.find('select').removeClass('uk-form-danger');
+}
+
+function onJsonFormError(resp) {
+    resp.json().then(function (result) {
+        console.log('Error: ' + JSON.stringify(result));
+        // try find form:
+        clearFormError();
+        showFormError(result);
+    });
+}
+
+function onJsonError(resp) {
+    resp.json().then(function (err) {
+        console.log('Error: ' + JSON.stringify(err));
+        showError(err);
+    });
+}
+
+function processImageFile(file, callback) {
+    if (file.type!=='image/jpeg' && file.type!=='image/png') {
+        UIkit.modal.alert('File is not a valid image!');
+        return;
+    }
+    var reader = new FileReader();
+    reader.onload = function(e) {
+        var
+            data = e.target.result;
+            index = data.indexOf(';base64,');
+        if ((index >= 0) && (index < 100)) {
+            callback({
+                image: data,
+                data: data.substring(index + 8)
+            });
+        } else {
+            UIkit.modal.alert('Browser does not support data URL!');
+        }
+    };
+    reader.readAsDataURL(file);
+}
+
+</script>
+
+<style>
+#vm {
+    display: none;
+}
+#loading {
+    margin-bottom: 15px;
+}
+#error {
+    display: none;
+    margin-bottom: 15px;
+}
+.x-container {
+    min-width: 760px;
+}
+.x-btn {
+    margin-right: 10px;
+}
+</style>
+
+{% set __show_navigations__ = true %}
+{% block head %}<!-- block head  -->{% endblock %}
+
+<script>
+var modalUploadImage = null;
+
+function uploadImage(callback) {
+    if (modalUploadImage === null) {
+        var
+            $modal = $('#modal-upload-image'),
+            $preview = $modal.find('.x-upload-preview'),
+            $alert = $modal.find('.uk-alert-danger'),
+            $form = $modal.find('form'),
+            $text = $form.find('input[name=name]'),
+            $file = $form.find('input[type=file]'),
+            $upload = $form.find('button[type=submit]'),
+            $cancel = $modal.find('button.x-cancel');
+        var imageData = null, mime = null;
+        modalUploadImage = UIkit.modal('#modal-upload-image');
+        $('#modal-upload-image').on({
+            'show.uk.modal': function () {
+                console.log('show upload image modal...');
+                $file.val('');
+                $text.val('');
+                $alert.text('').hide();
+                $preview.css('background-image', '');
+            },
+            'hide.uk.modal': function () {
+                console.log('hide upload image modal...');
+            }
+        });
+        $file.change(function () {
+            imageData = null;
+            $alert.hide();
+            $preview.css('background-image', '');
+            $upload.attr('disabled', 'disabled');
+
+            var f = $file.val();
+            if (!f) {
+                return;
+            }
+            var lf = $file.get(0).files[0];
+            if (lf.size > 1024*1024) {
+                $alert.text('Image is too large.').show();
+                return;
+            }
+            mime = lf.type;
+            if (mime==='image/png' || mime==='image/jpeg') {
+                // extract filename without ext:
+                var pos = Math.max(f.lastIndexOf('\\'), f.lastIndexOf('/'));
+                if (pos>0) {
+                    f = f.substring(pos + 1);
+                }
+                var pos = f.lastIndexOf('.');
+                if (pos>0) {
+                    f = f.substring(0, pos);
+                }
+                $text.val(f);
+                processImageFile(lf, function (r) {
+                    imageData = r.data;
+                    $preview.css('background-image', 'url(' + r.image + ')');
+                    $upload.removeAttr('disabled');
+                });
+            }
+            else {
+                $alert.text('Not a valid web image.').show();
+            }
+        });
+        // upload:
+        $form.submit(function (e) {
+            e.preventDefault();
+            var data = {
+                name: $text.val(),
+                mime: mime,
+                data: imageData
+            };
+            postJSON('/api/attachments', data, function (err, result) {
+                if (err) {
+                    $alert.text(err.message || err.error || 'ERROR: ' + String(err));
+                    return;
+                }
+                callback(err, {
+                    name: result.name,
+                    url: '/files/attachments/' + result.id + '/l'
+                });
+                modalUploadImage.hide();
+                return true;
+            });
+        });
+        // cancel:
+        $modal.find('button.x-cancel').click(function () {
+            modalUploadImage.hide();
+        });
+    }
+    modalUploadImage.show();
+}
+</script>
+</head>
+<body>
+    <div id="modal-upload-image" class="uk-modal">
+        <div class="uk-modal-dialog">
+            <div class="uk-modal-header">Upload Image</div>
+            <div class="x-upload-preview" style="background-repeat:no-repeat;background-position:center center;background-size:cover;height:320px;border:solid 1px #ccc">
+                Preview
+            </div>
+            <div>
+                <form class="uk-form uk-form-stacked">
+                    <div class="uk-alert uk-alert-danger" style="display:none;">
+                        ERROR: upload failed.
+                    </div>
+                    <div class="uk-form-row">
+                        <label class="uk-form-label">Image File</label>
+                        <div class="uk-form-controls">
+                            <input name="file" type="file">
+                        </div>
+                    </div>
+                    <div class="uk-form-row">
+                        <label class="uk-form-label">Image Name</label>
+                        <div class="uk-form-controls">
+                            <input name="name">
+                        </div>
+                    </div>
+                    <div class="uk-form-row">
+                        <div class="uk-form-controls">
+                            <button type="submit" disabled class="uk-button uk-button-primary"><i class="uk-icon-upload"></i> Upload</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="uk-modal-footer uk-text-right">
+                <button type="button" class="uk-button x-cancel">Cancel</button>
+            </div>
+        </div>
+    </div>
+    <div id="header" class="uk-navbar uk-navbar-attached">
+        <div class="uk-container x-container">
+            <div class="uk-navbar uk-navbar-attached">
+                <a href="/" target="_blank" class="uk-navbar-brand"><i class="uk-icon-home"></i></a>
+                <ul id="ul-navbar" class="uk-navbar-nav">
+                    <div class="uk-navbar-content">Management</div>
+                    <li><a href="/manage/board/">{{ _('Discuss') }}</a></li>
+                    <li><a href="/manage/article/">{{ _('Articles') }}</a></li>
+                    <li><a href="/manage/single/">{{ _('Single Pages') }}</a></li>
+                    <li><a href="/manage/wiki/">{{ _('Wikis') }}</a></li>
+                    <li><a href="/manage/attachment/">{{ _('Attachments') }}</a></li>
+                    <li><a href="/manage/user/">{{ _('Users') }}</a></li>
+                    <li><a href="/manage/navigation/">{{ _('Navigations') }}</a></li>
+                    <li><a href="/manage/ad/">{{ _('AD') }}</a></li>
+                    <li><a href="/manage/setting/">{{ _('Settings') }}</a></li>
+                    <!-- <li><a href="/manage/api/">API</a></li> -->
+                </ul>
+
+                <div class="uk-navbar-flip">
+                    <ul class="uk-navbar-nav">
+                        <li class="uk-parent" data-uk-dropdown>
+                            <a href="#0"><i class="uk-icon-user"></i><span>&nbsp;</span><span class="x-user-name">{{ __user__.name }}</span></a>
+                            <div class="uk-dropdown uk-dropdown-navbar">
+                                <ul class="uk-nav uk-nav-navbar">
+                                    <li><a href="/auth/signout"><i class="uk-icon-power-off"></i> {{ _('Sign Out') }}</a></li>
+                                </ul>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div><!-- // header -->
+
+    <div id="main">
+        <div class="x-placeholder-50"><!-- placeholder --></div>
+        <div class="x-placeholder"><!-- placeholder --></div>
+        <div class="uk-container x-container">
+            <div class="uk-grid">
+                {% block main %}
+                    <div class="uk-width-1-6">
+                        <ul class="uk-nav uk-nav-side">
+                        {% block menu %}
+                            <li class="uk-nav-header">Sample Menu</li>
+                            <li id="menu-1"><a href="#0">Menu 1</a></li>
+                            <li id="menu-2"><a href="#0">Menu 2</a></li>
+                            <li id="menu-3"><a href="#0">Menu 3</a></li>
+                        {% endblock %}
+                        </ul>
+                    </div>
+                    <div class="uk-width-5-6">
+                        {% block content %}
+                        <h3>Content</h3>
+                        {% endblock %}
+
+                    </div>
+                {% endblock %}
+            </div>
+        </div>
+        <div class="x-push-to-bottom"></div>
+    </div>
+
+    <div id="footer">
+        <div class="uk-container x-container">
+            <hr>
+            <div class="uk-grid">
+                <div class="uk-width-2-6">
+                    <p>
+                        <a href="/">{{ __website__.name }}</a>&copy;2019
+                        <br>
+                        Powered by <a href="https://github.com/michaelliao/itranswarp" target="_blank">iTranswarp</a>
+                    </p>
+                </div>
+                <div class="uk-width-2-6">
+                    <a target="_blank" href="https://github.com/michaelliao/itranswarp" class="uk-icon-button uk-icon-github"></a>
+                    <a target="_blank" href="https://twitter.com/liaoxuefeng" class="uk-icon-button uk-icon-twitter"></a>
+                    <a target="_blank" href="http://www.weibo.com/liaoxuefeng" class="uk-icon-button uk-icon-weibo"></a>
+                </div>
+                <div class="uk-width-2-6">
+                    <p>
+                        <a href="https://github.com/michaelliao/itranswarp/issues" target="_blank">Feedback</a>
+                        <br>
+                        <a href="https://github.com/michaelliao/itranswarp/blob/master/LICENSE" target="_blank">License</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,105 @@
+{% extends '../_manage.html' %}
+
+{% block title %} {{ _('All Wikis') }} {% endblock %}
+
+{% block head %}
+<script>
+
+var g_timestamp = parseInt('{{ __timestamp__ }}');
+
+$(function() {
+    getJSON('/api/wikis', function (err, resp) {
+        if (err) {
+            return showError(err);
+        }
+        initVM(resp.results);
+    });
+});
+
+function initVM(wikis) {
+    var vm = new Vue({
+        el: '#vm',
+        data: {
+            wikis: wikis
+        },
+        created: function () {
+            $('#loading').hide();
+            $('#vm').show();
+        },
+        methods: {
+        	isPublished: function (w) {
+        		return g_timestamp > w.publishAt;
+        	},
+            editWiki: function (w) {
+                location.assign('wiki_tree?id=' + w.id);
+            },
+            deleteWiki: function (w) {
+                var that = this;
+                UIkit.modal.confirm('Wiki \"' + w.name + '\" will be deleted. Continue?', function () {
+                    that.$resource('/api/wikis/' + w.id + '/delete').save({}).then(function (resp) {
+                        resp.json().then(function (result) {
+                            refresh();
+                        });
+                    }, onJsonError);
+                });
+            }
+        }
+    });
+}
+</script>
+{% endblock %}
+
+{% block main %}
+
+    <div id="error" class="uk-width-1-1">
+    </div>
+
+    <div id="loading" class="uk-width-1-1">
+        <i class="uk-icon-spinner uk-icon-spin"></i> {{ _('Loading') }}...
+    </div>
+
+    <div id="vm" class="uk-width-1-1">
+
+        <div class="uk-margin">
+            <a href="javascript:refresh()" class="uk-button"><i class="uk-icon-refresh"></i> {{ _('Refresh') }}</a>
+            <a href="wiki_create" class="uk-button uk-button-primary uk-float-right"><i class="uk-icon-plus"></i> {{ _('New Wiki') }}</a>
+        </div>
+
+        <table class="uk-table uk-table-hover">
+            <thead>
+                <tr>
+                    <th width="15%">{{ _('Cover') }}</th>
+                    <th width="50%">{{ _('Name') }} / {{ _('Description') }}</th>
+                    <th width="10%">{{ _('Tag') }}</th>
+                    <th width="15%">{{ _('Publish at') }}</th>
+                    <th width="10%">{{ _('Action') }}</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr v-for="w in wikis">
+                    <td><img v-bind:src="'/files/attachments/' + w.imageId + '/s'" /></td>
+                    <td>
+                        <p>
+                        	<a v-bind:href="'/wiki/' + w.id" target="_blank">
+                        		<i v-if="!isPublished(w)" class="uk-icon-eye-slash"></i>
+	                        	<span v-text="w.name"></span>
+                        	</a>
+                        </p>
+                        <p v-text="w.description"></p>
+                    </td>
+                    <td><span v-text="w.tag"></span></td>
+                    <td><span v-text="w.publishAt.toDateTime()"></span></td>
+                    <td>
+                        <a v-on:click="editWiki(w)" data-toggle="tooltip" title="Edit Wiki" href="#0" class="x-btn"><i class="uk-icon-list"></i></a>
+                        <a v-on:click="deleteWiki(w)" data-toggle="tooltip" title="Delete wiki" href="#0" class="x-btn"><i class="uk-icon-trash"></i></a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div v-if="wikis.length===0" class="x-empty-list">
+            <p>No wiki found.</p>
+        </div>
+    </div>
+
+{% endblock %}

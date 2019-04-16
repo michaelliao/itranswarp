@@ -1,0 +1,98 @@
+{% extends '../_manage.html' %}
+
+{% block title %} {{ _('All Attachments') }} {% endblock %}
+
+{% block head %}
+<script>
+var page = parseInt('{{ page }}');
+
+$(function() {
+    getJSON('/api/attachments', {
+        page: page
+    }, function (err, resp) {
+        if (err) {
+            return showError(err);
+        }
+        initVM({
+        	page: resp.page,
+        	attachments: resp.results
+        });
+    });
+});
+
+function initVM(data) {
+    window.vm = new Vue({
+        el: '#vm',
+        data: {
+            attachments: data.attachments,
+            page: data.page
+        },
+        created: function () {
+            $('#loading').hide();
+            $('#vm').show();
+        },
+        methods: {
+            deleteAttachment: function(a) {
+                var that = this;
+                UIkit.modal.confirm('Attachment \"' + a.name + '\" will be deleted. Continue?', function() {
+                    that.$resource('/api/attachments/' + a.id + '/delete').save({}).then(function (resp) {
+                        resp.json().then(function (result) {
+                            refresh();
+                        });
+                    }, onJsonError);
+                });
+            }
+        }
+    });
+}
+</script>
+{% endblock %}
+
+{% block main %}
+
+    <div id="loading" class="uk-width-1-1">
+        <i class="uk-icon-spinner uk-icon-spin"></i> {{ _('Loading') }}...
+    </div>
+
+    <div id="error" class="uk-width-1-1">
+    </div>
+
+    <div id="vm" class="uk-width-1-1">
+
+        <h3>All Attachments</h3>
+
+        <table class="uk-table uk-table-hover">
+            <thead>
+                <tr>
+                    <th width="20%">{{ _('Preview') }}</th>
+                    <th width="15%">Mime / {{ _('Size') }}</th>
+                    <th width="40%">{{ _('Name') }}</th>
+                    <th width="15%">{{ _('Created At') }}</th>
+                    <th width="10%">{{ _('Action') }}</th>
+                </tr>
+            </thead>
+        	<tbody>
+                <tr v-for="a in attachments">
+                    <td>
+                        <a v-bind:href="'/files/attachments/' + a.id + '/'" target="_blank"><img v-bind:src="'/files/attachments/' + a.id + '/s'" style="width: 160px;" /></a>
+                    </td>
+                    <td>
+                        <p v-text="a.mime"></p>
+                        <p v-text="a.size.toFileSize()"></p>
+                        <p v-if="a.width * a.height > 0" v-text="a.width + ' x ' + a.height"></p>
+                    </td>
+                    <td>
+                        <p v-text="a.name"></p>
+                    </td>
+                    <td><span v-text="a.createdAt.toDateTime()"></span></td>
+                    <td>
+                        <a v-on:click="deleteAttachment(a)" href="#0" title="Delete Attachment" class="x-btn"><i class="uk-icon-trash"></i></a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div is="pagination" v-bind:page="page"></div>
+    </div>
+
+{% endblock %}

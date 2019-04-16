@@ -1,0 +1,172 @@
+{% extends '../_manage.html' %}
+
+{% block title %} {{ ('All Ad Periods') }} {% endblock %}
+
+{% block head %}
+<script>
+
+var TODAY = '{{ today }}';
+
+$(function() {
+    getJSON('/api/adSlots', function (err, data) {
+        if (err) {
+            return showError(err);
+        }
+        var adSlots = data.results;
+        var findAdSlotById = function (id) {
+            return adSlots.find(slot => slot.id === id) || {};
+        }
+        getJSON('/api/adPeriods', function (err, data) {
+            if (err) {
+                return showError(err);
+            }
+            var
+                i,
+                adPeriod,
+                adPeriods = data.results;
+            adPeriods.forEach(function (p) {
+            	p.adSlot = findAdSlotById(p.adSlotId);
+            	p.isActive = TODAY >= p.startAt && p.endAt > TODAY;
+            	p.isExpired = TODAY >= p.endAt;
+            	p.isPending = p.startAt > TODAY;
+            	p.extend = 0;
+            });
+            if (adPeriods.length === 0) {
+            	initVM(adPeriods);
+            	return;
+            }
+            getJSON('/api/users/ids?' + adPeriods.map(p=>'id='+p.userId).join('&'), function (err, resp) {
+            	if (err) {
+            		return showError(err);
+            	}
+                adPeriods.forEach(p => {
+                	p.user = resp[p.userId];
+	    	    });
+            	initVM(adPeriods);
+            });
+        });
+    });
+});
+
+function initVM(adPeriods) {
+    window.vm = new Vue({
+        el: '#vm',
+        data: {
+            adPeriods: adPeriods
+        },
+        created: function () {
+            $('#loading').hide();
+            $('#vm').show();
+        },
+        methods: {
+            extendAdPeriod: function (p) {
+                var that = this;
+                UIkit.modal.confirm('Ad period \"' + p.adSlot.name + '\" of user \"' + p.user.name + '\" will be extended ' + p.extend + '. Continue?', function() {
+                    var
+                    	n = p.extend.split(' ')[0],
+                    	unit = p.extend.split(' ')[1];
+                    that.$resource('/api/adPeriods/' + p.id).save({
+                        endAt: moment(p.endAt).add(n, unit).format('YYYY-MM-DD')
+                    }).then(function (resp) {
+                        resp.json().then(function (result) {
+                            refresh();
+                        });
+                    }, onJsonError);
+                }, function () {
+                    p.extendMonths = 0;
+                });
+            },
+            deleteAdPeriod: function (p) {
+                var that = this;
+                UIkit.modal.confirm('Ad Period (' + p.adSlot.name + ' ' + p.adSlot.width + ' x ' + p.adSlot.height + ') of user \"' + p.user.name + '\" will be deleted. Continue?', function() {
+                    that.$resource('/api/adPeriods/' + p.id + '/delete').save({}).then(function(resp) {
+                        resp.json().then(function (result) {
+                            refresh();
+                        });
+                    }, onJsonError);
+                });
+            }
+        }
+    });
+};
+
+</script>
+{% endblock %}
+
+{% block main %}
+
+    <div id="error" class="uk-width-1-1">
+    </div>
+
+    <div id="loading" class="uk-width-1-1">
+        <i class="uk-icon-spinner uk-icon-spin"></i> {{ _('Loading') }}...
+    </div>
+
+    <div id="vm" class="uk-width-1-1">
+        <ul class="uk-tab" data-uk-tab>
+            <li><a href="#0" onclick="location.assign('/manage/ad/')">{{ _('Ad Slots') }}</a></li>
+            <li class="uk-active"><a href="#0">{{ _('Ad Periods') }}</a></li>
+            <li><a href="#0" onclick="location.assign('/manage/ad/admaterial_list')">{{ _('Ad Materials') }}</a></li>
+        </ul>
+
+        <div class="uk-margin">
+            <a href="javascript:refresh()" class="uk-button"><i class="uk-icon-refresh"></i> {{ _('Refresh') }}</a>
+            <a href="/manage/ad/adperiod_create" class="uk-button uk-button-primary uk-float-right"><i class="uk-icon-plus"></i> {{ _('New Ad Period') }}</a>
+        </div>
+
+        <table class="uk-table uk-table-hover">
+            <thead>
+                <tr>
+                    <th width="5%">{{ _('Image') }}</th>
+                    <th width="20%">{{ _('User') }}</th>
+                    <th width="15%">{{ _('Ad Slot Name') }}</th>
+                    <th width="10%">{{ _('Ad Slot Size') }}</th>
+                    <th width="10%">{{ _('Display Order') }}</th>
+                    <th width="10%">{{ _('Start At') }}</th>
+                    <th width="10%">{{ _('End At') }} (Exclusive)</th>
+                    <th width="10%">{{ _('Status') }}</th>
+                    <th width="10%">{{ _('Action') }}</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr v-for="p in adPeriods">
+                    <td>
+                        <a v-bind:href="'/user/' + p.user.id" target="_blank"><img v-bind:src="p.user.imageUrl" class="uk-comment-avatar uk-border-circle x-avatar" style="width: 50px; height: 50px;"></a>
+                    </td>
+                    <td>
+                        <a v-bind:href="'/user/' + p.user.id" v-text="p.user.name" target="_blank"></a>
+                    </td>
+                    <td v-text="p.adSlot.name"></td>
+                    <td>
+                        <span v-text="p.adSlot.width"></span>
+                        x
+                        <span v-text="p.adSlot.height"></span>
+                    </td>
+                    <td v-text="p.displayOrder"></td>
+                    <td><span v-text="p.startAt"></span></td>
+                    <td><span v-text="p.endAt"></span></td>
+                    <td>
+                        <span v-if="p.isActive" class="uk-text-success"><i class="uk-icon-play-circle-o"></i> Active</span>
+                        <span v-if="p.isExpired" class="uk-text-danger"><i class="uk-icon-stop-circle-o"></i> Expired</span>
+                        <span v-if="p.isPending" class="uk-text-warning"><i class="uk-icon-pause-circle-o"></i> Pending</span>
+                    </td>
+                    <td>
+                        <select v-if="!p.isExpired" v-model="p.extend" v-on:change="extendAdPeriod(p)">
+                            <option value="0">-- Extend --</option>
+                            <option value="1 days">1 day</option>
+                            <option value="1 weeks">1 week</option>
+                            <option value="1 months">1 month</option>
+                            <option value="3 months">3 months</option>
+                            <option value="1 years">1 year</option>
+                        </select>
+                        <a v-if="p.isExpired" v-on:click="deleteAdPeriod(p)" title="Delete Ad Period" href="#0" class="x-btn"><i class="uk-icon-trash"></i></a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <div v-if="adPeriods.length===0" class="x-empty-list">
+            <p>No ad period found.</p>
+        </div>
+    </div>
+
+{% endblock%}

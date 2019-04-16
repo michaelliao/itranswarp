@@ -1,0 +1,129 @@
+{% extends '../_manage.html' %}
+
+{% block title %} {{ ('All Ad Materials') }} {% endblock %}
+
+{% block head %}
+
+<script>
+
+$(function() {
+	var page = parseInt('{{ page }}');
+    getJSON('/api/adPeriods', function (err, resp) {
+        if (err) {
+            return showError(err);
+        }
+        var adPeriods = resp.results;
+        getJSON('/api/users/ids?' + adPeriods.map(p=>'id='+p.userId).join('&'), function (err, resp) {
+            if (err) {
+         		return showError(err);
+            }
+	        adPeriods.map(p => {
+	            p.user = resp[p.userId];
+			});
+	        getJSON('/api/adMaterials', { page: page }, function (err, data) {
+    	        if (err) {
+        	        return showError(err);
+            	}
+	            var
+    	        	page = data.page,
+        	    	adMaterials = data.results;
+            	adMaterials.forEach(m => {
+            		m.adPeriod = adPeriods.find(p => p.id===m.adPeriodId);
+	            });
+    	        initVM(page, adMaterials);
+	        });
+        });
+    });
+});
+
+function initVM(page, adMaterials) {
+    var vm = new Vue({
+        el: '#vm',
+        data: {
+        	page: page,
+            adMaterials: adMaterials
+        },
+        created: function () {
+            $('#loading').hide();
+            $('#vm').show();
+        },
+        methods: {
+            deleteAdMaterial: function (m) {
+                var that = this;
+                UIkit.modal.confirm('Ad material will be deleted. Continue?', function() {
+                    that.$resource('/api/adMaterials/' + m.id + '/delete').save({}).then(function(resp) {
+                        resp.json().then(function (result) {
+                            refresh();
+                        });
+                    }, onJsonError);
+                });
+            }
+        }
+    });
+};
+
+</script>
+
+{% endblock %}
+
+{% block main %}
+
+    <div id="error" class="uk-width-1-1">
+    </div>
+
+    <div id="loading" class="uk-width-1-1">
+        <i class="uk-icon-spinner uk-icon-spin"></i> {{ _('Loading') }}...
+    </div>
+
+    <div id="vm" class="uk-width-1-1">
+        <ul class="uk-tab" data-uk-tab>
+            <li><a href="#0" onclick="location.assign('/manage/ad/')">{{ _('Ad Slots') }}</a></li>
+            <li><a href="#0" onclick="location.assign('/manage/ad/adperiod_list')">{{ _('Ad Periods') }}</a></li>
+            <li class="uk-active"><a href="#0">{{ _('Ad Materials') }}</a></li>
+        </ul>
+
+        <div class="uk-margin">
+            <a href="javascript:refresh()" class="uk-button"><i class="uk-icon-refresh"></i> {{ _('Refresh') }}</a>
+        </div>
+
+        <table class="uk-table uk-table-hover">
+            <thead>
+                <tr>
+                    <th width="10%">{{ _('Image') }}</th>
+                    <th width="10%">{{ _('User') }}</th>
+                    <th width="10%">{{ _('Start At') }}</th>
+                    <th width="10%">{{ _('End At') }}</th>
+                    <th width="5%">{{ _('Weight') }}</th>
+                    <th width="10%">{{ _('GEO') }}</th>
+                    <th width="10%">{{ _('Tags') }}</th>
+                    <th width="30%">{{ _('URL') }}</th>
+                    <th width="5%">{{ _('Action') }}</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr v-for="m in adMaterials">
+                    <td>
+                        <a v-bind:href="'/files/attachments/' + m.imageId + '/l'" target="_blank"><img v-bind:src="'/files/attachments/' + m.imageId + '/s'" style="width: 160px;"></a>
+                    </td>
+                    <td>
+                        <a v-bind:href="'/user/' + m.adPeriod.userId" v-text="m.adPeriod.user.name" target="_blank"></a>
+                    </td>
+                    <td v-text="m.startAt"></td>
+                    <td v-text="m.endAt"></td>
+                    <td v-text="m.weight"></td>
+                    <td v-text="m.geo"></td>
+                    <td v-text="m.tags"></td>
+                    <td>
+                        <a v-bind:href="m.url" v-text="m.url" target="_blank"></a>
+                    </td>
+                    <td>
+                        <a v-on:click="deleteAdMaterial(m)" title="Delete Ad Material" href="#0" class="x-btn"><i class="uk-icon-trash"></i></a>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+
+	    <div is="pagination" v-bind:page="page"></div>
+    </div>
+
+{% endblock%}

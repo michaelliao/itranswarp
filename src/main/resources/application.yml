@@ -5,8 +5,8 @@ spring:
     active: ${PROFILES:native}
   application:
     name: ${NAME:itranswarp}
+    # default to empty (using server default timezone)
     timezone: ${TIMEZONE:}
-    cdn: ${CDN:}
   # MySQL configuration:
   datasource:
     url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:it}?useSSL=${DB_SSL:false}&characterEncoding=utf8
@@ -32,23 +32,31 @@ spring:
   # Markdown plugins:
   markdown:
     plugins:
+      # convert link to Bilibili video player, e.g. https://www.bilibili.com/video/av21322566
       bilibili:
         enabled: ${MARKDOWN_BILIBILI_ENABLED:true}
         width:   ${MARKDOWN_BILIBILI_WIDTH:100%}
         height:  ${MARKDOWN_BILIBILI_HEIGHT:480px}
+      # convert link to QQ video player, e.g. https://v.qq.com/x/cover/3nd6v5g14aoo20t/j0859o1tww8.html
       qq-video:
         enabled: ${MARKDOWN_QQ_VIDEO_ENABLED:true}
         width:   ${MARKDOWN_QQ_VIDEO_WIDTH:100%}
         height:  ${MARKDOWN_QQ_VIDEO_HEIGHT:480px}
+      # convert link to YouTube video player, e.g. https://www.youtube.com/watch?v=EaW6VcOzLT4
       youtube:
         enabled: ${MARKDOWN_YOUTUBE_ENABLED:true}
         width:   ${MARKDOWN_YOUTUBE_WIDTH:100%}
         height:  ${MARKDOWN_YOUTUBE_HEIGHT:480px}
+      # convert securities to TradingView chart, e.g. $$NASDAQ:AAPL$$
+      # search valid symbol name at https://www.tradingview.com/widget/advanced-chart/
       trading-view:
         enabled: ${MARKDOWN_TRADING_VIEW_ENABLED:true}
         width:   ${MARKDOWN_TRADING_VIEW_WIDTH:100%}
         height:  ${MARKDOWN_TRADING_VIEW_HEIGHT:480px}
   # OAuth authentication configuration:
+  # - name: display name
+  # - icon: icon name, check https://getuikit.com/v2/docs/icon.html
+  # - color: the button css background color
   oauth:
     facebook:
       enabled:       "${OAUTH_FACEBOOK_ENABLED:true}"

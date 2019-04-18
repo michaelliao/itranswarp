@@ -272,6 +272,7 @@ public class ApiController extends AbstractController {
 	public Map<String, Boolean> boardDelete(@PathVariable("id") long id) {
 		this.boardService.deleteBoard(id);
 		this.boardService.deleteBoardFromCache(id);
+		this.boardService.deleteTopicsFromCache(id);
 		return API_RESULT_TRUE;
 	}
 
@@ -404,6 +405,7 @@ public class ApiController extends AbstractController {
 		Topic topic = this.boardService.getTopicById(id);
 		Reply reply = this.boardService.createReply(user, topic, bean);
 		this.boardService.deleteBoardFromCache(topic.boardId);
+		this.boardService.deleteTopicsFromCache(topic.boardId);
 		return reply;
 	}
 
@@ -520,6 +522,7 @@ public class ApiController extends AbstractController {
 		}
 		Topic topic = this.boardService.createTopic(HttpContext.getRequiredCurrentUser(), board, bean);
 		this.boardService.deleteBoardFromCache(topic.boardId);
+		this.boardService.deleteTopicsFromCache(topic.boardId);
 		return topic;
 	}
 
@@ -550,6 +553,7 @@ public class ApiController extends AbstractController {
 		}
 		Topic topic = this.boardService.createTopic(HttpContext.getRequiredCurrentUser(), board, bean);
 		this.boardService.deleteBoardFromCache(topic.boardId);
+		this.boardService.deleteTopicsFromCache(topic.boardId);
 		return topic;
 	}
 
@@ -558,6 +562,7 @@ public class ApiController extends AbstractController {
 	public Map<String, Boolean> topicDelete(@PathVariable("id") long id) {
 		Topic topic = this.boardService.deleteTopic(HttpContext.getRequiredCurrentUser(), id);
 		this.boardService.deleteBoardFromCache(topic.boardId);
+		this.boardService.deleteTopicsFromCache(topic.boardId);
 		return API_RESULT_TRUE;
 	}
 

@@ -89,7 +89,9 @@ public class MvcController extends AbstractController {
 	@GetMapping("/")
 	public ModelAndView index() {
 		List<Article> recentArticles = this.articleService.getPublishedArticles(10);
-		return prepareModelAndView("index.html", Map.of("recentArticles", recentArticles));
+		List<Topic> recentTopics = this.boardService.getRecentTopicsFromCache();
+		return prepareModelAndView("index.html",
+				Map.of("recentArticles", recentArticles, "recentTopics", recentTopics));
 	}
 
 	@GetMapping("/locale/{lo}")
@@ -213,7 +215,8 @@ public class MvcController extends AbstractController {
 	@GetMapping("/discuss")
 	public ModelAndView discuss() {
 		List<Board> boards = boardService.getBoards();
-		return prepareModelAndView("discuss.html", Map.of("boards", boards));
+		List<Topic> recentTopics = this.boardService.getRecentTopicsFromCache();
+		return prepareModelAndView("discuss.html", Map.of("boards", boards, "recentTopics", recentTopics));
 	}
 
 	@GetMapping("/discuss/" + ID)
@@ -261,13 +264,15 @@ public class MvcController extends AbstractController {
 	@GetMapping("/user/" + ID)
 	public ModelAndView user(@PathVariable("id") long id) {
 		User user = userService.getById(id);
-		return prepareModelAndView("profile.html", Map.of("user", user));
+		List<Topic> topics = boardService.getTopicsByUser(user.id);
+		return prepareModelAndView("profile.html", Map.of("user", user, "topics", topics));
 	}
 
 	@GetMapping("/profile")
 	public ModelAndView profile() {
 		User user = HttpContext.getRequiredCurrentUser();
-		return prepareModelAndView("profile.html", Map.of("user", user));
+		List<Topic> topics = boardService.getTopicsByUser(user.id);
+		return prepareModelAndView("profile.html", Map.of("user", user, "topics", topics));
 	}
 
 	///////////////////////////////////////////////////////////////////////////////////////////////

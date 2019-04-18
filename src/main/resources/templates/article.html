@@ -56,9 +56,9 @@ $(function () {
     <div class="x-article-content x-main-content">
         {{ content|raw }}
     </div>
+{% endblock %}
 
-    <div id="x-sponsor-a" class="uk-clearfix"><!-- sponsor A --></div>
-
+{% block content_comment %}
     <div class="x-anchor"><a name="comments"></a></div>
 
     <h3>{{ _('Comments') }}</h3>

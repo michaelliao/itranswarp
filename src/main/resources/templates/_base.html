@@ -143,6 +143,7 @@
 	var g_ads = JSON.parse(decodeURIComponent('{{ __ads__|json|url|raw }}'));
 	$(function () {
 		initSponsors(g_ads);
+		console.log('init ad ok.');
 	});
 	</script>
 
@@ -153,7 +154,7 @@
 </script>
 
 <!-- BEGIN custom_header -->
-{{ __website__.custom_header|raw }}
+{{ __website__.customHeader|raw }}
 <!-- END custom_header -->
 
 <script>
@@ -224,7 +225,7 @@
 							<a href="#0"><i class="uk-icon-user"></i><span class="x-hidden-tiny">&nbsp;</span><span class="x-user-name x-hidden-tiny">{% if __user__ != null %}{{ __user__.name }}{% endif %}</span></a>
 							<div class="uk-dropdown uk-dropdown-navbar">
 								<ul class="uk-nav uk-nav-navbar">
-									<li><a target="_blank" href="/me/profile"><i class="uk-icon-cog"></i> {{ _('Profile') }}</a></li>
+									<li><a target="_blank" href="/profile"><i class="uk-icon-cog"></i> {{ _('Profile') }}</a></li>
 									<li class="uk-nav-divider"></li>
 								{% if __user__ != null and __user__.role.value <= 100 %}
 									<li><a target="_blank" href="/manage/"><i class="uk-icon-cogs"></i> {{ _('Manage') }}</a></li>
@@ -272,17 +273,17 @@
 						<div class="uk-flex-item-none x-sidebar-left">
 							<div id="x-sidebar-left">
 								<div id="x-sidebar-left-top">
-									<!-- __snippet__.leftSideBarTop -->
-									{{ __snippet__.leftSideBarTop|raw }}
-									<!-- // __snippet__.leftSideBarTop -->
+									<!-- __snippet__.sidebarLeftTop -->
+									{{ __snippet__.sidebarLeftTop|raw }}
+									<!-- // __snippet__.sidebarLeftTop -->
 								</div>
 								<div id="x-sidebar-left-content" class="x-sidebar-left-content">
 									{% block sidebar_left_content %}<p>override block "sidebar_left_content"</p>{% endblock %}
 								</div>
 								<div id="x-sidebar-left-bottom">
-									<!-- __snippet__.leftSideBarBottom -->
-									{{ __snippet__.leftSideBarBottom|raw }}
-									<!-- // __snippet__.leftSideBarBottom -->
+									<!-- __snippet__.sidebarLeftBottom -->
+									{{ __snippet__.sidebarLeftBottom|raw }}
+									<!-- // __snippet__.sidebarLeftBottom -->
 								</div>
 							</div>
 						</div>
@@ -301,22 +302,25 @@
 								{{ __snippet__.contentBottom|raw }}
 								<!-- // __snippet__.contentBottom -->
 							</div>
+							<div id="x-content-comment">
+								{% block content_comment %}{% endblock %}
+							</div>
 						</div>
 						{% if __sidebar_right__ %}
 						<div class="uk-flex-item-none x-sidebar-right">
 							<div id="x-sidebar-right">
 								<div id="x-sidebar-right-top">
-									<!-- __snippet__.rightSideBarTop -->
-									{{ __snippet__.rightSideBarTop|raw }}
-									<!-- // __snippet__.rightSideBarTop -->
+									<!-- __snippet__.sidebarRightTop -->
+									{{ __snippet__.sidebarRightTop|raw }}
+									<!-- // __snippet__.sidebarRightTop -->
 								</div>
 								<div id="x-sidebar-right-content" class="x-sidebar-right-content">
 									{% block sidebar_right_content %}<p>override block "sidebar_right_content"</p>{% endblock %}
 								</div>
 								<div id="x-sidebar-right-bottom">
-									<!-- __snippet__.rightSideBarBottom -->
-									{{ __snippet__.rightSideBarBottom|raw }}
-									<!-- // __snippet__.rightSideBarBottom -->
+									<!-- __snippet__.sidebarRightBottom -->
+									{{ __snippet__.sidebarRightBottom|raw }}
+									<!-- // __snippet__.sidebarRightBottom -->
 								</div>
 							</div>
 						</div>

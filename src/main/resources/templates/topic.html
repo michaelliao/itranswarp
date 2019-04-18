@@ -115,7 +115,7 @@ $(function () {
         <div class="x-anchor"><a name="{{ topic.id }}"></a></div>
         <div class="uk-comment-header">
             <a href="/user/{{ topic.userId }}"><img class="uk-comment-avatar uk-border-circle x-avatar" src="{{ topic.userImageUrl }}" width="50" height="50" alt=""></a>
-            <h4 class="uk-comment-title"><a href="/user/{{ topic.user.id }}">{{ topic.userName }}</a></h4>
+            <h4 class="uk-comment-title"><a href="/user/{{ topic.userId }}">{{ topic.userName }}</a></h4>
             <div class="uk-comment-meta">#1 Created at <span class="x-smart-datetime" data="{{ topic.createdAt }}">...</span>
             	<span class="x-can-delete">
                 	[<a href="javascript:deleteTopic('{{ topic.id }}')" class="uk-text-danger">{{ _('Delete') }}</a>]

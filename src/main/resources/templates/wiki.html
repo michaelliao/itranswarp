@@ -8,6 +8,7 @@
 {% block nav %} /wiki/{{ wiki.id }} {% endblock %}
 
 {% block meta %}
+    <meta property="og:ad" content="true" />
     <meta property="og:type" content="article" />
     <meta property="og:url" content="http://{{ __request__.host }}/wiki/{{ wiki.id }}{% if current.type == 'wikipage' %}/{{ current.id }}{% endif %}" />
     <meta property="og:title" content="{{ current.name }}" />
@@ -245,10 +246,10 @@ function expandWikiNode(icon, rec) {
 
     <div class="x-wiki-prev-next uk-clearfix"></div>
 
-    <div id="x-sponsor-a" class="uk-clearfix"><!-- sponsor A --></div>
-
     <div class="x-anchor x-comment-anchor"><a name="comments"></a></div>
+{% endblock %}
 
+{% block content_comment %}
     <h3>{{ _('Comments') }}</h3>
 
     <ul id="x-comment-list" class="uk-comment-list">

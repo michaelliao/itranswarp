@@ -6,6 +6,7 @@
 {% block title %}{{ _('Home') }}{% endblock %}
 
 {% block meta %}
+    <meta property="og:ad" content="true" />
     <meta property="og:type" content="website" />
     <meta property="og:url" content="http://{{ __request__.host }}/" />
     <meta property="og:title" content="{{ __website__.name }}" />
@@ -29,14 +30,14 @@
 
     <div class="uk-grid">
         <div class="x-index-top uk-width-1-1">
-            {% block index_top %}{{ __snippets__.index_top|raw }}{% endblock %}
+            {{ __snippet__.indexTop|raw }}
         </div>
     </div>
 
     <h3>{{ _('Hot Articles') }}</h3>
     <div style="max-width:640px;" class="uk-slidenav-position" data-uk-slideshow="{autoplay:true,pauseOnHover:false,kenburns:true}">
         <ul class="uk-slideshow uk-overlay-active">
-            {% for a in hotArticles %}
+            {% for a in recentArticles %}
             <li>
                 <img src="/files/attachments/{{ a.imageId }}/l" width="640" height="360">
                 <div onclick="window.open('/article/{{ a.id }}')" style="cursor:pointer" class="uk-overlay-panel uk-overlay-background uk-overlay-bottom uk-overlay-slide-bottom">
@@ -65,11 +66,9 @@
 
     <div class="uk-grid">
         <div class="x-index-bottom uk-width-1-1">
-            {% block index_bottom %}{{ __snippets__.index_bottom|raw }}{% endblock %}
+           {{ __snippet__.indexBottom|raw }}
         </div>
     </div>
-
-    <div id="x-sponsor-a" class="uk-clearfix"><!-- sponsor A --></div>
 
 {% endblock %}
 
@@ -79,7 +78,7 @@
     <h3>{{ _('Recent Topics') }}</h3>
     <ul class="uk-nav">
         {% for t in recentTopics %}
-        <li><a href="/discuss/{{ t.board_id }}/{{ t.id }}" target="_blank">{{ t.user.name }}: {{ t.name }}</a></li>
+        <li><a href="/discuss/{{ t.boardId }}/{{ t.id }}" target="_blank">{{ t.userName }}: {{ t.name }}</a></li>
         {% endfor %}
     </ul>
 </div>

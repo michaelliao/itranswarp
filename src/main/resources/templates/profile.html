@@ -1,9 +1,10 @@
 {% extends '_base.html' %}
 
-<!-- display sidebar on left -->
-{% set __sidebar_left__ = true %}
+{% block layout %}
+	{% set __sidebar_left__ = true %}
+{% endblock %}
 
-{% block nav %} /user/ {% endblock %}
+{% block nav %} /none {% endblock %}
 
 {% block title %}{{ user.name }}{% endblock %}
 
@@ -24,7 +25,7 @@
     </div>
 
     <h3>{{ _('Registration Date') }}</h3>
-    <p><span class="x-smartdate" date="{{ user.createdAt }}"></span></p>
+    <p><span class="x-smart-datetime" data="{{ user.createdAt }}"></span></p>
 {% endblock %}
 
 {% block content %}
@@ -41,11 +42,11 @@
                 <td>
                     <a href="/user/{{ user.id }}" target="_blank"><img class="uk-comment-avatar uk-border-circle x-avatar" src="{{ user.imageUrl }}" style="width:50px"></a>
                     <div style="margin-left:70px;">
-                        <div class="uk-margin" style="font-size:16px;"><a href="/discuss/{{ t.boardId }}/{{ t.id }}">{{ t.name}}</a></div>
+                        <div class="uk-margin" style="font-size:16px;"><a href="/discuss/{{ t.boardId }}/{{ t.id }}">{{ t.name }}</a></div>
                         <div>
-                            <a href="/user/{{ user.id }}" target="_blank">{{ user.name }}</a> {{ _('posted at') }} <span class="x-smartdate" date="{{ t.createdAt }}">...</span>
-                            {% if t.updatedAt > t.created_at %}
-                            {{ _('Last replied at') }} <span class="x-smartdate" date="{{ t.updatedAt }}">...</span>
+                            <a href="/user/{{ user.id }}" target="_blank">{{ user.name }}</a> {{ _('posted at') }} <span class="x-smart-datetime" data="{{ t.createdAt }}">...</span>
+                            {% if t.updatedAt > t.createdAt %}
+                            {{ _('Last replied at') }} <span class="x-smart-datetime" data="{{ t.updatedAt }}">...</span>
                             {% endif %}
                         </div>
                     </div>

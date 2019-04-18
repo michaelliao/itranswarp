@@ -3,9 +3,10 @@ package com.itranswarp.model;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 
 @Entity
-@Table(name = "boards")
+@Table(name = "boards", uniqueConstraints = @UniqueConstraint(name = "UNI_TAG", columnNames = { "tag" }))
 public class Board extends AbstractSortableEntity {
 
 	@Column(nullable = false)

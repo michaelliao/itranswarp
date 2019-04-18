@@ -424,7 +424,7 @@ $(function() {
     		d = Math.floor(h / 24),
     		s = 'a minute ago';
 		if (d >= 1) {
-			s = dt.toLocaleDateString() + ' ' + dt.getHours() + ':' + dt.getMinutes();
+			s = dt.toLocaleDateString() + ' ' + (dt.getHours() < 10 ? '0' : '') + dt.getHours() + ':' + (dt.getMinutes() < 10 ? '0' : '') + dt.getMinutes();
 		} else {
 			s = moment(t).fromNow();
 		}

@@ -24,15 +24,15 @@ public class Snippet extends AbstractSettingBean {
 	public String contentBottom;
 
 	@SettingInput(value = InputType.TEXTAREA, order = 7, description = "Left side bar top")
-	public String leftSideBarTop;
+	public String sidebarLeftTop;
 
 	@SettingInput(value = InputType.TEXTAREA, order = 8, description = "Left side bar bottom")
-	public String leftSideBarBottom;
+	public String sidebarLeftBottom;
 
 	@SettingInput(value = InputType.TEXTAREA, order = 9, description = "Right side bar top")
-	public String rightSideBarTop;
+	public String sidebarRightTop;
 
 	@SettingInput(value = InputType.TEXTAREA, order = 10, description = "Right side bar bottom")
-	public String rightSideBarBottom;
+	public String sidebarRightBottom;
 
 }

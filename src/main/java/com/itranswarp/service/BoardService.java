@@ -34,11 +34,12 @@ public class BoardService extends AbstractService<Board> {
 
 	static final String KEY_BOARDS = "__boards__";
 	static final String KEY_TOPICS_FIRST_PAGE = "__topics__";
+	static final String KEY_RECENT_TOPICS = "__recent_topics__";
 	static final long CACHE_TOPICS_SECONDS = 3600;
 
 	String sqlUpdateBoardIncTopicNumber;
 	String sqlUpdateBoardDecTopicNumber;
-	String sqlUpdateTopicIncReplyNumber;
+	String sqlUpdateTopicUpdatedAtAndIncReplyNumber;
 	String sqlUpdateTopicDecReplyNumber;
 	String sqlDeleteReplies;
 
@@ -49,7 +50,8 @@ public class BoardService extends AbstractService<Board> {
 		String replyTable = this.db.getTable(Reply.class);
 		this.sqlUpdateBoardIncTopicNumber = "UPDATE " + boardTable + " SET topicNumber = topicNumber + 1 WHERE id = ?";
 		this.sqlUpdateBoardDecTopicNumber = "UPDATE " + boardTable + " SET topicNumber = topicNumber - 1 WHERE id = ?";
-		this.sqlUpdateTopicIncReplyNumber = "UPDATE " + topicTable + " SET replyNumber = replyNumber + 1 WHERE id = ?";
+		this.sqlUpdateTopicUpdatedAtAndIncReplyNumber = "UPDATE " + topicTable
+				+ " SET replyNumber = replyNumber + 1, updatedAt = ? WHERE id = ?";
 		this.sqlUpdateTopicDecReplyNumber = "UPDATE " + topicTable + " SET replyNumber = replyNumber - 1 WHERE id = ?";
 
 		this.sqlDeleteReplies = "DELETE FROM " + replyTable + " WHERE topicId = ?";
@@ -129,6 +131,20 @@ public class BoardService extends AbstractService<Board> {
 		sortEntities(boards, ids);
 	}
 
+	public List<Topic> getRecentTopicsFromCache() {
+		List<Topic> topics = this.redisService.get(KEY_RECENT_TOPICS, TYPE_LIST_TOPIC);
+		if (topics == null) {
+			topics = this.db.from(Topic.class).orderBy("updatedAt").desc().limit(10).list();
+			this.redisService.set(KEY_RECENT_TOPICS, topics, CACHE_TOPICS_SECONDS);
+		}
+		return topics;
+	}
+
+	public void deleteTopicsFromCache(long boardId) {
+		this.redisService.del(KEY_TOPICS_FIRST_PAGE + boardId);
+		this.redisService.del(KEY_RECENT_TOPICS);
+	}
+
 	public PagedResults<Topic> getTopicsFromCache(Board board, int pageIndex) {
 		PagedResults<Topic> result = null;
 		if (pageIndex == 1) {
@@ -157,6 +173,11 @@ public class BoardService extends AbstractService<Board> {
 			tw.replies = getRecentReplies(topic);
 			return tw;
 		}).collect(Collectors.toList());
+	}
+
+	public List<Topic> getTopicsByUser(long userId) {
+		return this.db.from(Topic.class).where("userId = ?", userId).orderBy("updatedAt").desc().orderBy("id").desc()
+				.limit(20).list();
 	}
 
 	public PagedResults<Topic> getTopics(int pageIndex) {
@@ -240,7 +261,7 @@ public class BoardService extends AbstractService<Board> {
 		reply.topicId = topic.id;
 		reply.content = markdown.ugcToHtml(bean.content, AbstractEntity.TEXT);
 		this.db.insert(reply);
-		this.db.updateSql(this.sqlUpdateTopicIncReplyNumber, reply.topicId);
+		this.db.updateSql(this.sqlUpdateTopicUpdatedAtAndIncReplyNumber, System.currentTimeMillis(), reply.topicId);
 		return reply;
 	}
 
@@ -258,6 +279,9 @@ public class BoardService extends AbstractService<Board> {
 
 	}
 
-	static final TypeReference<PagedResults<Topic>> TYPE_PAGE_RESULTS_TOPIC = new TypeReference<>() {
+	private static final TypeReference<List<Topic>> TYPE_LIST_TOPIC = new TypeReference<>() {
+	};
+
+	private static final TypeReference<PagedResults<Topic>> TYPE_PAGE_RESULTS_TOPIC = new TypeReference<>() {
 	};
 }

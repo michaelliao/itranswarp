@@ -76,11 +76,16 @@
 
 <div class="uk-margin">
     <h3>{{ _('Recent Topics') }}</h3>
-    <ul class="uk-nav">
+    <div class="x-index-recent-topics">
         {% for t in recentTopics %}
-        <li><a href="/discuss/{{ t.boardId }}/{{ t.id }}" target="_blank">{{ t.userName }}: {{ t.name }}</a></li>
+        	<div class="uk-margin uk-clearfix">
+        		<a href="/user/{{ t.userId }}" target="_blank"><img class="uk-comment-avatar uk-border-circle x-avatar" src="{{ t.userImageUrl }}" style="width:30px"></a>
+                <div style="margin-left:40px;">
+                    <div class="uk-x"><a href="/discuss/{{ t.boardId }}/{{ t.id }}">{{ t.name }}</a></div>
+                </div>
+            </div>
         {% endfor %}
-    </ul>
+    </div>
 </div>
 
 {% endblock %}

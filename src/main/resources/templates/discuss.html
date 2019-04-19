@@ -9,6 +9,7 @@
 {% block title %}{{ _('Discuss') }}{% endblock %}
 
 {% block meta %}
+    <meta property="og:ad" content="true" />
     <meta property="og:type" content="webpage" />
     <meta property="og:url" content="http://{{ __request__.host }}/discuss/" />
     <meta property="og:title" content="{{ _('Discuss') }}" />
@@ -54,5 +55,17 @@
 {% endblock %}
 
 {% block sidebar_right_content %}
+
+    <h3>{{ _('Recent Topics') }}</h3>
+    <div class="x-index-recent-topics">
+        {% for t in recentTopics %}
+        	<div class="uk-margin uk-clearfix">
+        		<a href="/user/{{ t.userId }}" target="_blank"><img class="uk-comment-avatar uk-border-circle x-avatar" src="{{ t.userImageUrl }}" style="width:30px"></a>
+                <div style="margin-left:40px;">
+                    <div class="uk-x"><a href="/discuss/{{ t.boardId }}/{{ t.id }}">{{ t.name }}</a></div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
 
 {% endblock %}

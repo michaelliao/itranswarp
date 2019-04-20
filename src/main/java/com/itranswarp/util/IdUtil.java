@@ -54,17 +54,25 @@ public final class IdUtil {
 	private static synchronized long nextId(long epochSecond) {
 		if (epochSecond < lastEpoch) {
 			// warning: clock is turn back:
-			logger.warn("[IdGenerator] clock is back: " + epochSecond + " from previous:" + lastEpoch);
+			logger.warn("clock is back: " + epochSecond + " from previous:" + lastEpoch);
 			epochSecond = lastEpoch;
+		}
+		if (lastEpoch != epochSecond) {
+			lastEpoch = epochSecond;
+			reset();
 		}
 		offset++;
 		long next = offset & MAX_NEXT;
 		if (next == 0) {
-			logger.warn("[IdGenerator] maximum id reached in 1 second in epoch: " + epochSecond);
+			logger.warn("maximum id reached in 1 second in epoch: " + epochSecond);
 			epochSecond++;
+			lastEpoch = epochSecond;
 		}
-		lastEpoch = epochSecond;
 		return generateId(epochSecond, next, shardId);
+	}
+
+	private static void reset() {
+		offset = 0;
 	}
 
 	private static long generateId(long epochSecond, long next, long shardId) {
@@ -83,7 +91,7 @@ public final class IdUtil {
 				}
 			}
 		} catch (UnknownHostException e) {
-			logger.warn("unable to get host name.");
+			logger.warn("unable to get host name. set server id = 0.");
 		}
 		return 0;
 	}

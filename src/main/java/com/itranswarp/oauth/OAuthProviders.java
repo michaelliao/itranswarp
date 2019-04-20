@@ -22,8 +22,10 @@ public class OAuthProviders {
 
 	final Logger logger = LoggerFactory.getLogger(getClass());
 
-	@Autowired(required = false)
-	List<AbstractOAuthProvider> enabledOAuthProviders = List.of();
+	@Autowired
+	List<AbstractOAuthProvider> allOAuthProviders;
+
+	List<AbstractOAuthProvider> enabledOAuthProviders;
 
 	Map<String, AbstractOAuthProvider> enabledOAuthProviderMap;
 
@@ -31,6 +33,8 @@ public class OAuthProviders {
 
 	@PostConstruct
 	public void init() {
+		this.enabledOAuthProviders = this.allOAuthProviders.stream().filter(p -> p.isEnabled())
+				.collect(Collectors.toList());
 		this.enabledOAuthProviderMap = this.enabledOAuthProviders.stream().map(p -> {
 			logger.info("Found OAuth provider: " + p.getProviderId());
 			return p;

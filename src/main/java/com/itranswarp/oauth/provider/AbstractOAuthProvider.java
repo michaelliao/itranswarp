@@ -25,6 +25,13 @@ public abstract class AbstractOAuthProvider {
 		throw new IllegalArgumentException("Could not get provider name from class name: " + className);
 	}
 
+	public boolean isEnabled() {
+		AbstractOAuthConfiguration conf = getOAuthConfiguration();
+		String clientId = conf.getClientId();
+		String clientSecret = conf.getClientSecret();
+		return clientId != null && !clientId.isEmpty() && clientSecret != null && !clientSecret.isEmpty();
+	}
+
 	public abstract AbstractOAuthConfiguration getOAuthConfiguration();
 
 	public abstract String getAuthenticateUrl(String redirectUrl);

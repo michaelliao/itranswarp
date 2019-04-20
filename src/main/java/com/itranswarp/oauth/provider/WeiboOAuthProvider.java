@@ -9,7 +9,6 @@ import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.stereotype.Component;
 
@@ -17,7 +16,6 @@ import com.itranswarp.oauth.OAuthAuthentication;
 import com.itranswarp.util.JsonUtil;
 
 @Component
-@ConditionalOnProperty(name = "spring.signin.oauth.weibo.enabled", havingValue = "true")
 public class WeiboOAuthProvider extends AbstractOAuthProvider {
 
 	@Component

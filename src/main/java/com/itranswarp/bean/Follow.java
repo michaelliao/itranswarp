@@ -17,6 +17,9 @@ public class Follow extends AbstractSettingBean {
 	@SettingInput(value = InputType.TEXT, order = 2, description = "Github URL")
 	public String github;
 
+	@SettingInput(value = InputType.TEXT, order = 3, description = "Instagram URL")
+	public String instagram;
+
 	@SettingInput(value = InputType.TEXT, order = 3, description = "Linkedin URL")
 	public String linkedin;
 
@@ -25,9 +28,6 @@ public class Follow extends AbstractSettingBean {
 
 	@SettingInput(value = InputType.TEXT, order = 5, description = "Twitter URL")
 	public String twitter;
-
-	@SettingInput(value = InputType.TEXT, order = 6, description = "Wechat URL")
-	public String wechat;
 
 	@SettingInput(value = InputType.TEXT, order = 7, description = "Weibo URL")
 	public String weibo;

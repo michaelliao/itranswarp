@@ -19,7 +19,7 @@
     </scm>
 
     <name>itranswarp</name>
-    <url>http://www.liaoxuefeng.com</url>
+    <url>https://www.liaoxuefeng.com</url>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

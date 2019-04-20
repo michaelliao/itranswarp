@@ -1,25 +1,38 @@
 // extension for markdown content
 
-// init markdown table:
-function _mdInitTables() {
-	$('#x-content table').each(function () {
-		var $t = $(this);
-		if (!$t.hasClass('uk-table')) {
-			$t.addClass('uk-table');
+function execute_html(tid, btn) {
+	var w = window.open('about:blank', 'Online HTML Practice', 'width=640,height=480,resizeable=1,scrollbars=1');
+	w.document.write(_mdGetCode(tid));
+	w.document.close();
+}
+
+function execute_java(tid, btn) {
+	var
+		code = _mdGetCode(tid),
+		$button = $(btn),
+		$i = $button.find('i');
+	$button.attr('disabled', 'disabled');
+	$i.addClass('uk-icon-spinner');
+	$i.addClass('uk-icon-spin');
+	$.post('https://local.liaoxuefeng.com:39193/run', $.param({
+		code: code
+	})).done(function (r) {
+		if (r.exitCode === 0) {
+			_mdShowCodeResult(btn, r.output);
+		} else {
+			_mdShowCodeError(btn, r.output, false);
 		}
+	}).fail(function (r) {
+		_mdShowCodeError(btn, '<p>无法连接到Java代码运行助手。请检查<a target="_blank" href="/wiki/001543970808338ad98bbeaa6fc405c8df49d6a015b6e67000/001543970112198a66c30326d4c4ba38684767edcc16912000">本机的设置</a>。</p>', true);
+	}).always(function () {
+		$i.removeClass('uk-icon-spinner');
+		$i.removeClass('uk-icon-spin');
+		$button.removeAttr('disabled');
 	});
 }
 
-function _get_code(tid) {
-	var
-		$pre = $('#pre-' + tid),
-		$post = $('#post-' + tid),
-		$textarea = $('#textarea-' + tid);
-	return $pre.text() + $textarea.val() + '\n' + ($post.length === 0 ? '' : $post.text());
-}
-
-function run_javascript(tid, btn) {
-	var code = _get_code(tid);
+function execute_javascript(tid, btn) {
+	var code = _mdGetCode(tid);
 	(function () {
 		// prepare console.log
 		var
@@ -49,59 +62,21 @@ function run_javascript(tid, btn) {
 			if (!buffer) {
 				buffer = '(no output)';
 			}
-			showCodeResult(btn, buffer);
+			_mdShowCodeResult(btn, buffer);
 		}
 		catch (e) {
 			buffer = buffer + String(e);
-			showCodeError(btn, buffer);
+			_mdShowCodeError(btn, buffer);
 		}
 	})();
 }
 
-function run_html(tid, btn) {
-	var code = _get_code(tid);
-	(function () {
-		var w = window.open('about:blank', 'Online Practice', 'width=640,height=480,resizeable=1,scrollbars=1');
-		w.document.write(code);
-		w.document.close();
-	})();
-}
-
-function _showCodeResult(btn, result, isHtml, isError) {
-	var $r = $(btn).next('div.x-code-result');
-	if ($r.get(0) === undefined) {
-		$(btn).after('<div class="x-code-result x-code uk-alert"></div>');
-		$r = $(btn).next('div.x-code-result');
-	}
-	$r.removeClass('uk-alert-danger');
-	if (isError) {
-		$r.addClass('uk-alert-danger');
-	}
-	if (isHtml) {
-		$r.html(result);
-	} else {
-		var ss = result.split('\n');
-		var htm = _.map(ss, function (s) {
-			return encodeHtml(s).replace(/ /g, '&nbsp;');
-		}).join('<br>');
-		$r.html(htm);
-	}
-}
-
-function showCodeResult(btn, result, isHtml) {
-	_showCodeResult(btn, result, isHtml);
-}
-
-function showCodeError(btn, result, isHtml) {
-	_showCodeResult(btn, result, isHtml, true);
-}
-
-function run_sql(tid, btn) {
+function execute_sql(tid, btn) {
 	if (typeof alasql === undefined) {
-		showCodeError(btn, '错误：JavaScript嵌入式SQL引擎尚未加载完成，请稍后再试或者刷新页面！');
+		_mdShowCodeError(btn, '错误：JavaScript嵌入式SQL引擎尚未加载完成，请稍后再试或者刷新页面！');
 		return;
 	}
-	var code = _get_code(tid);
+	var code = _mdGetCode(tid);
 	var genTable = function (arr) {
 		if (arr.length === 0) {
 			return 'Empty result set';
@@ -164,20 +139,20 @@ function run_sql(tid, btn) {
 			}
 		}
 		if (error) {
-			showCodeError(btn, 'ERROR when execute SQL: ' + s + '\n' + String(error));
+			_mdShowCodeError(btn, 'ERROR when execute SQL: ' + s + '\n' + String(error));
 		} else {
 			if (Array.isArray(result)) {
-				showCodeResult(btn, genTable(result), true);
+				_mdShowCodeResult(btn, genTable(result), true);
 			} else {
-				showCodeResult(btn, result || '(empty)');
+				_mdShowCodeResult(btn, result || '(empty)');
 			}
 		}
 	})();
 }
 
-function run_python(tid, btn) {
+function execute_python(tid, btn) {
 	var
-		code = _get_code(tid),
+		code = _mdGetCode(tid),
 		$button = $(btn),
 		$i = $button.find('i');
 	$button.attr('disabled', 'disabled');
@@ -186,9 +161,9 @@ function run_python(tid, btn) {
 	$.post('https://local.liaoxuefeng.com:39093/run', $.param({
 		code: code
 	})).done(function (r) {
-		showCodeResult(btn, r.output);
+		_mdShowCodeResult(btn, r.output);
 	}).fail(function (r) {
-		showCodeError(btn, '<p>无法连接到Python代码运行助手。请检查<a target="_blank" href="/wiki/0014316089557264a6b348958f449949df42a6d3a2e542c000/001432523496782e0946b0f454549c0888d05959b99860f000">本机的设置</a>。</p>', true);
+		_mdShowCodeError(btn, '<p>无法连接到Python代码运行助手。请检查<a target="_blank" href="/wiki/0014316089557264a6b348958f449949df42a6d3a2e542c000/001432523496782e0946b0f454549c0888d05959b99860f000">本机的设置</a>。</p>', true);
 	}).always(function () {
 		$i.removeClass('uk-icon-spinner');
 		$i.removeClass('uk-icon-spin');
@@ -196,32 +171,54 @@ function run_python(tid, btn) {
 	});
 }
 
-function run_java(tid, btn) {
-	var
-		code = _get_code(tid),
-		$button = $(btn),
-		$i = $button.find('i');
-	$button.attr('disabled', 'disabled');
-	$i.addClass('uk-icon-spinner');
-	$i.addClass('uk-icon-spin');
-	$.post('https://local.liaoxuefeng.com:39193/run', $.param({
-		code: code
-	})).done(function (r) {
-		if (r.exitCode === 0) {
-			showCodeResult(btn, r.output);
-		} else {
-			showCodeError(btn, r.output, false);
+// init markdown table:
+function initMarkdownTables() {
+	$('#x-content table').each(function () {
+		var $t = $(this);
+		if (!$t.hasClass('uk-table')) {
+			$t.addClass('uk-table');
 		}
-	}).fail(function (r) {
-		showCodeError(btn, '<p>无法连接到Java代码运行助手。请检查<a target="_blank" href="/wiki/001543970808338ad98bbeaa6fc405c8df49d6a015b6e67000/001543970112198a66c30326d4c4ba38684767edcc16912000">本机的设置</a>。</p>', true);
-	}).always(function () {
-		$i.removeClass('uk-icon-spinner');
-		$i.removeClass('uk-icon-spin');
-		$button.removeAttr('disabled');
 	});
 }
 
-function adjustTextareaHeight(t) {
+function _mdGetCode(tid) {
+	var
+		$pre = $('#pre-' + tid),
+		$post = $('#post-' + tid),
+		$textarea = $('#textarea-' + tid);
+	return $pre.text() + $textarea.val() + '\n' + ($post.length === 0 ? '' : $post.text());
+}
+
+function _mdSetCodeResult(btn, result, isHtml, isError) {
+	var $r = $(btn).next('div.x-code-result');
+	if ($r.get(0) === undefined) {
+		$(btn).after('<div class="x-code-result x-code uk-alert"></div>');
+		$r = $(btn).next('div.x-code-result');
+	}
+	$r.removeClass('uk-alert-danger');
+	if (isError) {
+		$r.addClass('uk-alert-danger');
+	}
+	if (isHtml) {
+		$r.html(result);
+	} else {
+		var ss = result.split('\n');
+		var htm = _.map(ss, function (s) {
+			return encodeHtml(s).replace(/ /g, '&nbsp;');
+		}).join('<br>');
+		$r.html(htm);
+	}
+}
+
+function _mdShowCodeResult(btn, result, isHtml) {
+	_mdSetCodeResult(btn, result, isHtml);
+}
+
+function _mdShowCodeError(btn, result, isHtml) {
+	_mdSetCodeResult(btn, result, isHtml, true);
+}
+
+function _mdAdjustTextareaHeight(t) {
 	var
 		$t = $(t),
 		lines = $t.val().split('\n').length;
@@ -255,7 +252,7 @@ var initRunCode = (function() {
 		}
 		return code + '\n';
 	};
-	var initPre = function ($pre, fn_run) {
+	var fnInitPre = function ($pre, fn_run) {
 		tid++;
 		var
 			theId = 'online-run-code-' + tid,
@@ -285,14 +282,14 @@ var initRunCode = (function() {
 			$post = $('#post-' + theId);
 			$post.text(trimCode(codes[2]));
 		}
-		$pre.after('<textarea id="textarea-' + theId + '" onkeyup="adjustTextareaHeight(this)" class="uk-width-1-1 x-codearea" rows="10" style="overflow: scroll; border-top-left-radius: 0; border-top-right-radius: 0;' + ($post === null ? '' : 'border-bottom-left-radius: 0; border-bottom-right-radius: 0;') + '"></textarea>');
+		$pre.after('<textarea id="textarea-' + theId + '" onkeyup="_mdAdjustTextareaHeight(this)" class="uk-width-1-1 x-codearea" rows="10" style="overflow: scroll; border-top-left-radius: 0; border-top-right-radius: 0;' + ($post === null ? '' : 'border-bottom-left-radius: 0; border-bottom-right-radius: 0;') + '"></textarea>');
 		$('#textarea-' + theId).val(trimCode(codes[1]));
-		adjustTextareaHeight($('#textarea-' + theId).get(0));
+		_mdAdjustTextareaHeight($('#textarea-' + theId).get(0));
 	};
-	return initPre;
+	return fnInitPre;
 })();
 
-function checkChoice(formId) {
+function _mdCheckChoice(formId) {
 	var
 		$form = $('#' + formId),
 		$yes = $form.find('span.uk-text-success'),
@@ -312,14 +309,13 @@ function checkChoice(formId) {
 	});
 }
 
-var choiceId = 0;
+var _theChoiceId = 0;
 
 function _initChoice($pre) {
-	choiceId++;
-	console.log('init choice ' + choiceId);
+	_theChoiceId++;
 	var
 		i, x, c,
-		id = 'form-choice-' + choiceId,
+		id = 'form-choice-' + _theChoiceId,
 		codes = $pre.children('code').text().split('----', 2),
 		question = codes[0],
 		choices = $.trim(codes[1]).split('\n');
@@ -332,26 +328,24 @@ function _initChoice($pre) {
 		}
 		h = h + '<div class="uk-form-row"><label><input type="checkbox" ' + (x ? 'x-data="x"' : '') + '> ' + encodeHtml(c) + '</label></div>';
 	}
-	h = h + '<div class="uk-form-row"><button type="button" class="uk-button uk-button-primary" onclick="checkChoice(\'' + id + '\')">Submit</button>&nbsp;&nbsp;&nbsp;';
+	h = h + '<div class="uk-form-row"><button type="button" class="uk-button uk-button-primary" onclick="_mdCheckChoice(\'' + id + '\')">Submit</button>&nbsp;&nbsp;&nbsp;';
 	h = h + '<span class="uk-text-large uk-text-success" style="display:none"><i class="uk-icon-check"></i></span>';
 	h = h + '<span class="uk-text-large uk-text-danger" style="display:none"><i class="uk-icon-times"></i></span></div></fieldset></form>';
 	$pre.replaceWith(h);
 }
 
-function _mdInitChoice() {
-	$('pre>code.language-choice').each(function (i, code) {
+function initMarkdownChoice() {
+	$('pre>code.language-choice').each(function () {
 		_initChoice($(this).parent());
 	});
 }
 
-function _mdInitRunCode() {
+function initMarkdownRun() {
 	$('pre>code').each(function (i, code) {
 		var
 			$code = $(code),
 			classes = ($code.attr('class') || '').split(' '),
 			nohightlight = (_.find(classes, function (s) { return s.indexOf('language-nohightlight') >= 0; }) || '').trim(),
-			warn = (_.find(classes, function (s) { return s.indexOf('language-!') >= 0; }) || '').trim(),
-			info = (_.find(classes, function (s) { return s.indexOf('language-?') >= 0; }) || '').trim(),
 			x_run = (_.find(classes, function (s) { return s.indexOf('language-x-') >= 0; }) || '').trim();
 		console.log("init " + $code);
 		if ($code.hasClass('language-ascii')) {
@@ -364,7 +358,7 @@ function _mdInitRunCode() {
 				.css('white-space', 'pre')
 				.css('background-color', 'transparent');
 		} else if (x_run) {
-			var fn = 'run_' + x_run.substring('language-x-'.length);
+			var fn = 'execute_' + x_run.substring('language-x-'.length);
 			initRunCode($code.parent(), fn);
 		} else if (!nohightlight) {
 			hljs.highlightBlock(code);
@@ -372,10 +366,10 @@ function _mdInitRunCode() {
 	});
 }
 
-function _mdInitInfo() {
-	$('pre>code').each(function (i, code) {
+function initMarkdownInfo() {
+	$('pre>code').each(function () {
 		var
-			$code = $(code),
+			$code = $(this),
 			classes = ($code.attr('class') || '').split(' '),
 			warn = (_.find(classes, function (s) { return s.indexOf('language-!') >= 0; }) || '').trim(),
 			info = (_.find(classes, function (s) { return s.indexOf('language-?') >= 0; }) || '').trim();
@@ -385,8 +379,8 @@ function _mdInitInfo() {
 	});
 }
 
-function _mdInitMath() {
-	var renderMath = function (text) {
+function initMarkdownMath() {
+	var fnRenderMath = function (text) {
 		try {
 			return katex.renderToString(text);
 		} catch (e) {
@@ -395,17 +389,17 @@ function _mdInitMath() {
 			};
 		}
 	};
-	$('pre>code.language-math').each(function (i, code) {
+	$('pre>code.language-math').each(function () {
 		var
 			$code = $(this),
-			math = renderMath($code.text().trim());
+			math = fnRenderMath($code.text().trim());
 		if (math.error) {
 			$code.text(math.error);
 		} else {
 			$code.parent().replaceWith('<p>' + math + '</p>');
 		}
 	});
-	$('p>code').each(function (i, code) {
+	$('p>code').each(function () {
 		var
 			math,
 			$code = $(this),
@@ -415,7 +409,7 @@ function _mdInitMath() {
 			nextText = nextNode && nextNode.nodeValue;
 		if (typeof(prevText)=== 'string' && typeof(nextText)==='string') {
 			if (prevText.substring(prevText.length-1, prevText.length) === '$' && nextText.substring(0, 1) === '$') {
-				math = renderMath($code.text());
+				math = fnRenderMath($code.text());
 				if (math.error) {
 					$code.text(math.error);
 				} else {
@@ -429,17 +423,17 @@ function _mdInitMath() {
 }
 
 $(function () {
-	var tryFn = function (fn) {
+	var fnTry = function (fn) {
 		try {
 			fn();
 		} catch (err) {
 			console.log(err);
 		}
 	};
-	tryFn(_mdInitTables);
-	tryFn(_mdInitInfo);
-	tryFn(_mdInitRunCode);
-	tryFn(_mdInitChoice);
-	tryFn(_mdInitMath);
+	fnTry(initMarkdownTables);
+	fnTry(initMarkdownInfo);
+	fnTry(initMarkdownRun);
+	fnTry(initMarkdownChoice);
+	fnTry(initMarkdownMath);
 	console.log('init extensions ok.');
 });

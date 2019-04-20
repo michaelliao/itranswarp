@@ -11,11 +11,11 @@ import org.springframework.stereotype.Component;
 import com.itranswarp.oauth.OAuthAuthentication;
 
 @Component
-@ConditionalOnProperty(name = "spring.oauth.qq.enabled", havingValue = "true")
+@ConditionalOnProperty(name = "spring.signin.oauth.qq.enabled", havingValue = "true")
 public class QQOAuthProvider extends AbstractOAuthProvider {
 
 	@Component
-	@ConfigurationProperties("spring.oauth.qq")
+	@ConfigurationProperties("spring.signin.oauth.qq")
 	public static class OAuthConfiguration extends AbstractOAuthConfiguration {
 
 	}

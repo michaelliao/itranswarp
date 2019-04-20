@@ -53,74 +53,77 @@ spring:
         enabled: ${MARKDOWN_TRADING_VIEW_ENABLED:true}
         width:   ${MARKDOWN_TRADING_VIEW_WIDTH:100%}
         height:  ${MARKDOWN_TRADING_VIEW_HEIGHT:480px}
-  # OAuth authentication configuration:
-  # - name: display name
-  # - icon: icon name, check https://getuikit.com/v2/docs/icon.html
-  # - color: the button css background color
-  oauth:
-    facebook:
-      enabled:       "${OAUTH_FACEBOOK_ENABLED:true}"
-      name:          "${OAUTH_FACEBOOK_NAME:Facebook}"
-      icon:          "${OAUTH_FACEBOOK_ICON:facebook}"
-      color:         "${OAUTH_FACEBOOK_COLOR:#3b5998}"
-      client-id:     "${OAUTH_FACEBOOK_CLIENT_ID:}"
-      client-secret: "${OAUTH_FACEBOOK_CLIENT_SECRET:}"
-    github:
-      enabled:       "${OAUTH_GITHUB_ENABLED:true}"
-      name:          "${OAUTH_GITHUB_NAME:Github}"
-      icon:          "${OAUTH_GITHUB_ICON:github}"
-      color:         "${OAUTH_GITHUB_COLOR:#666666}"
-      client-id:     "${OAUTH_GITHUB_CLIENT_ID:}"
-      client-secret: "${OAUTH_GITHUB_CLIENT_SECRET:}"
-    google:
-      enabled:       "${OAUTH_GOOGLE_ENABLED:true}"
-      name:          "${OAUTH_GOOGLE_NAME:Google}"
-      icon:          "${OAUTH_GOOGLE_ICON:google}"
-      color:         "${OAUTH_GOOGLE_COLOR:#4285f4}"
-      client-id:     "${OAUTH_GOOGLE_CLIENT_ID:}"
-      client-secret: "${OAUTH_GOOGLE_CLIENT_SECRET:}"
-    linkedin:
-      enabled:       "${OAUTH_LINKEDIN_ENABLED:true}"
-      name:          "${OAUTH_LINKEDIN_NAME:LinkedIn}"
-      icon:          "${OAUTH_LINKEDIN_ICON:linkedin}"
-      color:         "${OAUTH_LINKEDIN_COLOR:#007bb6}"
-      client-id:     "${OAUTH_LINKEDIN_CLIENT_ID:}"
-      client-secret: "${OAUTH_LINKEDIN_CLIENT_SECRET:}"
-    microsoft:
-      enabled:       "${OAUTH_MICROSOFT_ENABLED:true}"
-      name:          "${OAUTH_MICROSOFT_NAME:Microsoft}"
-      icon:          "${OAUTH_MICROSOFT_ICON:windows}"
-      color:         "${OAUTH_MICROSOFT_COLOR:#2672ec}"
-      client-id:     "${OAUTH_MICROSOFT_CLIENT_ID:}"
-      client-secret: "${OAUTH_MICROSOFT_CLIENT_SECRET:}"
-    qq:
-      enabled:       "${OAUTH_QQ_ENABLED:true}"
-      name:          "${OAUTH_QQ_NAME:QQ}"
-      icon:          "${OAUTH_QQ_ICON:qq}"
-      color:         "${OAUTH_QQ_COLOR:#00a8e6}"
-      client-id:     "${OAUTH_QQ_CLIENT_ID:}"
-      client-secret: "${OAUTH_QQ_CLIENT_SECRET:}"
-    twitter:
-      enabled:       "${OAUTH_TWITTER_ENABLED:true}"
-      name:          "${OAUTH_TWITTER_NAME:Twitter}"
-      icon:          "${OAUTH_TWITTER_ICON:facebook}"
-      color:         "${OAUTH_TWITTER_COLOR:#1da1f2}"
-      client-id:     "${OAUTH_TWITTER_CLIENT_ID:}"
-      client-secret: "${OAUTH_TWITTER_CLIENT_SECRET:}"
-    weibo:
-      enabled:       "${OAUTH_WEIBO_ENABLED:true}"
-      name:          "${OAUTH_WEIBO_NAME:Weibo}"
-      icon:          "${OAUTH_WEIBO_ICON:weibo}"
-      color:         "${OAUTH_WEIBO_COLOR:#e92b00}"
-      client-id:     "${OAUTH_WEIBO_CLIENT_ID:}"
-      client-secret: "${OAUTH_WEIBO_CLIENT_SECRET:}"
-    yahoo:
-      enabled:       "${OAUTH_YAHOO_ENABLED:true}"
-      name:          "${OAUTH_YAHOO_NAME:Yahoo}"
-      icon:          "${OAUTH_YAHOO_ICON:yahoo}"
-      color:         "${OAUTH_YAHOO_COLOR:#720e9e}"
-      client-id:     "${OAUTH_YAHOO_CLIENT_ID:}"
-      client-secret: "${OAUTH_YAHOO_CLIENT_SECRET:}"
+  signin:
+    password:
+      enabled: ${SIGNIN_PASSWORD_ENABLED:true}
+    # OAuth authentication configuration:
+    # - name: display name
+    # - icon: icon name, check https://getuikit.com/v2/docs/icon.html
+    # - color: the button css background color
+    oauth:
+      facebook:
+        enabled:       "${OAUTH_FACEBOOK_ENABLED:false}"
+        name:          "${OAUTH_FACEBOOK_NAME:Facebook}"
+        icon:          "${OAUTH_FACEBOOK_ICON:facebook}"
+        color:         "${OAUTH_FACEBOOK_COLOR:#3b5998}"
+        client-id:     "${OAUTH_FACEBOOK_CLIENT_ID:}"
+        client-secret: "${OAUTH_FACEBOOK_CLIENT_SECRET:}"
+      github:
+        enabled:       "${OAUTH_GITHUB_ENABLED:false}"
+        name:          "${OAUTH_GITHUB_NAME:Github}"
+        icon:          "${OAUTH_GITHUB_ICON:github}"
+        color:         "${OAUTH_GITHUB_COLOR:#666666}"
+        client-id:     "${OAUTH_GITHUB_CLIENT_ID:}"
+        client-secret: "${OAUTH_GITHUB_CLIENT_SECRET:}"
+      google:
+        enabled:       "${OAUTH_GOOGLE_ENABLED:false}"
+        name:          "${OAUTH_GOOGLE_NAME:Google}"
+        icon:          "${OAUTH_GOOGLE_ICON:google}"
+        color:         "${OAUTH_GOOGLE_COLOR:#4285f4}"
+        client-id:     "${OAUTH_GOOGLE_CLIENT_ID:}"
+        client-secret: "${OAUTH_GOOGLE_CLIENT_SECRET:}"
+      linkedin:
+        enabled:       "${OAUTH_LINKEDIN_ENABLED:false}"
+        name:          "${OAUTH_LINKEDIN_NAME:LinkedIn}"
+        icon:          "${OAUTH_LINKEDIN_ICON:linkedin}"
+        color:         "${OAUTH_LINKEDIN_COLOR:#007bb6}"
+        client-id:     "${OAUTH_LINKEDIN_CLIENT_ID:}"
+        client-secret: "${OAUTH_LINKEDIN_CLIENT_SECRET:}"
+      microsoft:
+        enabled:       "${OAUTH_MICROSOFT_ENABLED:false}"
+        name:          "${OAUTH_MICROSOFT_NAME:Microsoft}"
+        icon:          "${OAUTH_MICROSOFT_ICON:windows}"
+        color:         "${OAUTH_MICROSOFT_COLOR:#2672ec}"
+        client-id:     "${OAUTH_MICROSOFT_CLIENT_ID:}"
+        client-secret: "${OAUTH_MICROSOFT_CLIENT_SECRET:}"
+      qq:
+        enabled:       "${OAUTH_QQ_ENABLED:true}"
+        name:          "${OAUTH_QQ_NAME:QQ}"
+        icon:          "${OAUTH_QQ_ICON:qq}"
+        color:         "${OAUTH_QQ_COLOR:#00a8e6}"
+        client-id:     "${OAUTH_QQ_CLIENT_ID:}"
+        client-secret: "${OAUTH_QQ_CLIENT_SECRET:}"
+      twitter:
+        enabled:       "${OAUTH_TWITTER_ENABLED:false}"
+        name:          "${OAUTH_TWITTER_NAME:Twitter}"
+        icon:          "${OAUTH_TWITTER_ICON:facebook}"
+        color:         "${OAUTH_TWITTER_COLOR:#1da1f2}"
+        client-id:     "${OAUTH_TWITTER_CLIENT_ID:}"
+        client-secret: "${OAUTH_TWITTER_CLIENT_SECRET:}"
+      weibo:
+        enabled:       "${OAUTH_WEIBO_ENABLED:true}"
+        name:          "${OAUTH_WEIBO_NAME:Weibo}"
+        icon:          "${OAUTH_WEIBO_ICON:weibo}"
+        color:         "${OAUTH_WEIBO_COLOR:#e92b00}"
+        client-id:     "${OAUTH_WEIBO_CLIENT_ID:}"
+        client-secret: "${OAUTH_WEIBO_CLIENT_SECRET:}"
+      yahoo:
+        enabled:       "${OAUTH_YAHOO_ENABLED:false}"
+        name:          "${OAUTH_YAHOO_NAME:Yahoo}"
+        icon:          "${OAUTH_YAHOO_ICON:yahoo}"
+        color:         "${OAUTH_YAHOO_COLOR:#720e9e}"
+        client-id:     "${OAUTH_YAHOO_CLIENT_ID:}"
+        client-secret: "${OAUTH_YAHOO_CLIENT_SECRET:}"
 
 server:
   port: ${SERVER_PORT:2019}

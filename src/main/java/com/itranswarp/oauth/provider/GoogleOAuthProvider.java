@@ -11,11 +11,11 @@ import org.springframework.stereotype.Component;
 import com.itranswarp.oauth.OAuthAuthentication;
 
 @Component
-@ConditionalOnProperty(name = "spring.oauth.google.enabled", havingValue = "true")
+@ConditionalOnProperty(name = "spring.signin.oauth.google.enabled", havingValue = "true")
 public class GoogleOAuthProvider extends AbstractOAuthProvider {
 
 	@Component
-	@ConfigurationProperties("spring.oauth.google")
+	@ConfigurationProperties("spring.signin.oauth.google")
 	public static class OAuthConfiguration extends AbstractOAuthConfiguration {
 
 	}

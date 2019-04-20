@@ -17,11 +17,11 @@ import com.itranswarp.oauth.OAuthAuthentication;
 import com.itranswarp.util.JsonUtil;
 
 @Component
-@ConditionalOnProperty(name = "spring.oauth.weibo.enabled", havingValue = "true")
+@ConditionalOnProperty(name = "spring.signin.oauth.weibo.enabled", havingValue = "true")
 public class WeiboOAuthProvider extends AbstractOAuthProvider {
 
 	@Component
-	@ConfigurationProperties("spring.oauth.weibo")
+	@ConfigurationProperties("spring.signin.oauth.weibo")
 	public static class OAuthConfiguration extends AbstractOAuthConfiguration {
 
 	}

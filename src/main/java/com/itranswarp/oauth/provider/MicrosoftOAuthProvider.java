@@ -11,11 +11,11 @@ import org.springframework.stereotype.Component;
 import com.itranswarp.oauth.OAuthAuthentication;
 
 @Component
-@ConditionalOnProperty(name = "spring.oauth.microsoft.enabled", havingValue = "true")
+@ConditionalOnProperty(name = "spring.signin.oauth.microsoft.enabled", havingValue = "true")
 public class MicrosoftOAuthProvider extends AbstractOAuthProvider {
 
 	@Component
-	@ConfigurationProperties("spring.oauth.microsoft")
+	@ConfigurationProperties("spring.signin.oauth.microsoft")
 	public static class OAuthConfiguration extends AbstractOAuthConfiguration {
 
 	}

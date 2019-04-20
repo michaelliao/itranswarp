@@ -11,11 +11,11 @@ import org.springframework.stereotype.Component;
 import com.itranswarp.oauth.OAuthAuthentication;
 
 @Component
-@ConditionalOnProperty(name = "spring.oauth.facebook.enabled", havingValue = "true")
+@ConditionalOnProperty(name = "spring.signin.oauth.facebook.enabled", havingValue = "true")
 public class FacebookOAuthProvider extends AbstractOAuthProvider {
 
 	@Component
-	@ConfigurationProperties("spring.oauth.facebook")
+	@ConfigurationProperties("spring.signin.oauth.facebook")
 	public static class OAuthConfiguration extends AbstractOAuthConfiguration {
 
 	}

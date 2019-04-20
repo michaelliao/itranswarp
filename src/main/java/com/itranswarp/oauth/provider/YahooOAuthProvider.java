@@ -11,11 +11,11 @@ import org.springframework.stereotype.Component;
 import com.itranswarp.oauth.OAuthAuthentication;
 
 @Component
-@ConditionalOnProperty(name = "spring.oauth.yahoo.enabled", havingValue = "true")
+@ConditionalOnProperty(name = "spring.signin.oauth.yahoo.enabled", havingValue = "true")
 public class YahooOAuthProvider extends AbstractOAuthProvider {
 
 	@Component
-	@ConfigurationProperties("spring.oauth.yahoo")
+	@ConfigurationProperties("spring.signin.oauth.yahoo")
 	public static class OAuthConfiguration extends AbstractOAuthConfiguration {
 
 	}

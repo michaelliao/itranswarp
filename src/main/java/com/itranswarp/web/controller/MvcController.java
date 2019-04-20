@@ -67,6 +67,9 @@ public class MvcController extends AbstractController {
 	@Value("#{applicationConfiguration.profiles eq 'native'}")
 	Boolean dev;
 
+	@Value("${spring.signin.password.enabled}")
+	boolean passauthEnabled;
+
 	@Autowired
 	Translators translators;
 
@@ -280,14 +283,34 @@ public class MvcController extends AbstractController {
 	///////////////////////////////////////////////////////////////////////////////////////////////
 
 	@GetMapping("/auth/signin")
-	public ModelAndView signin(@RequestParam(value = "type", defaultValue = "oauth") String type) {
-		return prepareModelAndView("signin.html",
-				Map.of("type", type, "oauthConfigurations", this.oauthProviders.getOAuthConfigurations()));
+	public ModelAndView signin(@RequestParam(value = "type", defaultValue = "") String type) {
+		boolean oauthEnabled = !this.oauthProviders.getOAuthProviders().isEmpty();
+		boolean passauthEnabled = this.passauthEnabled;
+		if (!oauthEnabled && !passauthEnabled) {
+			throw new ApiException(ApiError.INTERNAL_SERVER_ERROR, null, "Invalid signin configuration.");
+		}
+		if (!oauthEnabled && type.equals("oauth")) {
+			throw new ApiException(ApiError.PARAMETER_INVALID, "type", "Do not support OAuth signin.");
+		}
+		if (!passauthEnabled && type.equals("passauth")) {
+			throw new ApiException(ApiError.PARAMETER_INVALID, "type", "Do not support password signin.");
+		}
+		if (type.isEmpty() && oauthEnabled) {
+			type = "oauth";
+		}
+		if (type.isEmpty() && passauthEnabled) {
+			type = "passauth";
+		}
+		return prepareModelAndView("signin.html", Map.of("type", type, "oauthEnabled", oauthEnabled, "passauthEnabled",
+				passauthEnabled, "oauthConfigurations", this.oauthProviders.getOAuthConfigurations()));
 	}
 
 	@PostMapping("/auth/signin")
 	public ModelAndView signinLocal(@RequestParam("email") String email, @RequestParam("passwd") String password,
 			HttpServletRequest request, HttpServletResponse response) {
+		if (!this.passauthEnabled) {
+			throw new ApiException(ApiError.OPERATION_FAILED, null, "Password auth is disabled.");
+		}
 		if (password.length() != 64) {
 			return passwordAuthFailed();
 		}

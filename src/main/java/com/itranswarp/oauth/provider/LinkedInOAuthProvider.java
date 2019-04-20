@@ -11,11 +11,11 @@ import org.springframework.stereotype.Component;
 import com.itranswarp.oauth.OAuthAuthentication;
 
 @Component
-@ConditionalOnProperty(name = "spring.oauth.linkedin.enabled", havingValue = "true")
+@ConditionalOnProperty(name = "spring.signin.oauth.linkedin.enabled", havingValue = "true")
 public class LinkedInOAuthProvider extends AbstractOAuthProvider {
 
 	@Component
-	@ConfigurationProperties("spring.oauth.linkedin")
+	@ConfigurationProperties("spring.signin.oauth.linkedin")
 	public static class OAuthConfiguration extends AbstractOAuthConfiguration {
 
 	}

@@ -3,7 +3,7 @@
 {% block title %}{{ _('Sign In') }}{% endblock %}
 
 {% block head %}
-<script src="/static/js/3rdparty/sha256.min.js"></script>
+<script src="/static/js/3rdparty/sha256.js"></script>
 <style>
 div.x-signin-panel {
 	border-top-left-radius: 0;
@@ -69,13 +69,10 @@ function onPasswordAuth() {
 }
 
 $(function () {
-	{% if oauthConfigurations.isEmpty() %}
-		$('#x-tab-oauth').addClass('uk-disabled');
-		showPasswordAuth();
+	{% if type == "oauth" %}
+		showOAuth();
 	{% elseif type == "passauth" %}
 		showPasswordAuth();
-	{% else %}
-		showOAuth();
 	{% endif %}
 	{% if error %}
 		$('div.uk-alert-danger').show();
@@ -88,8 +85,12 @@ $(function () {
 {% block content %}
 	<div style="width:480px; margin:0 auto;">
     	<ul id="x-tab" class="uk-tab" data-uk-tab>
+    	{% if oauthEnabled %}
     		<li id="x-tab-oauth"><a href="#0" onclick="showOAuth()">Sign in with 3rd Party</a></li>
+    	{% endif %}
+    	{% if passauthEnabled %}
     		<li id="x-tab-passauth"><a href="#0" onclick="showPasswordAuth()">Sign in with Password</a></li>
+    	{% endif %}
 		</ul>
 		<div id="x-panel-oauth" style="display:none" class="uk-panel uk-panel-box uk-panel-box-secondary x-signin-panel x-oauth-signin-panel">
 			<h3>Please signin without registration:</h3>

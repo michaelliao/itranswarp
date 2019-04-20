@@ -11,11 +11,11 @@ import org.springframework.stereotype.Component;
 import com.itranswarp.oauth.OAuthAuthentication;
 
 @Component
-@ConditionalOnProperty(name = "spring.oauth.github.enabled", havingValue = "true")
+@ConditionalOnProperty(name = "spring.signin.oauth.github.enabled", havingValue = "true")
 public class GithubOAuthProvider extends AbstractOAuthProvider {
 
 	@Component
-	@ConfigurationProperties("spring.oauth.github")
+	@ConfigurationProperties("spring.signin.oauth.github")
 	public static class OAuthConfiguration extends AbstractOAuthConfiguration {
 
 	}

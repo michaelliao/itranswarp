@@ -11,11 +11,11 @@ import org.springframework.stereotype.Component;
 import com.itranswarp.oauth.OAuthAuthentication;
 
 @Component
-@ConditionalOnProperty(name = "spring.oauth.twitter.enabled", havingValue = "true")
+@ConditionalOnProperty(name = "spring.signin.oauth.twitter.enabled", havingValue = "true")
 public class TwitterOAuthProvider extends AbstractOAuthProvider {
 
 	@Component
-	@ConfigurationProperties("spring.oauth.twitter")
+	@ConfigurationProperties("spring.signin.oauth.twitter")
 	public static class OAuthConfiguration extends AbstractOAuthConfiguration {
 
 	}

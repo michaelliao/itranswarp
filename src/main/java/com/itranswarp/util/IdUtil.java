@@ -39,7 +39,7 @@ public final class IdUtil {
 
 	private static final long OFFSET = LocalDate.of(2000, 1, 1).atStartOfDay(ZoneId.of("Z")).toEpochSecond();
 
-	private static final long MAX_NEXT = 0b111111_11111111_111L;
+	private static final long MAX_NEXT = 0b11111_11111111_111L;
 
 	private static final long shardId = getServerIdAsLong();
 
@@ -65,8 +65,7 @@ public final class IdUtil {
 		long next = offset & MAX_NEXT;
 		if (next == 0) {
 			logger.warn("maximum id reached in 1 second in epoch: " + epochSecond);
-			epochSecond++;
-			lastEpoch = epochSecond;
+			return nextId(epochSecond + 1);
 		}
 		return generateId(epochSecond, next, shardId);
 	}
@@ -76,7 +75,7 @@ public final class IdUtil {
 	}
 
 	private static long generateId(long epochSecond, long next, long shardId) {
-		return ((epochSecond - OFFSET) << 22) | (next << 5) | shardId;
+		return ((epochSecond - OFFSET) << 21) | (next << 5) | shardId;
 	}
 
 	private static long getServerIdAsLong() {

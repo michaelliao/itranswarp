@@ -81,6 +81,12 @@ function onAuthSuccess() {
 }
 
 $(function () {
+	if (location.hash) {
+		$('a[name=' + location.hash.substring(1) + ']').closest('div.uk-comment').css('background-color', '#fffceb');
+	}
+});
+
+$(function () {
     if (g_user !== null) {
         initReplyArea('{{ topic.id }}');
     }
@@ -113,7 +119,7 @@ $(function () {
 {% if page.pageIndex == 1 %}
     <div class="uk-comment">
         <div class="x-anchor"><a name="{{ topic.id }}"></a></div>
-        <div class="uk-comment-header">
+        <div class="uk-comment-header uk-margin-bottom-remove">
             <a href="/user/{{ topic.userId }}"><img class="uk-comment-avatar uk-border-circle x-avatar" src="{{ topic.userImageUrl }}" width="50" height="50" alt=""></a>
             <h4 class="uk-comment-title"><a href="/user/{{ topic.userId }}">{{ topic.userName }}</a></h4>
             <div class="uk-comment-meta">#1 Created at <span class="x-smart-datetime" data="{{ topic.createdAt }}">...</span>
@@ -123,8 +129,8 @@ $(function () {
                 </span>
             </div>
         </div>
-        <div class="uk-comment-body uk-margin">
-            {{ topic.content|raw }}
+        <div class="uk-comment-body">
+            <div class="uk-margin">{{ topic.content|raw }}</div>
         </div>
     </div>
 {% endif %}
@@ -132,9 +138,9 @@ $(function () {
 {% set index = 1 + (page.pageIndex - 1) * page.itemsPerPage %}
 {% for r in replies %}
     {% set index = index + 1 %}
-    <div class="uk-comment">
+    <div class="uk-comment uk-margin-bottom-remove" style="padding-bottom:10px;">
         <div class="x-anchor"><a name="{{ r.id }}"></a></div>
-        <div class="uk-comment-header">
+        <div class="uk-comment-header uk-margin-bottom-remove">
             <a href="/user/{{ r.userId }}"><img class="uk-comment-avatar uk-border-circle x-avatar" src="{{ r.userImageUrl }}" width="50" height="50" alt=""></a>
             <h4 class="uk-comment-title"><a href="/user/{{ r.userId }}">{{ r.userName }}</a></h4>
             <div class="uk-comment-meta">#{{ index }} Created at <span class="x-smart-datetime" data="{{ r.createdAt }}">...</span>
@@ -144,13 +150,13 @@ $(function () {
     	        </span>
             </div>
         </div>
-        <div class="uk-comment-body uk-margin">
-            {{ r.content|raw }}
+        <div class="uk-comment-body">
+            <div class="uk-margin">{{ r.content|raw }}</div>
         </div>
     </div>
 {% endfor %}
 
-    <hr>
+    <hr class="uk-margin-top-remove">
 
     <div class="x-page">
         {{ pagination("/discuss/" + board.id + "/" + topic.id + "?page=", page) }}

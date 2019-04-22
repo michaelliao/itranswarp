@@ -120,7 +120,7 @@
                 <td>
                     <p>
                         <a v-text="t.name" v-bind:href="'/discuss/' + t.board.id + '/' + t.id" target="_blank"></a>
-                        <span v-if="t.refId > 0"><a v-bind:href="'/' + t.refType + '/' + t.refId" target="_blank">问题来源</a></span>
+                        <span v-if="t.refId > 0">[<a v-bind:href="'/ref/' + t.refType + '/' + t.refId" target="_blank">问题来源</a>]</span>
                         <i class="icon-tag"></i> <span v-text="t.tags"></span>
                     </p>
                     <div v-html="t.content"></div>

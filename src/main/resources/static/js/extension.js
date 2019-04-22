@@ -176,6 +176,9 @@ function initMarkdownTables() {
 	$('#x-content table').each(function () {
 		var $t = $(this);
 		if (!$t.hasClass('uk-table')) {
+			$t.find('[align=left]').css('text-align', 'left');
+			$t.find('[align=right]').css('text-align', 'right');
+			$t.find('[align=center]').css('text-align', 'center');
 			$t.addClass('uk-table');
 		}
 	});

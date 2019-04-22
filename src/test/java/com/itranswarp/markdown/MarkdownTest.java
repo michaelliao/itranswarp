@@ -17,6 +17,7 @@ public class MarkdownTest {
 	@BeforeEach
 	void setUp() throws Exception {
 		markdown = new Markdown();
+		markdown.loadingUrl = "/static/loading.gif";
 		markdown.patternLinkRenderers = List.of(new BilibiliLinkPlugin());
 		TradingViewSecurityPlugin tv = new TradingViewSecurityPlugin();
 		tv.init();
@@ -60,7 +61,7 @@ public class MarkdownTest {
 		assertEquals("<p>This is <a href=\"https://www.example.com/test?a=1&amp;b=2\">Sparta</a></p>\n",
 				markdown.toHtml("This is [Sparta](https://www.example.com/test?a=1&b=2)"));
 		// img:
-		assertEquals("<p>This is <img src=\"https://www.example.com/test.jpg\" alt=\"Sparta\" /></p>\n",
+		assertEquals("<p>This is <img src=\"/static/loading.gif\" data-src=\"https://www.example.com/test.jpg\" alt=\"Sparta\" /></p>\n",
 				markdown.toHtml("This is ![Sparta](https://www.example.com/test.jpg)"));
 		// del:
 		assertEquals("<p>This is <del>Sparta</del></p>\n", markdown.toHtml("This is ~~Sparta~~"));
@@ -127,7 +128,7 @@ public class MarkdownTest {
 	@Test
 	void testUgc() {
 		assertEquals(
-				"<p>This is <a rel=\"nofollow\" href=\"https://www.example.com/test?a=1&amp;b=2\">Sparta</a></p>\n",
+				"<p>This is <a rel=\"nofollow\" href=\"https://www.example.com/test?a=1&amp;b=2\" target=\"_blank\">Sparta</a></p>\n",
 				markdown.ugcToHtml("This is [Sparta](https://www.example.com/test?a=1&b=2)"));
 		assertEquals("<p>&lt;script&gt;alert('hi');&lt;/script&gt;</p>\n",
 				markdown.ugcToHtml("<script>alert('hi');</script>"));

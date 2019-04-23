@@ -182,7 +182,8 @@ public class SchemaBuilder {
 	void initArticles(List<AbstractEntity> entities) {
 		Category category = new Category();
 		category.id = IdUtil.nextId();
-		category.name = "Java";
+		category.name = "Sample";
+		category.tag = "sample";
 		category.description = "Java Series";
 		entities.add(category);
 
@@ -230,10 +231,10 @@ public class SchemaBuilder {
 	void initWiki(List<AbstractEntity> entities) {
 		Wiki wiki = new Wiki();
 		wiki.id = IdUtil.nextId();
-		wiki.description = "A Python Wiki";
+		wiki.description = "A Sample Wiki";
 		wiki.imageId = imageIds[0];
-		wiki.name = "Python Tutorial";
-		wiki.tag = "python";
+		wiki.name = "Sample Tutorial";
+		wiki.tag = "sample";
 		wiki.textId = initText(entities).id;
 		wiki.userId = admin.id;
 		entities.add(wiki);
@@ -287,9 +288,9 @@ public class SchemaBuilder {
 	void initDiscuss(List<AbstractEntity> entities) {
 		Board board = new Board();
 		board.id = IdUtil.nextId();
-		board.name = "Discuss Python";
-		board.description = "Discuss Python programming.";
-		board.tag = "python";
+		board.name = "Discuss Sample";
+		board.description = "Discuss Sample.";
+		board.tag = "sample";
 		entities.add(board);
 
 		for (int i = 0; i < 20; i++) {

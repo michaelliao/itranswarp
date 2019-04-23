@@ -249,6 +249,18 @@ public class MvcController extends AbstractController {
 		return prepareModelAndView("topic_form.html", Map.of("board", board));
 	}
 
+	@GetMapping("/discuss/topic/" + ID + "/find/" + ID2)
+	public ModelAndView discussFindReplyInTopic(@PathVariable("id") Long topicId, @PathVariable("id2") Long replyId) {
+		Reply reply = boardService.getReplyById(replyId);
+		if (reply.topicId != topicId) {
+			return notFound();
+		}
+		Topic topic = boardService.getTopicById(topicId);
+		int pageIndex = boardService.getReplyPageIndex(topicId, replyId);
+		return new ModelAndView(
+				"redirect:/discuss/" + topic.boardId + "/" + topicId + "?page=" + pageIndex + "#" + replyId);
+	}
+
 	///////////////////////////////////////////////////////////////////////////////////////////////
 	// single page
 	///////////////////////////////////////////////////////////////////////////////////////////////

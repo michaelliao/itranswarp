@@ -9,7 +9,7 @@
 {% block meta %}
     <meta property="og:ad" content="true" />
     <meta property="og:type" content="article" />
-    <meta property="og:url" content="http://{{ __request__.host }}/article/{{ article.id }}" />
+    <meta property="og:url" content="{{ __url__ }}" />
     <meta property="og:title" content="{{ article.name }}" />
     <meta property="og:description" content="{{ article.name }}" />
     <meta property="og:image" content="/files/attachments/{{ article.imageId }}/l" />

@@ -10,7 +10,7 @@
     <meta property="og:url" content="{{ __url__ }}" />
     <meta property="og:title" content="{{ category.name }}" />
     <meta property="og:description" content="{{ category.description }}" />
-    <meta property="og:tag" content="" />
+    <meta property="og:tag" content="{{ category.tag }}" />
 {% endblock %}
 
 {% block nav %} /category/{{ category.id }} {% endblock %}

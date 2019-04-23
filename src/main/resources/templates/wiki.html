@@ -10,7 +10,7 @@
 {% block meta %}
     <meta property="og:ad" content="true" />
     <meta property="og:type" content="article" />
-    <meta property="og:url" content="http://{{ __request__.host }}/wiki/{{ wiki.id }}{% if current.type == 'wikipage' %}/{{ current.id }}{% endif %}" />
+    <meta property="og:url" content="{{ __url__ }}" />
     <meta property="og:title" content="{{ current.name }}" />
     <meta property="og:description" content="{{ wiki.description }}" />
     <meta property="og:image" content="/files/attachments/{{ wiki.cover_id }}/l" />

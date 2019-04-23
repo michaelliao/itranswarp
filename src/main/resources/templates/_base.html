@@ -49,19 +49,15 @@
 	{% endblock %}
 
 	{% block meta %}<!-- meta here -->{% endblock %}
-	{% if __dev__ %}
-	<!-- BEGIN CSS COMPRESS -->
+
+	<!-- BEGIN CSS -->
 	<link rel="stylesheet" href="/static/css/codemirror.css" />
 	<link rel="stylesheet" href="/static/css/highlight.css" />
 	<link rel="stylesheet" href="/static/css/katex.css" />
 	<link rel="stylesheet" href="/static/css/simditor.css" />
 	<link rel="stylesheet" href="/static/css/main.css" />
-	<!-- END CSS COMPRESS -->
-	{% else %}
-	<link rel="stylesheet" href="/static/css/all.css?v={{ __version__ }}" />
-	{% endif %}
-	{% if __dev__ %}
-	<!-- BEGIN JAVASCRIPT COMPRESS -->
+	<!-- END CSS -->
+	<!-- BEGIN JAVASCRIPT -->
 	<script src="/static/js/3rdparty/jquery.js"></script>
 	<script src="/static/js/3rdparty/underscore.js"></script>
 	<script src="/static/js/3rdparty/moment-with-locales.min.js"></script>
@@ -82,10 +78,7 @@
 	<script src="/static/js/uikit/components/notify.js"></script>
 	<script src="/static/js/uikit/components/lightbox.js"></script>
 	<script src="/static/js/uikit/components/htmleditor.js"></script>
-	<!-- END JAVASCRIPT COMPRESS -->
-	{% else %}
-	<script src="/static/js/all.js?v={{ __version__ }}"></script>
-	{% endif %}
+	<!-- END JAVASCRIPT -->
 	<script src="/static/js/shared.js?v={{ __version__ }}"></script>
 	<script src="/static/js/itranswarp.js?v={{ __version__ }}"></script>
 	<script src="/static/js/extension.js?v={{ __version__ }}"></script>
@@ -111,11 +104,10 @@
 	<script>
 		// global variables:
 		var g_time = parseFloat('{{ __timestamp__ }}');
-		var g_signins = JSON.parse('{{ __signins__|json|raw }}');
 {% if __user__ != null %}
 		var g_user = {
 			id: '{{ __user__.id }}',
-			name: JSON.parse('{{ __user__.name|json|raw }}'),
+			name: JSON.parse(decodeURIComponent('{{ __user__.name|json|url|raw }}')),
 			image_url: '{{ __user__.image_url }}'
 		};
 {% else %}
@@ -373,20 +365,6 @@
 					</p>
 				</div>
 			</div>
-		</div>
-	</div>
-
-	<div id="modal-signin" class="uk-modal">
-		<div class="uk-modal-dialog">
-			<a class="uk-modal-close uk-close"></a>
-			<div class="uk-modal-header">
-				<h2>{{ _('Please Sign In') }}</h2>
-			</div>
-			<p>You can sign in directly without register:</p>
-			{% for signin in __signins__ %}
-			<h3><a href="/auth/from/{{ signin.id }}"><i class="uk-icon-weibo"></i> {{ signin.name }}</a></h3>
-			{% endfor %}
-			<p>You need authorize to allow connect to your social passport for the first time.</p>
 		</div>
 	</div>
 </body>

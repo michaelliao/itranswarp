@@ -1,7 +1,11 @@
 {% extends '_base.html' %}
 
+{% block nav %} /search {% endblock %}
+
 {% block meta %}
-    <meta property="x-nav" content="/search" />
+    <meta property="og:ad" content="true" />
+    <meta property="og:type" content="webpage" />
+    <meta property="og:url" content="{{ __url__ }}" />
 {% endblock %}
 
 {% block title %}{{ _('Search result') }}{% endblock %}
@@ -55,8 +59,6 @@ $(function() {
             <div class="x-page">
                 {{ pagination(page, '?q=' + q|url_encode + '&type=' + type + '&page=') }}
             </div>
-
-            <div id="x-sponsor-a" class="uk-clearfix"><!-- sponsor A --></div>
 
         </div><!-- // search -->
     </div>

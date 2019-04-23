@@ -7,6 +7,13 @@
 
 {% block title %}{{ _('Discuss') }}{% endblock %}
 
+{% block meta %}
+    <meta property="og:ad" content="true" />
+    <meta property="og:type" content="webpage" />
+    <meta property="og:url" content="{{ __url__ }}" />
+    <meta property="og:title" content="{{ topic.name }}" />
+{% endblock %}
+
 {% block head %}
 
 <style>
@@ -171,8 +178,6 @@ $(function () {
     </div>
 
     <div id="x-reply-area"></div>
-
-    <div id="x-sponsor-a" class="uk-clearfix"><!-- sponsor A --></div>
 
 {% endblock %}
 

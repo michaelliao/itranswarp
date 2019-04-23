@@ -7,11 +7,9 @@
 
 {% block meta %}
     <meta property="og:ad" content="true" />
-    <meta property="og:type" content="website" />
-    <meta property="og:url" content="http://{{ __request__.host }}/" />
+    <meta property="og:type" content="webpage" />
+    <meta property="og:url" content="{{ __url__ }}" />
     <meta property="og:title" content="{{ __website__.name }}" />
-    <meta property="og:description" content="{{ __website__.name }}" />
-    <meta property="og:tag" content="index" />
 {% endblock %}
 
 {% block head %}

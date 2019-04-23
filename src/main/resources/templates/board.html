@@ -9,8 +9,9 @@
 {% block title %}{{ board.name }}{% endblock %}
 
 {% block meta %}
+    <meta property="og:ad" content="true" />
     <meta property="og:type" content="webpage" />
-    <meta property="og:url" content="http://{{ __request__.host }}/discuss/{{ board.id }}" />
+    <meta property="og:url" content="{{ __url__ }}" />
     <meta property="og:title" content="{{ board.name }}" />
     <meta property="og:description" content="{{ board.description }}" />
     <meta property="og:tag" content="{{ board.tag }}" />
@@ -65,8 +66,6 @@
     <div class="x-page">
         {{ pagination("/discuss/" + board.id + "?page=", page) }}
     </div>
-
-    <div id="x-sponsor-a" class="uk-clearfix"><!-- sponsor A --></div>
 
 {% endblock %}
 

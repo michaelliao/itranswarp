@@ -208,6 +208,11 @@ public class BoardService extends AbstractService<Board> {
 		return new PagedResults<>(page, list);
 	}
 
+	public int getReplyPageIndex(Long topicId, Long replyId) {
+		int offset = 2 + this.db.from(Reply.class).where("topicId = ? AND id < ?", topicId, replyId).count();
+		return offset / ITEMS_PER_PAGE + (offset % ITEMS_PER_PAGE == 0 ? 0 : 1);
+	}
+
 	@Transactional
 	public Topic createTopic(User user, Board board, TopicBean bean) {
 		bean.validate(true);
@@ -284,4 +289,5 @@ public class BoardService extends AbstractService<Board> {
 
 	private static final TypeReference<PagedResults<Topic>> TYPE_PAGE_RESULTS_TOPIC = new TypeReference<>() {
 	};
+
 }

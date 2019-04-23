@@ -59,7 +59,7 @@ spring:
     # OAuth authentication configuration:
     # - name: display name
     # - icon: icon name, check https://getuikit.com/v2/docs/icon.html
-    # - color: the button css background color
+    # - color: the button css background color, must be quoted by "".
     oauth:
       facebook:
         name:          "${OAUTH_FACEBOOK_NAME:Facebook}"

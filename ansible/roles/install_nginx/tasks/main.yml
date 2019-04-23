@@ -1,0 +1,7 @@
+# install nginx
+
+---
+
+- name: install nginx
+  apt:
+    name: nginx

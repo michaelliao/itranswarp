@@ -1,0 +1,22 @@
+# generate supervisor conf and restart
+
+---
+
+- name: init app log dir /var/log/itranswarp
+  file:
+    path: /var/log/itranswarp
+    state: directory
+    owner: www-data
+    group: www-data
+
+- name: generate supervisor conf
+  template:
+    src: templates/supervisor.j2
+    dest: /srv/itranswarp-{{ timestamp }}/supervisor.conf
+
+- name: make symbol link
+  file:
+    src: /srv/itranswarp/supervisor.conf
+    dest: /etc/supervisor/conf.d/itranswarp.conf
+    state: link
+    force: yes

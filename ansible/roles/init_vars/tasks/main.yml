@@ -1,0 +1,29 @@
+# init vars and env
+
+---
+
+# init var timestamp:
+
+- name: init var_timestamp by executing command
+  shell: date +%Y-%m-%d_%H_%M_%S
+  register: var_timestamp
+
+- name: set global var "timestamp"
+  set_fact:
+    timestamp: "{{ var_timestamp.stdout }}"
+
+# calculate the maximum memory used by JVM: xmx = MAX(total * 0.75, total - 800MB)
+
+- name: init memory size
+  shell: grep MemTotal /proc/meminfo | awk '{x=int($2/1024*0.75);y=int($2/1024-800);print (x<y?y:x)}'
+  register: var_xmx
+
+- name: set var "xmx"
+  set_fact:
+    xmx: "{{ var_xmx.stdout }}"
+
+- name: print global var "timestamp"
+  debug: msg="timestamp = {{ timestamp }}"
+
+- name: print global var "xmx"
+  debug: msg="xmx = {{ xmx }}"

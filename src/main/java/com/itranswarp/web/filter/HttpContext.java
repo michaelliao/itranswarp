@@ -3,6 +3,9 @@ package com.itranswarp.web.filter;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.itranswarp.common.ApiException;
 import com.itranswarp.enums.ApiError;
 import com.itranswarp.enums.Role;
@@ -10,6 +13,8 @@ import com.itranswarp.model.User;
 import com.itranswarp.util.HttpUtil;
 
 public class HttpContext implements AutoCloseable {
+
+	static final Logger logger = LoggerFactory.getLogger(HttpContext.class);
 
 	static final ThreadLocal<HttpContext> threadlocal = new ThreadLocal<>();
 
@@ -32,6 +37,7 @@ public class HttpContext implements AutoCloseable {
 		this.path = request.getRequestURI();
 		String query = request.getQueryString();
 		this.url = this.scheme + "://" + this.host + this.path + (query == null ? "" : "?" + query);
+		logger.info("process new http context: {} {}...", request.getMethod(), this.url);
 		threadlocal.set(this);
 	}
 

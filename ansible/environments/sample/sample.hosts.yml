@@ -1,0 +1,12 @@
+#
+# Define ALL deploy hosts grouped by app.
+#
+# NOTE you CANNOT define same hosts for multiple app or ansible will read vars incorrectly.
+#
+
+all:
+  children:
+    itranswarp:
+      hosts:
+        1.domain.com:
+        2.domain.com:

@@ -1,0 +1,16 @@
+# define env for "sample"
+
+# NOTE: the vars.yml contains sensitive data and MUST NOT submitted into git.
+
+---
+
+env:
+  DOMAIN: domain.com
+  TIMEZONE: "Asia/Shanghai"
+  ENCRYPT_KEY: "the-random-str-contains-32-chars"
+
+  DB_HOST: 127.0.0.1
+  DB_USERNAME: it
+  DB_PASSWORD: "dbPassword"
+
+  REDIS_HOST: 127.0.0.1

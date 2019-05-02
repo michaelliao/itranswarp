@@ -42,4 +42,29 @@ public class LongIdRedirectController {
 		return "redirect:/discuss/" + IdUtil.stringIdToLongId(stringId);
 	}
 
+	@GetMapping("/files/attachments/" + STR_ID)
+	public String attachments(@PathVariable("id") String stringId) {
+		return "redirect:/files/attachments/" + IdUtil.stringIdToLongId(stringId);
+	}
+
+	@GetMapping("/files/attachments/" + STR_ID + "/0")
+	public String attachments_0(@PathVariable("id") String stringId) {
+		return "redirect:/files/attachments/" + IdUtil.stringIdToLongId(stringId) + "/0";
+	}
+
+	@GetMapping("/files/attachments/" + STR_ID + "/l")
+	public String attachments_l(@PathVariable("id") String stringId) {
+		return "redirect:/files/attachments/" + IdUtil.stringIdToLongId(stringId) + "/l";
+	}
+
+	@GetMapping("/files/attachments/" + STR_ID + "/m")
+	public String attachments_m(@PathVariable("id") String stringId) {
+		return "redirect:/files/attachments/" + IdUtil.stringIdToLongId(stringId) + "/m";
+	}
+
+	@GetMapping("/files/attachments/" + STR_ID + "/s")
+	public String attachments_s(@PathVariable("id") String stringId) {
+		return "redirect:/files/attachments/" + IdUtil.stringIdToLongId(stringId) + "/s";
+	}
+
 }

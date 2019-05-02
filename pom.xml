@@ -93,11 +93,13 @@
 			<artifactId>mysql-connector-java</artifactId>
 		</dependency>
 
+		<!-- datasource -->
 		<dependency>
 			<groupId>com.zaxxer</groupId>
 			<artifactId>HikariCP</artifactId>
 		</dependency>
 
+		<!-- warpdb -->
 		<dependency>
 			<groupId>com.itranswarp</groupId>
 			<artifactId>warpdb</artifactId>
@@ -170,9 +172,7 @@
 					</execution>
 				</executions>
 				<configuration>
-					<configuration>
-						<shortRevisionLength>7</shortRevisionLength>
-					</configuration>
+					<shortRevisionLength>7</shortRevisionLength>
 					<doCheck>false</doCheck>
 					<doUpdate>false</doUpdate>
 				</configuration>

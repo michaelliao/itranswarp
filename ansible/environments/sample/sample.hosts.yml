@@ -8,5 +8,8 @@ all:
   children:
     itranswarp:
       hosts:
+        # domain or ip list:
         1.domain.com:
         2.domain.com:
+        10.0.1.100:
+        10.0.1.101:

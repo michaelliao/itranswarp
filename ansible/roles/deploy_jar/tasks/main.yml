@@ -9,5 +9,5 @@
 
 - name: copy itranswarp.jar
   copy:
-    src: ../target/itranswarp.jar
+    src: ../release/itranswarp.jar
     dest: /srv/itranswarp-{{ timestamp }}/

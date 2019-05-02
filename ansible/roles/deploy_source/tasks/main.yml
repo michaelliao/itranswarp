@@ -2,17 +2,6 @@
 
 ---
 
-- name: archive static files
-  local_action:
-    module: archive
-    path:
-      - ../src/main/resources/static
-      - ../src/main/resources/favicon.ico
-      - ../src/main/resources/robots.txt
-    dest: ../target/www.tar.gz
-  vars:
-    ansible_become: no
-
 - name: init app www dir /srv/itranswarp-{{ timestamp }}/www
   file:
     path: /srv/itranswarp-{{ timestamp }}/www
@@ -20,7 +9,7 @@
 
 - name: unarchive static files
   unarchive:
-    src: ../target/www.tar.gz
+    src: ../release/resources.tar.gz
     dest: /srv/itranswarp-{{ timestamp }}/www
     owner: root
     group: root

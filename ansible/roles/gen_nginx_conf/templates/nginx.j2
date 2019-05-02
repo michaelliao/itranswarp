@@ -7,6 +7,9 @@ upstream itw_upstream {
 {% endfor %}
 }
 
+# define access log format:
+log_format access_format '$remote_addr - $request_time [$time_local] "$request" $status $body_bytes_sent "$http_referer" "$http_user_agent"';
+
 # proxy cache:
 proxy_cache_path /var/cache/nginx/itranswarp levels=2:2 keys_zone=itw_cache:10m inactive=300d max_size=2g;
 proxy_temp_path  /var/cache/nginx/tmp;
@@ -36,7 +39,7 @@ server {
 	ssl_certificate_key /srv/itranswarp/ssl/www.{{ env.DOMAIN }}.key;
 
 	root       /srv/itranswarp/www;
-	access_log /var/log/nginx/www_access_log;
+	access_log /var/log/nginx/www_access_log access_format;
 	error_log  /var/log/nginx/www_error_log;
 
 	client_max_body_size 2m;
@@ -86,7 +89,7 @@ server {
 	ssl_certificate_key /srv/itranswarp/ssl/source.{{ env.DOMAIN }}.key;
 
 	root       /srv/itranswarp/www;
-	access_log /var/log/nginx/source_access_log;
+	access_log /var/log/nginx/source_access_log access_format;
 	error_log  /var/log/nginx/source_error_log;
 
 	client_max_body_size 1m;
@@ -128,7 +131,7 @@ server {
 	ssl_certificate     /srv/itranswarp/ssl/static.{{ env.DOMAIN }}.crt;
 	ssl_certificate_key /srv/itranswarp/ssl/static.{{ env.DOMAIN }}.key;
 
-	access_log /var/log/nginx/static_access_log;
+	access_log /var/log/nginx/static_access_log access_format;
 	error_log  /var/log/nginx/static_error_log;
 
 	client_max_body_size 1m;

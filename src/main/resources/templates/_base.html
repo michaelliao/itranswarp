@@ -36,6 +36,7 @@
 <head>
 	<meta charset="utf-8" />
 	<title>{% block title %} ??? {% endblock %} - {{ __website__.name }}</title>
+	<meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
 	<meta name="viewport" content="width=device-width" />
 	<meta name="keywords" content="{{ __website__.keywords }}" />
 	<meta name="description" content="{{ __website__.description }}" />
@@ -347,7 +348,7 @@
 			<div class="uk-grid">
 				<div class="x-footer-copyright uk-width-small-1-2 uk-width-medium-1-3">
 					<p>
-						<a href="/">{{ __website__.name }}</a>&copy;2017 v{{ __version__ }}
+						<a href="/" title="version={{ __version__ }}">{{ __website__.name }}</a>&copy;2019
 						<br>
 						Powered by <a href="https://github.com/michaelliao/itranswarp" target="_blank">iTranswarp</a>
 					</p>

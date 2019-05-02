@@ -78,5 +78,5 @@ $(function () {
 
 {% block sidebar_right_content %}
 	<p>Author: <a href="/user/{{ author.id }}">{{ author.name }}</a></p>
-	<p>Publish at: <span class="x-smart-datetime">{{ article.publishAt }}</span></p>
+	<p>Publish at: <span class="x-smart-datetime" data="{{ article.publishAt }}">...</span></p>
 {% endblock %}

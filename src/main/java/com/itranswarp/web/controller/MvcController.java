@@ -432,7 +432,9 @@ public class MvcController extends AbstractController {
 		mv.addObject("__version__", Application.VERSION);
 		// current user or null:
 		mv.addObject("__user__", ctx.user);
-		// full url:
+		// url:
+		mv.addObject("__scheme__", ctx.scheme);
+		mv.addObject("__host__", ctx.host);
 		mv.addObject("__url__", ctx.url);
 		// timestamp as millis:
 		mv.addObject("__timestamp__", ctx.timestamp);

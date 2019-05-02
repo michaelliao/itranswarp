@@ -7,6 +7,7 @@ import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import com.itranswarp.bean.Website;
@@ -20,6 +21,7 @@ import com.itranswarp.model.Board;
 import com.itranswarp.model.Category;
 import com.itranswarp.model.LocalAuth;
 import com.itranswarp.model.Navigation;
+import com.itranswarp.model.OAuth;
 import com.itranswarp.model.Reply;
 import com.itranswarp.model.Resource;
 import com.itranswarp.model.Setting;
@@ -42,14 +44,19 @@ public class SchemaBuilder {
 		SchemaBuilder builder = new SchemaBuilder();
 		String ddl = builder.generateDDL();
 		String inserts = builder.generateEntities();
-		File ddlFile = new File("target/" + builder.dbName + ".sql").getAbsoluteFile();
+		File ddlFile = new File("release/ddl.sql").getAbsoluteFile();
 		try (BufferedWriter writer = new BufferedWriter(
 				new OutputStreamWriter(new FileOutputStream(ddlFile), "UTF-8"))) {
 			writer.write(ddl);
+		}
+		File initFile = new File("release/init.sql").getAbsoluteFile();
+		try (BufferedWriter writer = new BufferedWriter(
+				new OutputStreamWriter(new FileOutputStream(initFile), "UTF-8"))) {
 			writer.write(inserts);
 		}
-		System.out.println("\nGenerated SQL:\n" + ddl + inserts);
+		System.out.println("\nGenerated SQL:\n" + ddl);
 		System.out.println("\nRun generated SQL:\n\nmysql -u root --password=password < " + ddlFile);
+		System.out.println("\nmysql -u root --password=password < " + initFile);
 	}
 
 	String dbName = "it";
@@ -68,9 +75,16 @@ public class SchemaBuilder {
 		db.init();
 	}
 
+	String generateTable(Class<?> clazz) {
+		Set<Class<?>> classesWithUtf8 = Set.of(OAuth.class, LocalAuth.class, Resource.class);
+		String charset = classesWithUtf8.contains(clazz) ? "UTF8" : "UTF8MB4";
+		return db.getDDL(clazz).replace(" BIT ", " BOOL ").replace(");",
+				") Engine=INNODB DEFAULT CHARSET=" + charset + ";\n");
+	}
+
 	String generateDDL() {
-		String schema = db.getDDL().replace(" BIT ", " BOOL ").replace(");\n",
-				") Engine=INNODB DEFAULT CHARSET=UTF8MB4;\n");
+		String[] tables = db.getEntities().stream().map(this::generateTable).toArray(String[]::new);
+		String schema = String.join("\n", tables);
 		StringBuilder sb = new StringBuilder(4096);
 		sb.append("\n\n-- BEGIN generate DDL --\n\n");
 		sb.append(String.format("DROP DATABASE IF EXISTS %s;\n\n", dbName));
@@ -95,16 +109,17 @@ public class SchemaBuilder {
 		initDiscuss(entities);
 		initWiki(entities);
 
+		final String icon = "<svg width=\"16\" height=\"16\" viewBox=\"0 0 20 20\"><polygon fill=\"none\" stroke=\"#000\" stroke-width=\"1.01\" points=\"10 2 12.63 7.27 18.5 8.12 14.25 12.22 15.25 18 10 15.27 4.75 18 5.75 12.22 1.5 8.12 7.37 7.27\"></polygon></svg>";
 		Navigation nav = new Navigation();
 		nav.name = "Discuss";
-		nav.icon = "comments-o";
+		nav.icon = icon;
 		nav.url = "/discuss";
 		nav.displayOrder = 4;
 		entities.add(nav);
 
 		nav = new Navigation();
 		nav.name = "External";
-		nav.icon = "";
+		nav.icon = icon;
 		nav.url = "https://weibo.com/";
 		nav.displayOrder = 5;
 		nav.blank = true;
@@ -117,6 +132,8 @@ public class SchemaBuilder {
 		entities.add(s);
 
 		StringBuilder sb = new StringBuilder(102400);
+		sb.append("-- generated initial data\n\n");
+		sb.append("USE it;\n\n");
 		entities.forEach(entity -> {
 			if (entity.id == 0) {
 				entity.id = IdUtil.nextId();

@@ -13,7 +13,7 @@
     <meta property="og:url" content="{{ __url__ }}" />
     <meta property="og:title" content="{{ current.name }}" />
     <meta property="og:description" content="{{ wiki.description }}" />
-    <meta property="og:image" content="/files/attachments/{{ wiki.cover_id }}/l" />
+    <meta property="og:image" content="{{ __scheme__ }}://{{ __host__ }}/files/attachments/{{ wiki.imageId }}/l" />
     <meta property="og:tag" content="{{ wiki.tag }}" />
 {% endblock %}
 

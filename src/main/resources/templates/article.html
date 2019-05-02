@@ -12,7 +12,7 @@
     <meta property="og:url" content="{{ __url__ }}" />
     <meta property="og:title" content="{{ article.name }}" />
     <meta property="og:description" content="{{ article.name }}" />
-    <meta property="og:image" content="/files/attachments/{{ article.imageId }}/l" />
+    <meta property="og:image" content="{{ __scheme__ }}://{{ __host__ }}/files/attachments/{{ article.imageId }}/l" />
     <meta property="og:tag" content="{{ article.tags }}" />
 {% endblock %}
 

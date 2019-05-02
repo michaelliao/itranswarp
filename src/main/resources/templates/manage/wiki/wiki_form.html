@@ -39,8 +39,7 @@ function initVM(data) {
         el: '#vm',
         data: {
         	title: data.title,
-            wiki: data.wiki,
-            saved: true
+            wiki: data.wiki
         },
         created: function () {
             $('#loading').hide();
@@ -78,6 +77,16 @@ function initVM(data) {
         markdown: true,
         maxsplitsize: 600
     });
+    // override image action:
+    htmleditor.off('action.image');
+    htmleditor.on('action.image', function() {
+        uploadImage(function (err, result) {
+            if (err) {
+                return;
+            }
+            htmleditor['replaceSelection']('\n![' + result.name + '](' + result.url + ')\n');
+        });
+    });
     window.htmleditor = htmleditor;
 
     // watch file change:
@@ -114,8 +123,8 @@ function initVM(data) {
 
     <div id="vm" class="uk-width-1-1">
         <ul class="uk-breadcrumb">
-            <li><a href="wiki_list">{{ _('All Wikis') }}</a></li>
-            <li class="uk-active"><span>{{ form.name }}</span></li>
+            <li><a href="/manage/wiki/">{{ _('All Wikis') }}</a></li>
+            <li class="uk-active"><span v-text="wiki.name"></span></li>
         </ul>
 
         <form v-on:submit.prevent="submit" class="uk-form uk-form-stacked uk-margin">

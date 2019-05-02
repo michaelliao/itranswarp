@@ -59,6 +59,16 @@ function initVM(wp) {
         markdown: true,
         maxsplitsize: 600
     });
+    // override image action:
+    htmleditor.off('action.image');
+    htmleditor.on('action.image', function() {
+        uploadImage(function (err, result) {
+            if (err) {
+                return;
+            }
+            htmleditor['replaceSelection']('\n![' + result.name + '](' + result.url + ')\n');
+        });
+    });
     window.htmleditor = htmleditor;
 }
 </script>

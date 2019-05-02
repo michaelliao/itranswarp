@@ -33,8 +33,7 @@ function initVM(data) {
         el: '#vm',
         data: {
         	title: data.title,
-            singlePage: data.singlePage,
-            saved: true
+            singlePage: data.singlePage
         },
         created: function () {
             $('#loading').hide();
@@ -60,7 +59,7 @@ function initVM(data) {
         if (window.vm.saved) {
             return;
         }
-        if (window.vm.content !== $('#content-editor').val()) {
+        if (window.vm.singlePage.content !== $('#content-editor').val()) {
             return 'Content has been changed.';
         }
     };
@@ -70,6 +69,17 @@ function initVM(data) {
         markdown: true,
         maxsplitsize: 600
     });
+    // override image action:
+    htmleditor.off('action.image');
+    htmleditor.on('action.image', function() {
+        uploadImage(function (err, result) {
+            if (err) {
+                return;
+            }
+            htmleditor['replaceSelection']('\n![' + result.name + '](' + result.url + ')\n');
+        });
+    });
+    window.htmleditor = htmleditor;
 }
 </script>
 

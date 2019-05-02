@@ -48,8 +48,7 @@ function initVM(data) {
         data: {
         	title: data.title,
             article: data.article,
-            categories: data.categories,
-            saved: true
+            categories: data.categories
         },
         created: function () {
             $('#loading').hide();
@@ -85,6 +84,16 @@ function initVM(data) {
     var htmleditor = UIkit.htmleditor($('#content-editor').get(0), {
         markdown: true,
         maxsplitsize: 600
+    });
+    // override image action:
+    htmleditor.off('action.image');
+    htmleditor.on('action.image', function() {
+        uploadImage(function (err, result) {
+            if (err) {
+                return;
+            }
+            htmleditor['replaceSelection']('\n![' + result.name + '](' + result.url + ')\n');
+        });
     });
     window.htmleditor = htmleditor;
 

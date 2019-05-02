@@ -26,4 +26,9 @@ public class User extends AbstractEntity {
 	@Column(nullable = false)
 	public long lockedUntil;
 
+	@Override
+	public String toString() {
+		return String.format("{User: id=%s, role=%s, email=%s, name=%s, locakedUntil=%s}", this.id, this.role,
+				this.email, this.name, this.lockedUntil);
+	}
 }

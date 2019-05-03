@@ -38,7 +38,7 @@
     <meta charset="utf-8" />
     <title>{% block title %} ??? {% endblock %} - {{ _('Management Console') }}</title>
     <link rel="stylesheet" href="/static/css/codemirror.css" />
-    <link rel="stylesheet" href="/static/css/main.css" />
+    <link rel="stylesheet" href="/static/css/main.css?v={{ __version__ }}" />
 
     <script src="/static/js/3rdparty/jquery.js"></script>
     <script src="/static/js/3rdparty/underscore.js"></script>
@@ -60,8 +60,8 @@
     <script src="/static/js/uikit/components/timepicker.js"></script>
     <script src="/static/js/uikit/components/htmleditor.js"></script>
 
-    <script src="/static/js/shared.js?v={{__version__}}"></script>
-    <script src="/static/js/itranswarp.js?v={{__version__}}"></script>
+    <script src="/static/js/shared.js?v={{ __version__ }}"></script>
+    <script src="/static/js/itranswarp.js?v={{ __version__ }}"></script>
 
 <script>
 

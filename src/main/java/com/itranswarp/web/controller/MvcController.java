@@ -193,7 +193,13 @@ public class MvcController extends AbstractController {
 
 	@GetMapping("/wiki/" + ID)
 	public ModelAndView wiki(@PathVariable("id") long id) {
-		Wiki wiki = wikiService.getPublishedWikiTreeFromCache(id);
+		Wiki wiki = wikiService.getWikiTreeFromCache(id);
+		if (wiki.publishAt > System.currentTimeMillis()) {
+			User user = HttpContext.getCurrentUser();
+			if (user == null || user.role.value > Role.CONTRIBUTOR.value) {
+				throw new ApiException(ApiError.ENTITY_NOT_FOUND, "wiki", "Wiki not found");
+			}
+		}
 		wiki.views += viewService.increaseWikiViews(id);
 		String content = textService.getHtmlFromCache(wiki.textId);
 		return prepareModelAndView("wiki.html", Map.of("wiki", wiki, "current", wiki, "content", content));
@@ -201,10 +207,22 @@ public class MvcController extends AbstractController {
 
 	@GetMapping("/wiki/" + ID + "/" + ID2)
 	public ModelAndView wikiPage(@PathVariable("id") long id, @PathVariable("id2") long pid) {
-		Wiki wiki = wikiService.getPublishedWikiTreeFromCache(id);
+		Wiki wiki = wikiService.getWikiTreeFromCache(id);
+		if (wiki.publishAt > System.currentTimeMillis()) {
+			User user = HttpContext.getCurrentUser();
+			if (user == null || user.role.value > Role.CONTRIBUTOR.value) {
+				throw new ApiException(ApiError.ENTITY_NOT_FOUND, "wiki", "Wiki not found");
+			}
+		}
 		WikiPage wikiPage = wikiService.getWikiPageById(pid);
 		if (wikiPage.wikiId != wiki.id) {
 			return notFound();
+		}
+		if (wikiPage.publishAt > System.currentTimeMillis()) {
+			User user = HttpContext.getCurrentUser();
+			if (user == null || user.role.value > Role.CONTRIBUTOR.value) {
+				return notFound();
+			}
 		}
 		wikiPage.views += viewService.increaseWikiPageViews(pid);
 		String content = textService.getHtmlFromCache(wikiPage.textId);

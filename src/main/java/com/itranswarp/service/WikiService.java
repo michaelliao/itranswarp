@@ -30,33 +30,29 @@ public class WikiService extends AbstractService<Wiki> {
 	AttachmentService attachmentService;
 
 	static final String KEY_WIKIS = "__wikis__";
-	static final long EXPIRES = 3600;
 
-	public void removeWikiFromCache(String id) {
+	public void removeWikiFromCache(Long id) {
 		this.redisService.del(KEY_WIKIS + id);
 	}
 
-	public Wiki getPublishedWikiTreeFromCache(Long id) {
+	public Wiki getWikiTreeFromCache(Long id) {
 		Wiki wiki = this.redisService.get(KEY_WIKIS + id, Wiki.class);
 		if (wiki == null) {
-			wiki = getWikiTree(id, System.currentTimeMillis());
-			this.redisService.set(KEY_WIKIS + id, wiki, EXPIRES);
+			wiki = getWikiTree(id);
+			this.redisService.set(KEY_WIKIS + id, wiki);
 		}
 		return wiki;
 	}
 
-	public Wiki getWikiTree(Long id, Long publishAfter) {
+	public Wiki getWikiTree(Long id) {
 		Wiki wiki = getById(id);
-		if (publishAfter != null && wiki.publishAt > publishAfter) {
-			throw new ApiException(ApiError.ENTITY_NOT_FOUND, "wiki", "Wiki not found");
-		}
-		List<WikiPage> children = getWikiPages(id, publishAfter);
+		List<WikiPage> children = getWikiPages(id);
 		Map<Long, WikiPage> nodes = new LinkedHashMap<>();
 		children.forEach(wp -> {
 			nodes.put(wp.id, wp);
 		});
 		treeIterate(wiki, nodes);
-		if (!nodes.isEmpty() && publishAfter == null) {
+		if (!nodes.isEmpty()) {
 			// there is error for tree structure, append to root for fix:
 			nodes.forEach((nodeId, node) -> {
 				wiki.addChild(node);
@@ -65,11 +61,7 @@ public class WikiService extends AbstractService<Wiki> {
 		return wiki;
 	}
 
-	private List<WikiPage> getWikiPages(Long wikiId, Long publishAfter) {
-		if (publishAfter != null) {
-			return this.db.from(WikiPage.class).where("wikiId = ? AND publishAt < ?", wikiId, publishAfter)
-					.orderBy("parentId").orderBy("displayOrder").orderBy("id").list();
-		}
+	private List<WikiPage> getWikiPages(Long wikiId) {
 		return this.db.from(WikiPage.class).where("wikiId = ?", wikiId).orderBy("parentId").orderBy("displayOrder")
 				.orderBy("id").list();
 	}
@@ -236,7 +228,7 @@ public class WikiService extends AbstractService<Wiki> {
 	}
 
 	@Transactional
-	public void deleteWikiPage(User user, Long id) {
+	public WikiPage deleteWikiPage(User user, Long id) {
 		WikiPage wikiPage = getWikiPageById(id);
 		Wiki wiki = getById(wikiPage.wikiId);
 		super.checkPermission(user, wiki.userId);
@@ -245,6 +237,7 @@ public class WikiService extends AbstractService<Wiki> {
 			throw new ApiException(ApiError.OPERATION_FAILED, null, "Could not remove non-empty wiki page.");
 		}
 		this.db.remove(wikiPage);
+		return wikiPage;
 	}
 
 	public WikiPage getWikiPageById(Long id) {

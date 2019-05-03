@@ -633,25 +633,30 @@ public class ApiController extends AbstractController {
 	@GetMapping("/api/wikis/" + ID + "/tree")
 	@RoleWith(Role.CONTRIBUTOR)
 	public Wiki wikiTree(@PathVariable("id") long id) {
-		return this.wikiService.getWikiTree(id, null);
+		return this.wikiService.getWikiTree(id);
 	}
 
 	@PostMapping("/api/wikis")
 	@RoleWith(Role.EDITOR)
 	public Wiki wikiCreate(@RequestBody WikiBean bean) {
-		return this.wikiService.createWiki(HttpContext.getRequiredCurrentUser(), bean);
+		Wiki wiki = this.wikiService.createWiki(HttpContext.getRequiredCurrentUser(), bean);
+		this.wikiService.removeWikiFromCache(wiki.id);
+		return wiki;
 	}
 
 	@PostMapping("/api/wikis/" + ID)
 	@RoleWith(Role.EDITOR)
 	public Wiki wikiUpdate(@PathVariable("id") long id, @RequestBody WikiBean bean) {
-		return this.wikiService.updateWiki(HttpContext.getRequiredCurrentUser(), id, bean);
+		Wiki wiki = this.wikiService.updateWiki(HttpContext.getRequiredCurrentUser(), id, bean);
+		this.wikiService.removeWikiFromCache(id);
+		return wiki;
 	}
 
 	@PostMapping("/api/wikis/" + ID + "/delete")
 	@RoleWith(Role.EDITOR)
 	public Map<String, Boolean> wikiDelete(@PathVariable("id") long id) {
 		this.wikiService.deleteWiki(HttpContext.getRequiredCurrentUser(), id);
+		this.wikiService.removeWikiFromCache(id);
 		return API_RESULT_TRUE;
 	}
 
@@ -659,7 +664,9 @@ public class ApiController extends AbstractController {
 	@RoleWith(Role.EDITOR)
 	public WikiPage wikiPageCreate(@PathVariable("id") long id, @RequestBody WikiPageBean bean) {
 		Wiki wiki = this.wikiService.getById(id);
-		return this.wikiService.createWikiPage(HttpContext.getRequiredCurrentUser(), wiki, bean);
+		WikiPage wikiPage = this.wikiService.createWikiPage(HttpContext.getRequiredCurrentUser(), wiki, bean);
+		this.wikiService.removeWikiFromCache(id);
+		return wikiPage;
 	}
 
 	@GetMapping("/api/wikiPages/" + ID)
@@ -673,21 +680,26 @@ public class ApiController extends AbstractController {
 	@PostMapping("/api/wikiPages/" + ID)
 	@RoleWith(Role.EDITOR)
 	public WikiPage wikiPageUpdate(@PathVariable("id") long id, @RequestBody WikiPageBean bean) {
-		return this.wikiService.updateWikiPage(HttpContext.getRequiredCurrentUser(), id, bean);
+		WikiPage wikiPage = this.wikiService.updateWikiPage(HttpContext.getRequiredCurrentUser(), id, bean);
+		this.wikiService.removeWikiFromCache(wikiPage.wikiId);
+		return wikiPage;
 	}
 
 	@PostMapping("/api/wikiPages/" + ID + "/move")
 	@RoleWith(Role.EDITOR)
 	public WikiPage wikiPageUpdate(@PathVariable("id") long wikiPageId, @RequestBody WikiPageMoveBean bean) {
 		bean.validate(true);
-		return this.wikiService.moveWikiPage(HttpContext.getRequiredCurrentUser(), wikiPageId, bean.parentId,
-				bean.displayIndex);
+		WikiPage wikiPage = this.wikiService.moveWikiPage(HttpContext.getRequiredCurrentUser(), wikiPageId,
+				bean.parentId, bean.displayIndex);
+		this.wikiService.removeWikiFromCache(wikiPage.wikiId);
+		return wikiPage;
 	}
 
 	@PostMapping("/api/wikiPages/" + ID + "/delete")
 	@RoleWith(Role.EDITOR)
 	public Map<String, Boolean> wikiPageDelete(@PathVariable("id") long id) {
-		this.wikiService.deleteWikiPage(HttpContext.getRequiredCurrentUser(), id);
+		WikiPage wikiPage = this.wikiService.deleteWikiPage(HttpContext.getRequiredCurrentUser(), id);
+		this.wikiService.removeWikiFromCache(wikiPage.wikiId);
 		return API_RESULT_TRUE;
 	}
 

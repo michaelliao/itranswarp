@@ -12,11 +12,13 @@ import com.itranswarp.bean.AttachmentBean;
 import com.itranswarp.bean.CategoryBean;
 import com.itranswarp.common.ApiException;
 import com.itranswarp.enums.ApiError;
+import com.itranswarp.enums.Role;
 import com.itranswarp.model.Article;
 import com.itranswarp.model.Category;
 import com.itranswarp.model.User;
 import com.itranswarp.util.IdUtil;
 import com.itranswarp.warpdb.PagedResults;
+import com.itranswarp.web.filter.HttpContext;
 
 @Component
 public class ArticleService extends AbstractService<Article> {
@@ -144,7 +146,10 @@ public class ArticleService extends AbstractService<Article> {
 	public Article getPublishedById(Long id) {
 		Article article = getById(id);
 		if (article.publishAt > System.currentTimeMillis()) {
-			throw new ApiException(ApiError.ENTITY_NOT_FOUND, "Article", "Article not found.");
+			User user = HttpContext.getCurrentUser();
+			if (user == null || user.role.value > Role.CONTRIBUTOR.value) {
+				throw new ApiException(ApiError.ENTITY_NOT_FOUND, "Article", "Article not found.");
+			}
 		}
 		return article;
 	}

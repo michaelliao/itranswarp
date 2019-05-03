@@ -9,7 +9,10 @@ import org.springframework.transaction.annotation.Transactional;
 import com.itranswarp.bean.SinglePageBean;
 import com.itranswarp.common.ApiException;
 import com.itranswarp.enums.ApiError;
+import com.itranswarp.enums.Role;
 import com.itranswarp.model.SinglePage;
+import com.itranswarp.model.User;
+import com.itranswarp.web.filter.HttpContext;
 
 @Component
 public class SinglePageService extends AbstractService<SinglePage> {
@@ -30,7 +33,10 @@ public class SinglePageService extends AbstractService<SinglePage> {
 			this.redisService.hset(KEY_SINGLE_PAGES, id, sp);
 		}
 		if (sp.publishAt > System.currentTimeMillis()) {
-			throw new ApiException(ApiError.ENTITY_NOT_FOUND, "SinglePage", "SinglePage not found.");
+			User user = HttpContext.getCurrentUser();
+			if (user != null && user.role.value > Role.CONTRIBUTOR.value) {
+				throw new ApiException(ApiError.ENTITY_NOT_FOUND, "SinglePage", "SinglePage not found.");
+			}
 		}
 		return sp;
 	}

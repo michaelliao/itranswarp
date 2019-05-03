@@ -69,7 +69,7 @@ public class OAuthProviders {
 		final String oauthProviderId;
 		final AbstractOAuthConfiguration oauthConfiguration;
 
-		public OAuthInfo(String oauthProviderId, AbstractOAuthConfiguration oauthConfiguration) {
+		OAuthInfo(String oauthProviderId, AbstractOAuthConfiguration oauthConfiguration) {
 			this.oauthProviderId = oauthProviderId;
 			this.oauthConfiguration = oauthConfiguration;
 		}

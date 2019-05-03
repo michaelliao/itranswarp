@@ -14,7 +14,7 @@ class MapTranslator implements Translator {
 	final String localeName;
 	final Map<String, String> translator;
 
-	public MapTranslator(String localeName, String displayName, Map<String, String> map) {
+	MapTranslator(String localeName, String displayName, Map<String, String> map) {
 		this.localeName = localeName;
 		this.displayName = displayName;
 		this.translator = new HashMap<>(map);

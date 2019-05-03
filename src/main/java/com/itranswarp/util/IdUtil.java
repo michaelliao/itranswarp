@@ -41,7 +41,7 @@ public final class IdUtil {
 
 	private static final long MAX_NEXT = 0b11111_11111111_111L;
 
-	private static final long shardId = getServerIdAsLong();
+	private static final long SHARD_ID = getServerIdAsLong();
 
 	private static long offset = 0;
 
@@ -67,7 +67,7 @@ public final class IdUtil {
 			logger.warn("maximum id reached in 1 second in epoch: " + epochSecond);
 			return nextId(epochSecond + 1);
 		}
-		return generateId(epochSecond, next, shardId);
+		return generateId(epochSecond, next, SHARD_ID);
 	}
 
 	private static void reset() {

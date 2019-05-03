@@ -37,7 +37,7 @@ public class Follow extends AbstractSettingBean {
 
 	public List<String[]> getFollows() {
 		List<String[]> list = new ArrayList<>();
-		fields.forEach(f -> {
+		FIELDS.forEach(f -> {
 			String value = null;
 			try {
 				value = (String) f.get(this);
@@ -50,6 +50,6 @@ public class Follow extends AbstractSettingBean {
 		return list;
 	};
 
-	private static final List<Field> fields = Arrays.stream(Follow.class.getFields())
+	private static final List<Field> FIELDS = Arrays.stream(Follow.class.getFields())
 			.sorted((f1, f2) -> f1.getName().compareTo(f2.getName())).collect(Collectors.toList());
 }

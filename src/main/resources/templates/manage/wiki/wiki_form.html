@@ -124,6 +124,7 @@ function initVM(data) {
     <div id="vm" class="uk-width-1-1">
         <ul class="uk-breadcrumb">
             <li><a href="/manage/wiki/">{{ _('All Wikis') }}</a></li>
+            <li v-if="wiki.id"><a v-bind:href="'/manage/wiki/wiki_tree?id='+wiki.id" v-text="wiki.name"></a></li>
             <li class="uk-active"><span v-text="wiki.name"></span></li>
         </ul>
 

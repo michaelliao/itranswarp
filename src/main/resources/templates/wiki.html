@@ -177,17 +177,19 @@ function expandWikiNode(icon, rec) {
 </script>
 {% endblock %}
 
-{% macro createNodes(wiki, node, depth) %}
+{% macro createNodes(wiki, node, depth, ts) %}
     {% for n in node.children %}
+    	{% if ts > n.publishAt %}
         <div id="{{ n.id }}" depth="{{ depth }}" style="display:none;position:relative;margin-left:15px;">
             {% if not n.children.isEmpty() %}
               <i onclick="toggleWikiNode(this)" class="uk-icon-plus-square-o" style="position:absolute;margin-left:-1em;padding-top:8px;"></i>
               <a href="/wiki/{{ wiki.id }}/{{ n.id }}" class="x-wiki-index-item">{{ n.name }}</a>
-              {{ createNodes(wiki, n, depth + 1) }}
+              {{ createNodes(wiki, n, depth + 1, ts) }}
             {% else %}
               <a href="/wiki/{{ wiki.id }}/{{ n.id }}" class="x-wiki-index-item">{{ n.name }}</a>
             {% endif %}
         </div>
+        {% endif %}
     {% endfor %}
 {% endmacro %}
 
@@ -204,19 +206,21 @@ function expandWikiNode(icon, rec) {
         <div id="{{ wiki.id }}" depth="0" style="position:relative;margin-left:15px;">
             <i onclick="toggleWikiNode(this)" class="uk-icon-plus-square-o" style="position:absolute;margin-left:-1em;padding-top:8px;"></i>
             <a href="/wiki/{{ wiki.id }}" class="x-wiki-index-item">{{ wiki.name }}</a>
-            {{ createNodes(wiki, wiki, 1) }}
+            {{ createNodes(wiki, wiki, 1, __timestamp__) }}
         </div>
     </ul>
     <div class="x-placeholder"></div>
 {% endblock %}
 
-{% macro createOffcanvasNodes(wiki, node, depth) %}
+{% macro createOffcanvasNodes(wiki, node, depth, ts) %}
     {% for n in node.children %}
-    <li id="off-{{ n.id }}" style="margin-left:{{ depth }}em;">
-        <a href="/wiki/{{ wiki.id }}/{{ n.id }}">{{ n.name }}</a>
-    </li>
-    {% if not n.children.isEmpty() %}
-        {{ createOffcanvasNodes(wiki, n, depth + 1) }}
+    {% if ts > n.publishAt %}
+	    <li id="off-{{ n.id }}" style="margin-left:{{ depth }}em;">
+	        <a href="/wiki/{{ wiki.id }}/{{ n.id }}">{{ n.name }}</a>
+	    </li>
+	    {% if not n.children.isEmpty() %}
+	        {{ createOffcanvasNodes(wiki, n, depth + 1, ts) }}
+	    {% endif %}
     {% endif %}
     {% endfor %}
 {% endmacro %}
@@ -227,7 +231,7 @@ function expandWikiNode(icon, rec) {
     </ul>
     <ul class="uk-nav uk-nav-side">
         <li id="off-{{ wiki.id }}"><a href="/wiki/{{ wiki.id }}">{{ wiki.name }}</a></li>
-        {{ createOffcanvasNodes(wiki, wiki, 1) }}
+        {{ createOffcanvasNodes(wiki, wiki, 1, __timestamp__) }}
     </ul>
     <div class="x-placeholder"></div>
 {% endblock %}

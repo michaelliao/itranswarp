@@ -8,19 +8,25 @@
 var id = parseInt('{{ id }}');
 
 $(function () {
-    getJSON('/api/wikiPages/' + id, function (err, wp) {
+	getJSON('/api/wikiPages/' + id, function (err, wp) {
         if (err) {
             return showError(err);
         }
-        wp.publishAtLocal = timestampToDateTimeLocal(wp.publishAt);
-        initVM(wp);
+		getJSON('/api/wikis/' + wp.wikiId, function (err, wiki) {
+    	    if (err) {
+        	    return showError(err);
+        	}
+	        wp.publishAtLocal = timestampToDateTimeLocal(wp.publishAt);
+    	    initVM(wiki, wp);
+    	});
     });
 });
 
-function initVM(wp) {
+function initVM(wiki, wp) {
     window.vm = new Vue({
         el: '#vm',
         data: {
+        	wiki: wiki,
             wikiPage: wp
         },
         created: function () {
@@ -84,6 +90,7 @@ function initVM(wp) {
     <div id="vm" class="uk-width-1-1">
         <ul class="uk-breadcrumb">
             <li><a href="/manage/wiki/">{{ _('All Wikis') }}</a></li>
+            <li><a v-bind:href="'/manage/wiki/wiki_tree?id='+wiki.id" v-text="wiki.name"></a></li>
             <li class="uk-active"><span v-text="wikiPage.name"></span></li>
         </ul>
 

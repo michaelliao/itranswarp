@@ -1,4 +1,8 @@
-# put https certificates in ssl/:
+# Sample environment
+
+HOWTO:
+
+## put https certificates in ssl/:
 
 - www.domain.name.crt
 - www.domain.name.key
@@ -9,8 +13,8 @@
 - source.domain.name.crt
 - source.domain.name.key
 
-# put hosts.yml in this directory.
+## change IPs in hosts.yml.
 
-# put vars.yml in this directory.
+## put vars.yml in this directory.
 
-# NOTE: the vars.yml contains sensitive data and MUST NOT submitted into git.
+NOTE: the vars.yml contains sensitive data and MUST NOT submitted into git for production environment.

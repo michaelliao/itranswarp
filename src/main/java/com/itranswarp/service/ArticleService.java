@@ -37,6 +37,8 @@ public class ArticleService extends AbstractService<Article> {
 
 	static final String KEY_CATEGORIES = "__categories__";
 
+	static final long KEY_TIMEOUT = 3600;
+
 	public Category getCategoryFromCache(Long id) {
 		Category c = this.redisService.hget(KEY_CATEGORIES, id, Category.class);
 		if (c == null) {
@@ -116,7 +118,7 @@ public class ArticleService extends AbstractService<Article> {
 		if (articles == null) {
 			articles = db.from(Article.class).where("publishAt < ?", System.currentTimeMillis()).orderBy("publishAt")
 					.desc().orderBy("id").desc().limit(maxResults).list();
-			this.redisService.set(KEY_RECENT_ARTICLES, articles);
+			this.redisService.set(KEY_RECENT_ARTICLES, articles, KEY_TIMEOUT);
 		}
 		return articles;
 	}
@@ -131,7 +133,7 @@ public class ArticleService extends AbstractService<Article> {
 			articles = this.db.from(Article.class).where("categoryId = ? AND publishAt < ?", category.id, ts)
 					.orderBy("publishAt").desc().orderBy("id").desc().list(pageIndex, ITEMS_PER_PAGE);
 			if (pageIndex == 1) {
-				this.redisService.set(KEY_ARTICLES_FIRST_PAGE + category.id, articles);
+				this.redisService.set(KEY_ARTICLES_FIRST_PAGE + category.id, articles, KEY_TIMEOUT);
 			}
 		}
 		return articles;

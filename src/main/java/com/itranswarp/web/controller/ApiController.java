@@ -181,20 +181,25 @@ public class ApiController extends AbstractController {
 
 	@PostMapping("/api/articles")
 	@RoleWith(Role.CONTRIBUTOR)
-	public Article articleUpdate(@RequestBody ArticleBean bean) {
-		return this.articleService.createArticle(HttpContext.getRequiredCurrentUser(), bean);
+	public Article articleCreate(@RequestBody ArticleBean bean) {
+		Article article = this.articleService.createArticle(HttpContext.getRequiredCurrentUser(), bean);
+		this.articleService.deleteArticlesFromCache(article.categoryId);
+		return article;
 	}
 
 	@PostMapping("/api/articles/" + ID)
 	@RoleWith(Role.CONTRIBUTOR)
 	public Article articleUpdate(@PathVariable("id") long id, @RequestBody ArticleBean bean) {
-		return this.articleService.updateArticle(HttpContext.getRequiredCurrentUser(), id, bean);
+		Article article = this.articleService.updateArticle(HttpContext.getRequiredCurrentUser(), id, bean);
+		this.articleService.deleteArticlesFromCache(article.categoryId);
+		return article;
 	}
 
 	@PostMapping("/api/articles/" + ID + "/delete")
 	@RoleWith(Role.CONTRIBUTOR)
 	public Map<String, Boolean> articleDelete(@PathVariable("id") long id) {
-		this.articleService.deleteArticle(HttpContext.getRequiredCurrentUser(), id);
+		Article article = this.articleService.deleteArticle(HttpContext.getRequiredCurrentUser(), id);
+		this.articleService.deleteArticlesFromCache(article.categoryId);
 		return API_RESULT_TRUE;
 	}
 

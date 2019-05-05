@@ -34,7 +34,6 @@ public class ArticleService extends AbstractService<Article> {
 
 	static final String KEY_RECENT_ARTICLES = "__recent_articles__";
 	static final String KEY_ARTICLES_FIRST_PAGE = "__articles__";
-	static final long CACHE_ARTICLES_SECONDS = 3600;
 
 	static final String KEY_CATEGORIES = "__categories__";
 
@@ -49,6 +48,11 @@ public class ArticleService extends AbstractService<Article> {
 
 	public void deleteCategoriesFromCache() {
 		this.redisService.del(KEY_CATEGORIES);
+	}
+
+	public void deleteArticlesFromCache(long categoryId) {
+		this.redisService.del(KEY_ARTICLES_FIRST_PAGE + categoryId);
+		this.redisService.del(KEY_RECENT_ARTICLES);
 	}
 
 	public void deleteCategoryFromCache(Long id) {
@@ -112,7 +116,7 @@ public class ArticleService extends AbstractService<Article> {
 		if (articles == null) {
 			articles = db.from(Article.class).where("publishAt < ?", System.currentTimeMillis()).orderBy("publishAt")
 					.desc().orderBy("id").desc().limit(maxResults).list();
-			this.redisService.set(KEY_RECENT_ARTICLES, articles, CACHE_ARTICLES_SECONDS);
+			this.redisService.set(KEY_RECENT_ARTICLES, articles);
 		}
 		return articles;
 	}
@@ -127,7 +131,7 @@ public class ArticleService extends AbstractService<Article> {
 			articles = this.db.from(Article.class).where("categoryId = ? AND publishAt < ?", category.id, ts)
 					.orderBy("publishAt").desc().orderBy("id").desc().list(pageIndex, ITEMS_PER_PAGE);
 			if (pageIndex == 1) {
-				this.redisService.set(KEY_ARTICLES_FIRST_PAGE + category.id, articles, CACHE_ARTICLES_SECONDS);
+				this.redisService.set(KEY_ARTICLES_FIRST_PAGE + category.id, articles);
 			}
 		}
 		return articles;
@@ -179,10 +183,11 @@ public class ArticleService extends AbstractService<Article> {
 	}
 
 	@Transactional
-	public void deleteArticle(User user, Long id) {
+	public Article deleteArticle(User user, Long id) {
 		Article article = this.getById(id);
 		checkPermission(user, article.userId);
 		this.db.remove(article);
+		return article;
 	}
 
 	@Transactional

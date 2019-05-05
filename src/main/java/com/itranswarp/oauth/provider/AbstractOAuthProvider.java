@@ -36,7 +36,8 @@ public abstract class AbstractOAuthProvider {
 
 	public abstract String getAuthenticateUrl(String redirectUrl);
 
-	public abstract OAuthAuthentication getAuthentication(String code, String redirectUrl) throws Exception;
+	public abstract OAuthAuthentication getAuthentication(String code, String state, String redirectUrl)
+			throws Exception;
 
 	protected final HttpClient httpClient = HttpClient.newBuilder().connectTimeout(DEFAULT_TIMEOUT)
 			.followRedirects(HttpClient.Redirect.NEVER).build();

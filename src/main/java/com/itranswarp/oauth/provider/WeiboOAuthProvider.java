@@ -39,7 +39,7 @@ public class WeiboOAuthProvider extends AbstractOAuthProvider {
 	}
 
 	@Override
-	public OAuthAuthentication getAuthentication(String code, String redirectUrl) throws Exception {
+	public OAuthAuthentication getAuthentication(String code, String state, String redirectUrl) throws Exception {
 		String[] queries = new String[] { // request body
 				"client_id=" + this.configuration.getClientId(), // client id
 				"client_secret=" + this.configuration.getClientSecret(), // client secret
@@ -47,7 +47,6 @@ public class WeiboOAuthProvider extends AbstractOAuthProvider {
 				"code=" + code, // code
 				"redirect_uri=" + URLEncoder.encode(redirectUrl, StandardCharsets.UTF_8) };
 		String postData = String.join("&", queries);
-		logger.info("post: {}", postData);
 		HttpRequest requestAccessToken = HttpRequest.newBuilder()
 				.uri(new URI("https://api.weibo.com/oauth2/access_token")).timeout(DEFAULT_TIMEOUT)
 				.header("Content-Type", "application/x-www-form-urlencoded;charset=utf-8")

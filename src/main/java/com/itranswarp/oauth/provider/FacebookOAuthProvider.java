@@ -33,7 +33,7 @@ public class FacebookOAuthProvider extends AbstractOAuthProvider {
 	}
 
 	@Override
-	public OAuthAuthentication getAuthentication(String code, String redirectUrl) throws Exception {
+	public OAuthAuthentication getAuthentication(String code, String state, String redirectUrl) throws Exception {
 		return null;
 	}
 

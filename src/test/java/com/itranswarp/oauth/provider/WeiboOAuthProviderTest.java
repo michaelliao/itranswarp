@@ -33,7 +33,7 @@ public class WeiboOAuthProviderTest {
 		String redirectUrl = provider.getAuthenticateUrl("https://www.liaoxuefeng.com/callback");
 		System.out.println("copy url to get code:\n" + redirectUrl);
 		String code = "xxxxx";
-		OAuthAuthentication auth = provider.getAuthentication(code, "https://www.liaoxuefeng.com/callback");
+		OAuthAuthentication auth = provider.getAuthentication(code, "", "https://www.liaoxuefeng.com/callback");
 		System.out.println(JsonUtil.writeJson(auth));
 	}
 

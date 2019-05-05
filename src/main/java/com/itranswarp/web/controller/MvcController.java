@@ -381,13 +381,15 @@ public class MvcController extends AbstractController {
 
 	@GetMapping("/auth/callback/{authProviderId}")
 	public String oauthCallback(@PathVariable("authProviderId") String authProviderId,
-			@RequestParam("code") String code, HttpServletRequest request, HttpServletResponse response) {
+			@RequestParam(value = "state", defaultValue = "") String state, @RequestParam("code") String code,
+			HttpServletRequest request, HttpServletResponse response) {
 		AbstractOAuthProvider provider = this.oauthProviders.getOAuthProvider(authProviderId);
 		String url = HttpUtil.getScheme(request) + "://" + request.getServerName() + "/auth/callback/" + authProviderId;
 		OAuthAuthentication authentication = null;
 		try {
-			authentication = provider.getAuthentication(code, url);
+			authentication = provider.getAuthentication(code, state, url);
 		} catch (Exception e) {
+			logger.error("OAuth failed.", e);
 			throw new ApiException(ApiError.AUTH_SIGNIN_FAILED, null, "Signin from OAuth failed.");
 		}
 		OAuth auth = this.userService.getOAuth(authProviderId, authentication);

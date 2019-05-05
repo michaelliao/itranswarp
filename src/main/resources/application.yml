@@ -19,7 +19,7 @@ spring:
       connection-timeout: ${DB_TIMEOUT:3000}
       validation-timeout: ${DB_TIMEOUT:3000}
       max-lifetime: ${DB_MAX_LIFETIME:600000}
-      maximum-pool-size: ${DB_POOL_SIZE:20}
+      maximum-pool-size: ${DB_POOL_SIZE:100}
       minimum-idle: ${DB_MIN_IDLE:1}
   # Redis configuration:
   redis:

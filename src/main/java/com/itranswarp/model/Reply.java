@@ -2,10 +2,11 @@ package com.itranswarp.model;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.Index;
 import javax.persistence.Table;
 
 @Entity
-@Table(name = "replies")
+@Table(name = "replies", indexes = @Index(name = "IDX_TOPICID", columnList = "topicId"))
 public class Reply extends AbstractEntity {
 
 	@Column(nullable = false, updatable = false)

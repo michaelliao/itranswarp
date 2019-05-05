@@ -2,12 +2,14 @@ package com.itranswarp.model;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.Index;
 import javax.persistence.Table;
 
 import com.itranswarp.enums.RefType;
 
 @Entity
-@Table(name = "topics")
+@Table(name = "topics", indexes = { @Index(name = "IDX_BOARDID", columnList = "boardId"),
+		@Index(name = "IDX_REFID", columnList = "refId"), @Index(name = "IDX_UPDATEDAT", columnList = "updatedAt") })
 public class Topic extends AbstractEntity {
 
 	@Column(nullable = false, updatable = false)

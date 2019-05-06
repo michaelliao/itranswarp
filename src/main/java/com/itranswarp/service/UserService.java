@@ -44,6 +44,14 @@ public class UserService extends AbstractService<User> {
 		return null;
 	}
 
+	public User getEnabledUserById(Long id) {
+		User user = this.getById(id);
+		if (user.lockedUntil > System.currentTimeMillis()) {
+			return null;
+		}
+		return user;
+	}
+
 	public User getUserFromCache(Long id) {
 		User user = this.redisService.hget(KEY_USERS, id, User.class);
 		if (user == null) {

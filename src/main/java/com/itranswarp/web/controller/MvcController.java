@@ -1,5 +1,6 @@
 package com.itranswarp.web.controller;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Locale;
@@ -347,7 +348,7 @@ public class MvcController extends AbstractController {
 		// try find user by email:
 		email = email.strip().toLowerCase();
 		User user = userService.fetchUserByEmail(email);
-		if (user == null) {
+		if (user == null || user.lockedUntil > System.currentTimeMillis()) {
 			return passwordAuthFailed();
 		}
 		// try find local auth by userId:
@@ -382,7 +383,7 @@ public class MvcController extends AbstractController {
 	@GetMapping("/auth/callback/{authProviderId}")
 	public String oauthCallback(@PathVariable("authProviderId") String authProviderId,
 			@RequestParam(value = "state", defaultValue = "") String state, @RequestParam("code") String code,
-			HttpServletRequest request, HttpServletResponse response) {
+			HttpServletRequest request, HttpServletResponse response) throws IOException {
 		AbstractOAuthProvider provider = this.oauthProviders.getOAuthProvider(authProviderId);
 		String url = HttpUtil.getScheme(request) + "://" + request.getServerName() + "/auth/callback/" + authProviderId;
 		OAuthAuthentication authentication = null;
@@ -393,6 +394,11 @@ public class MvcController extends AbstractController {
 			throw new ApiException(ApiError.AUTH_SIGNIN_FAILED, null, "Signin from OAuth failed.");
 		}
 		OAuth auth = this.userService.getOAuth(authProviderId, authentication);
+		User user = this.userService.getEnabledUserById(auth.userId);
+		if (user == null) {
+			response.sendError(HttpServletResponse.SC_FORBIDDEN, "User is locked.");
+			return null;
+		}
 		String cookieStr = CookieUtil.encodeSessionCookie(auth, encryptService.getSessionHmacKey());
 		CookieUtil.setSessionCookie(request, response, cookieStr, (int) authentication.getExpires().toSeconds());
 		return "redirect:" + HttpUtil.getReferer(request);

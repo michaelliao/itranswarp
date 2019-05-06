@@ -81,14 +81,14 @@ public class GlobalFilterRegistrationBean extends FilterRegistrationBean<Filter>
 					if ("local".equals(session.authProvider)) {
 						LocalAuth auth = userService.fetchLocalAuthById(session.id);
 						if (auth != null && session.validate(auth.passwd, encryptService.getSessionHmacKey())) {
-							user = userService.getById(auth.userId);
+							user = userService.getEnabledUserById(auth.userId);
 						} else {
 							CookieUtil.deleteSessionCookie(request, response);
 						}
 					} else {
 						OAuth auth = userService.fetchOAuthById(session.authProvider, session.id);
 						if (auth != null && session.validate(auth.authToken, encryptService.getSessionHmacKey())) {
-							user = userService.getById(auth.userId);
+							user = userService.getEnabledUserById(auth.userId);
 						} else {
 							CookieUtil.deleteSessionCookie(request, response);
 						}

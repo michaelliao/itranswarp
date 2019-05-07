@@ -1,0 +1,3 @@
+# ignore nginx log:
+*_log
+

@@ -28,6 +28,20 @@ server {
 
 }
 
+# https -> https www redirect:
+server {
+
+	listen 443 ssl;
+
+	server_name {{ env.DOMAIN }};
+
+	ssl_certificate     /srv/itranswarp/ssl/{{ env.DOMAIN }}.crt;
+	ssl_certificate_key /srv/itranswarp/ssl/{{ env.DOMAIN }}.key;
+
+	rewrite ^(.*) https://www.{{ env.DOMAIN }}$1 permanent;
+
+}
+
 # www reverse proxy:
 server {
 

@@ -21,8 +21,8 @@
 var
     activeId = parseInt('{{ id }}'),
     TODAY = '{{ today }}',
-    adSlots = {{ adSlots|json|raw }},
-    adPeriods = {{ adPeriods|json|raw }},
+    adSlots = JSON.parse(decodeURIComponent('{{ adSlots|json|url|raw }}')),
+    adPeriods = JSON.parse(decodeURIComponent('{{ adPeriods|json|url|raw }}')),
     currentAdSlot = null,
     currentAdPeriod = null;
 

@@ -216,7 +216,7 @@ public class AdService extends AbstractService<AdSlot> {
 
 	private List<AdPeriod> getActiveAdPeriodsByAdSlot(AdSlot slot, String today) {
 		return this.db.from(AdPeriod.class).where("adSlotId = ? AND startAt <= ? AND endAt > ?", slot.id, today, today)
-				.orderBy("displayOrder").desc().list();
+				.orderBy("displayOrder").list();
 	}
 
 	public List<AdMaterial> getAdMaterialsByAdPeriod(AdPeriod period) {

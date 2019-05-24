@@ -118,6 +118,9 @@ server {
 
 	sendfile on;
 
+	# remove after test:
+	rewrite ^/cdn/(.+)$ /$1 last;
+
 	location ~ /static/ {
 		expires    300d;
 	}

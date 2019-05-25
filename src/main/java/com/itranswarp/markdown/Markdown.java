@@ -58,7 +58,7 @@ public class Markdown {
 				.nodeRendererFactory(context -> new CustomLinkNodeRenderer(context, patternLinkRenderers)).build();
 
 		this.ugcRenderer = HtmlRenderer.builder().extensions(extensionList).escapeHtml(true)
-				.nodeRendererFactory(context -> new NoFollowLinkNodeRenderer(context)).build();
+				.nodeRendererFactory(context -> new SafeLinkNodeRenderer(context)).build();
 	}
 
 	public String toHtml(String md) {
@@ -169,16 +169,16 @@ class CustomLinkNodeRenderer implements NodeRenderer {
 }
 
 /**
- * Render link as rel="nofollow".
+ * Render link as rel="nofollow" href="no-script".
  * 
  * @author liaoxuefeng
  */
-class NoFollowLinkNodeRenderer implements NodeRenderer {
+class SafeLinkNodeRenderer implements NodeRenderer {
 
 	private final HtmlNodeRendererContext context;
 	private final HtmlWriter html;
 
-	NoFollowLinkNodeRenderer(HtmlNodeRendererContext context) {
+	SafeLinkNodeRenderer(HtmlNodeRendererContext context) {
 		this.context = context;
 		this.html = context.getWriter();
 	}
@@ -192,6 +192,9 @@ class NoFollowLinkNodeRenderer implements NodeRenderer {
 	public void render(Node node) {
 		Link link = (Link) node;
 		String url = context.encodeUrl(link.getDestination());
+		if (url.toLowerCase().startsWith("javascript:")) {
+			url = "javascript:void(0)";
+		}
 		String title = link.getTitle();
 		Map<String, String> attrs = new LinkedHashMap<>();
 		attrs.put("rel", "nofollow");

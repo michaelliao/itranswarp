@@ -270,6 +270,10 @@ var initRunCode = (function() {
 		$pre.css('padding', '6px');
 		$pre.css('border-bottom-left-radius', '0');
 		$pre.css('border-bottom-right-radius', '0');
+		$pre.css('white-space', 'pre-wrap');
+		$pre.css('word-wrap', 'break-word');
+		$pre.css('word-break', 'break-all');
+
 		$pre.wrap('<form class="uk-form uk-form-stack uk-margin-top uk-margin-bottom" action="#0"></form>');
 		$pre.after('<button type="button" onclick="' + fn_run + '(\'' + theId + '\', this)" class="uk-button uk-button-primary" style="margin-top:15px;"><i class="uk-icon-play"></i> Run</button>');
 		if (codes.length === 1) {

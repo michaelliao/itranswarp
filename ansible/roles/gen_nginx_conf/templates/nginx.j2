@@ -53,8 +53,8 @@ server {
 	ssl_certificate_key /srv/itranswarp/ssl/www.{{ env.DOMAIN }}.key;
 
 	root       /srv/itranswarp/www;
-	access_log /var/log/nginx/www_access_log access_format;
-	error_log  /var/log/nginx/www_error_log;
+	access_log /var/log/nginx/www_access.log access_format;
+	error_log  /var/log/nginx/www_error.log;
 
 	client_max_body_size 2m;
 
@@ -106,8 +106,8 @@ server {
 	ssl_certificate_key /srv/itranswarp/ssl/source.{{ env.DOMAIN }}.key;
 
 	root       /srv/itranswarp/www;
-	access_log /var/log/nginx/source_access_log access_format;
-	error_log  /var/log/nginx/source_error_log;
+	access_log /var/log/nginx/source_access.log access_format;
+	error_log  /var/log/nginx/source_error.log;
 
 	client_max_body_size 1m;
 
@@ -151,8 +151,8 @@ server {
 	ssl_certificate     /srv/itranswarp/ssl/static.{{ env.DOMAIN }}.crt;
 	ssl_certificate_key /srv/itranswarp/ssl/static.{{ env.DOMAIN }}.key;
 
-	access_log /var/log/nginx/static_access_log access_format;
-	error_log  /var/log/nginx/static_error_log;
+	access_log /var/log/nginx/static_access.log access_format;
+	error_log  /var/log/nginx/static_error.log;
 
 	client_max_body_size 1m;
 

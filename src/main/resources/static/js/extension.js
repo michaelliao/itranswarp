@@ -1,7 +1,7 @@
 // extension for markdown content
 
 function execute_html(tid, btn) {
-	var w = window.open('about:blank', 'Online HTML Practice', 'width=640,height=480,resizeable=1,scrollbars=1');
+	var w = window.open('about:blank', 'OnlineHTMLPractice');
 	w.document.write(_mdGetCode(tid));
 	w.document.close();
 }

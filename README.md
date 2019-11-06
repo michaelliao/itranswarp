@@ -84,3 +84,16 @@ The deploy script will do following:
 - update symbol link;
 - reload supervisor;
 - reload nginx.
+
+### Docker
+
+Support [.env.example](docker/.env.example) use local ip for test. 
+```
+$ cd docker
+$ cp .env.example
+$ vim .env
+$ docker-compose up -d
+```
+test:
+https://www.local.itranswarp.com/
+

@@ -1,0 +1,7 @@
+# install openjdk 11
+
+---
+
+- name: install openjdk
+  yum:
+    name: java-11-openjdk-headless

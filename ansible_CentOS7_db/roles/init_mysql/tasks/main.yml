@@ -1,0 +1,55 @@
+---
+- name: install pip
+  yum:
+    name: python2-pip
+- name: install PyMySQL for python
+  pip:
+    name: pymysql
+- name: start mysqld
+  service:
+    name: mysqld
+    state: started
+- name: set root password
+  template: src=setpassword.sh dest=/tmp/setpassword.sh
+  when: mysql_install_result.changed
+- name: set root password2
+  shell: sh /tmp/setpassword.sh;rm /tmp/setpassword.sh
+  when: mysql_install_result.changed
+- name: copy sql file
+  copy:
+    src: ../release/init.sql
+    dest: /tmp
+- name: copy sql file2
+  copy:
+    src: ../release/ddl.sql
+    dest: /tmp
+- name: create database
+  mysql_db:
+    login_password: "{{env.DB_ROOTPASSWORD}}"
+    name: "{{env.DB_NAME}}"
+    state: "present"
+  register: mysql_db_result
+- name: run sql file1
+  mysql_db:
+    login_password: "{{env.DB_ROOTPASSWORD}}"
+    name: "{{env.DB_NAME}}"
+    state: import
+    target: /tmp/ddl.sql
+  when: mysql_db_result.changed
+- name: run sql file2
+  mysql_db:
+    login_password: "{{env.DB_ROOTPASSWORD}}"
+    name: "{{env.DB_NAME}}"
+    state: import
+    target: /tmp/init.sql
+  when: mysql_db_result.changed
+#- name: show mysql_db_result
+#  debug: msg="{{mysql_db_result}}"
+- name: create mysql user
+  mysql_user:
+    login_password: "{{env.DB_ROOTPASSWORD}}"
+    name: "{{env.DB_USERNAME}}"
+    password: "{{env.DB_PASSWORD}}"
+    host: "%"
+    priv: "{{env.DB_NAME}}.*:ALL"
+    state: present

@@ -1,0 +1,12 @@
+# define env for "sample"
+
+# NOTE: the vars.yml contains sensitive data and MUST NOT submitted into git.
+
+---
+
+env:
+  DB_NAME: it
+  DB_ROOTPASSWORD: "asf:Sg124cc..change" # Must meet MySQL password complexity requirements
+  DB_USERNAME: itranswarp
+  DB_PASSWORD: "asf:Sg124dd..change" # Must meet MySQL password complexity requirements
+  REDIS_PASSWORD: "change_me"

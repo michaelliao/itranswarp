@@ -1,0 +1,199 @@
+# nginx conf for itranswarp
+
+# define upstream:
+upstream itw_upstream {
+{% for host in groups["itranswarp"] %}
+    server {% if inventory_hostname == host %}127.0.0.1{% else %}{{ host }}{% endif %}:2019 fail_timeout=3s;
+{% endfor %}
+}
+
+# define access log format:
+log_format access_format '$remote_addr - $request_time [$time_local] "$request" $status $body_bytes_sent "$http_referer" "$http_user_agent"';
+
+# proxy cache:
+proxy_cache_path /var/cache/nginx/itranswarp levels=2:2 keys_zone=itw_cache:10m inactive=300d max_size=2g;
+proxy_temp_path  /var/cache/nginx/tmp;
+
+# rate limit:
+limit_req_zone $binary_remote_addr zone=itw_limit_zone:5m rate=20r/s;
+
+# http -> https redirect:
+server {
+
+	listen 80;
+
+	server_name www.{{ env.DOMAIN }};
+
+	rewrite ^(.*) https://www.{{ env.DOMAIN }}$1 permanent;
+
+}
+
+# https -> https www redirect:
+server {
+
+	listen 443 ssl;
+
+	server_name {{ env.DOMAIN }};
+
+	ssl_certificate     /srv/itranswarp/ssl/{{ env.DOMAIN }}.crt;
+	ssl_certificate_key /srv/itranswarp/ssl/{{ env.DOMAIN }}.key;
+
+	rewrite ^(.*) https://www.{{ env.DOMAIN }}$1 permanent;
+
+}
+
+# www reverse proxy:
+server {
+
+	listen 443 ssl;
+
+	server_name www.{{ env.DOMAIN }};
+
+	ssl_certificate     /srv/itranswarp/ssl/www.{{ env.DOMAIN }}.crt;
+	ssl_certificate_key /srv/itranswarp/ssl/www.{{ env.DOMAIN }}.key;
+
+	root       /srv/itranswarp/www;
+	access_log /var/log/nginx/www_access.log access_format;
+	error_log  /var/log/nginx/www_error.log;
+
+	client_max_body_size 2m;
+
+	gzip            on;
+	gzip_min_length 1024;
+	gzip_buffers    4 8k;
+	gzip_types      text/css application/x-javascript application/json;
+
+	sendfile on;
+
+	location = /favicon.ico {
+		expires 10d;
+	}
+
+	location = /robots.txt {
+		expires 10d;
+	}
+
+	location ~ /static/ {
+		rewrite ^(.*) https://static.{{ env.DOMAIN }}$1 permanent;
+		expires 300d;
+	}
+
+	location ~ /files/ {
+		rewrite ^(.*) https://static.{{ env.DOMAIN }}$1 permanent;
+		expires 300d;
+	}
+
+	location / {
+		if ($http_user_agent ~* "python|curl|java|wget|httpclient|okhttp") {
+			return 503;
+		}
+		proxy_pass       http://itw_upstream;
+		proxy_set_header Host $host;
+		proxy_set_header X-Real-IP $remote_addr;
+		proxy_set_header X-Forwarded-Proto $scheme;
+		proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+	}
+}
+
+# CDN source:
+server {
+
+	listen 443 ssl;
+
+	server_name source.{{ env.DOMAIN }};
+
+	ssl_certificate     /srv/itranswarp/ssl/source.{{ env.DOMAIN }}.crt;
+	ssl_certificate_key /srv/itranswarp/ssl/source.{{ env.DOMAIN }}.key;
+
+	root       /srv/itranswarp/www;
+	access_log /var/log/nginx/source_access.log access_format;
+	error_log  /var/log/nginx/source_error.log;
+
+	client_max_body_size 1m;
+
+	gzip            on;
+	gzip_min_length 1024;
+	gzip_buffers    4 8k;
+	gzip_types      text/css application/x-javascript application/json;
+
+	sendfile on;
+
+	# remove after test:
+	rewrite ^/cdn/(.+)$ /$1 last;
+
+	location ~ /static/ {
+		expires    300d;
+	}
+
+	location ~ /files/ {
+		proxy_pass         http://itw_upstream;
+		proxy_set_header   Host $host;
+		proxy_set_header   X-Real-IP $remote_addr;
+		proxy_set_header   X-Forwarded-Proto $scheme;
+		proxy_set_header   X-Forwarded-For $proxy_add_x_forwarded_for;
+		proxy_read_timeout 3s;
+
+		proxy_cache       itw_cache;
+		proxy_cache_key   $uri;
+		proxy_cache_valid 300d;
+
+		expires    300d;
+	}
+}
+
+# act as CDN:
+server {
+
+	listen 443 ssl;
+
+	server_name static.{{ env.DOMAIN }};
+
+	ssl_certificate     /srv/itranswarp/ssl/static.{{ env.DOMAIN }}.crt;
+	ssl_certificate_key /srv/itranswarp/ssl/static.{{ env.DOMAIN }}.key;
+
+	access_log /var/log/nginx/static_access.log access_format;
+	error_log  /var/log/nginx/static_error.log;
+
+	client_max_body_size 1m;
+
+	gzip            on;
+	gzip_min_length 1024;
+	gzip_buffers    4 8k;
+	gzip_types      text/css application/x-javascript application/json;
+
+	sendfile on;
+
+	location ~ /static/ {
+		if ($request_method ~* "(GET|POST)") {
+			add_header "Access-Control-Allow-Origin"  *;
+		}
+
+		if ($request_method = OPTIONS ) {
+			add_header "Access-Control-Allow-Origin"  "https://www.{{ env.DOMAIN }}";
+			add_header "Access-Control-Allow-Methods" "GET, POST, OPTIONS, HEAD";
+			add_header "Access-Control-Allow-Headers" "Authorization, Origin, X-Requested-With, Content-Type, Accept";
+			expires 300d;
+			return 200;
+		}
+
+		proxy_pass         https://source.{{ env.DOMAIN }};
+		proxy_read_timeout 3s;
+	}
+
+	location ~ /files/ {
+		if ($request_method ~* "(GET|POST)") {
+			add_header "Access-Control-Allow-Origin"  *;
+		}
+
+		if ($request_method = OPTIONS ) {
+			add_header "Access-Control-Allow-Origin"  "https://www.{{ env.DOMAIN }}";
+			add_header "Access-Control-Allow-Methods" "GET, POST, OPTIONS, HEAD";
+			add_header "Access-Control-Allow-Headers" "Authorization, Origin, X-Requested-With, Content-Type, Accept";
+			expires 300d;
+			return 200;
+		}
+
+		proxy_pass         https://source.{{ env.DOMAIN }};
+		proxy_read_timeout 3s;
+	}
+}

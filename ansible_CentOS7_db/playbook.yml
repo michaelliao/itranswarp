@@ -1,0 +1,19 @@
+#
+# Deploy itranswarp
+# For CentOS 7 x64
+#
+
+---
+
+- hosts: database
+  serial: 1
+  become: yes
+  become_user: root
+  become_method: sudo
+  vars_files:
+    - environments/{{ profile }}/vars.yml
+  roles:
+    - { role: install_redis }
+    - { role: install_mysql }
+    - { role: init_redis }
+    - { role: init_mysql }

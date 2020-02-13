@@ -1,0 +1,12 @@
+---
+- name: bind redis to 0.0.0.0
+  shell: sed -i '/^bind/s/127.0.*.*/0.0.0.0/' /etc/redis.conf
+- name: set redis password
+  #shell: echo config set requirepass {{ env.REDIS_PASSWORD }} | redis-cli
+  template: src=setpass.sh dest=/tmp/setpass.sh
+- name: set redis password 2
+  shell: sh /tmp/setpass.sh;rm /tmp/setpass.sh
+- name: restart redis
+  service:
+    name: redis
+    state: restarted

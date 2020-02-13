@@ -1,0 +1,6 @@
+# install supervisor
+
+---
+- name: install supervisor
+  yum:
+    name: supervisor

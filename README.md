@@ -64,12 +64,29 @@ Please check [application.yml](src/main/resources/application.yml) for environme
 
 ### Deploy
 
-iTranswarp is deployed by Ansible. Scripts is ready for Ubuntu Server 18.04 x64.
+iTranswarp is deployed by Ansible. Scripts is ready for Ubuntu Server 18.04 x64 and CentOS7 x64
 
 Deploy script:
 
+For Ubuntu Server 18.04 x64
+First you need to check the configuration in ansible/environments
 ```
 $ ansible/deploy.py --profile <env>
+```
+
+For CentOS7 x64
+First you need to check the configuration in ansible_CentOS7/environments
+```
+$ ansible_CentOS7/deploy.py --profile <env>
+```
+
+iTranswarp need MySQL 5.7 and Redis 4/5 to run, If you don't have, you can deploy by ansible.
+
+Scripts is ready for CentOS7 x64
+
+First you need to check the configuration in ansible_CentOS7_db/environments
+```
+$ ansible_CentOS7_db/deploy.py --profile <env>
 ```
 
 The deploy script will do following:
@@ -84,6 +101,8 @@ The deploy script will do following:
 - update symbol link;
 - reload supervisor;
 - reload nginx.
+
+
 
 ### Docker
 

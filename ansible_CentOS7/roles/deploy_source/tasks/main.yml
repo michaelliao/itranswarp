@@ -1,0 +1,15 @@
+# deploy static files
+
+---
+
+- name: init app www dir /srv/itranswarp-{{ timestamp }}/www
+  file:
+    path: /srv/itranswarp-{{ timestamp }}/www
+    state: directory
+
+- name: unarchive static files
+  unarchive:
+    src: ../release/resources.tar.gz
+    dest: /srv/itranswarp-{{ timestamp }}/www
+    owner: root
+    group: root

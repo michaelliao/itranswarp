@@ -1,0 +1,15 @@
+---
+- name: check mysql57-community-release
+  shell: rpm -qa | grep mysql57-community-release
+  ignore_errors: True
+  register: _t
+- name: install mysql5.7 yum repo
+  yum:
+    name: http://dev.mysql.com/get/mysql57-community-release-el7-8.noarch.rpm
+  when: _t | failed
+- name: install mysql5.7
+  yum:
+    name: mysql-community-server
+  register: mysql_install_result
+#- name: show result
+#  debug: msg="{{mysql_install_result.changed}}"

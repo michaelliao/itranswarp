@@ -1,0 +1,43 @@
+# generate nginx conf
+
+---
+- name: new www-data user
+  user:
+    name: www-data
+    shell: /usr/sbin/nologin
+
+- name: init nginx cache dir /var/cache/nginx/itranswarp
+  file:
+    path: /var/cache/nginx/itranswarp
+    state: directory
+    owner: www-data
+    group: www-data
+
+- name: init nginx tmp dir /var/cache/nginx/tmp
+  file:
+    path: /var/cache/nginx/tmp
+    state: directory
+    owner: www-data
+    group: www-data
+
+- name: disable default conf
+  file:
+    path: /etc/nginx/conf.d/default
+    state: absent
+
+- name: generate nginx conf for itranswarp
+  template:
+    src: templates/nginx.j2
+    dest: /srv/itranswarp-{{ timestamp }}/nginx.conf
+
+- name: make symbol link
+  file:
+    src: /srv/itranswarp-{{ timestamp }}/nginx.conf
+    dest: /etc/nginx/conf.d/itranswarp.conf
+    state: link
+    force: yes
+
+- name: copy ssl certs
+  copy:
+    src: environments/{{ profile }}/ssl
+    dest: /srv/itranswarp-{{ timestamp }}/

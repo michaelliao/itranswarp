@@ -1,0 +1,6 @@
+
+[nginx.org_packages_centos_7_noarch]
+name=ngnix_repo
+baseurl=http://nginx.org/packages/centos/7/noarch
+enabled=1
+

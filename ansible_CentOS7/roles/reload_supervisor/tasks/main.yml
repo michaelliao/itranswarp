@@ -1,0 +1,13 @@
+# reload supervisor conf and restart service
+
+---
+
+- name: start supervisor if not running
+  service:
+    name: supervisord
+    state: started
+
+- name: start service itranswarp
+  supervisorctl:
+    name: itranswarp
+    state: restarted # restarted = supervisorctl update && supervisorctl restart

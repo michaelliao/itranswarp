@@ -1,0 +1,7 @@
+---
+- name: install epel-release
+  yum:
+    name: epel-release
+- name: install redis
+  yum:
+    name: redis

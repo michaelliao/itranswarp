@@ -35,8 +35,9 @@ import com.itranswarp.markdown.PatternLinkRenderer;
 @ConditionalOnProperty(name = "spring.markdown.plugins.bilibili.enabled", havingValue = "true")
 public class BilibiliLinkPlugin implements PatternLinkRenderer {
 
-	static final String URL_PREFIX = "https://www.bilibili.com/video/av";
-	static final Pattern ID_PATTERN = Pattern.compile("^(\\d+).*$");
+	static final String URL_PREFIX = "https://www.bilibili.com/video/";
+	static final Pattern ID1_PATTERN = Pattern.compile("^av(\\d+).*$");
+	static final Pattern ID2_PATTERN = Pattern.compile("^BV(\\w+).*$");
 
 	static final String DEFAULT_WIDTH = "100%";
 	static final String DEFAULT_HEIGHT = "480px";
@@ -59,14 +60,32 @@ public class BilibiliLinkPlugin implements PatternLinkRenderer {
 		if (!url.startsWith(URL_PREFIX)) {
 			return false;
 		}
-		Matcher matcher = ID_PATTERN.matcher(url.substring(URL_PREFIX.length()));
-		if (!matcher.matches()) {
+		String aid = null;
+		String bvid = null;
+		// try detect av123456:
+		Matcher matcher = ID1_PATTERN.matcher(url.substring(URL_PREFIX.length()));
+		if (matcher.matches()) {
+			aid = matcher.group(1);
+		}
+		// try detect BV1a2b3c:
+		if (aid == null) {
+			matcher = ID2_PATTERN.matcher(url.substring(URL_PREFIX.length()));
+			if (matcher.matches()) {
+				bvid = matcher.group(1);
+			}
+		}
+		if (aid == null && bvid == null) {
 			return false;
 		}
-		String id = matcher.group(1);
+		String src = null;
+		if (aid != null) {
+			src = "//player.bilibili.com/player.html?aid=" + aid;
+		} else {
+			src = "//player.bilibili.com/player.html?bvid=" + bvid;
+		}
 		// render as iframe:
 		Map<String, String> attrs = new LinkedHashMap<>();
-		attrs.put("src", "//player.bilibili.com/player.html?aid=" + id);
+		attrs.put("src", src);
 		attrs.put("style", style);
 		attrs.put("scrolling", "no");
 		attrs.put("border", "0");
@@ -76,5 +95,4 @@ public class BilibiliLinkPlugin implements PatternLinkRenderer {
 		html.tag("/iframe");
 		return true;
 	}
-
 }

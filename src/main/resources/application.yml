@@ -9,7 +9,7 @@ spring:
     timezone: ${TIMEZONE:}
   # MySQL configuration:
   datasource:
-    url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:it}?useSSL=${DB_SSL:false}&characterEncoding=utf8
+    url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:it}?useSSL=${DB_SSL:false}&characterEncoding=${DB_ENCODING:utf8}
     username: ${DB_USERNAME:root}
     password: ${DB_PASSWORD:password}
     driver-class-name: com.mysql.jdbc.Driver

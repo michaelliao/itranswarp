@@ -33,5 +33,4 @@ public class Application {
 		logger.info("start application version {}...", VERSION);
 		SpringApplication.run(Application.class, args);
 	}
-
 }

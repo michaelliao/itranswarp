@@ -24,7 +24,7 @@ import com.mitchellbosecke.pebble.extension.Extension;
 import com.mitchellbosecke.pebble.extension.Filter;
 import com.mitchellbosecke.pebble.extension.Function;
 import com.mitchellbosecke.pebble.loader.ClasspathLoader;
-import com.mitchellbosecke.pebble.spring.PebbleViewResolver;
+import com.mitchellbosecke.pebble.spring.servlet.PebbleViewResolver;
 
 /**
  * MVC configuration.
@@ -78,6 +78,7 @@ public class MvcConfiguration {
 	 */
 	@Bean
 	public ViewResolver pebbleViewResolver(@Autowired Extension extension) {
+		// disable cache for native profile:
 		boolean cache = !"native".equals(activeProfile);
 		logger.info("set cache as {} for active profile is {}.", cache, activeProfile);
 		PebbleEngine engine = new PebbleEngine.Builder().autoEscaping(true).cacheActive(cache).extension(extension)
@@ -116,5 +117,4 @@ public class MvcConfiguration {
 			}
 		};
 	}
-
 }

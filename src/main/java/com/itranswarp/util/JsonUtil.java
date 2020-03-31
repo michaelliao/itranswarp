@@ -82,8 +82,6 @@ public class JsonUtil {
 		} catch (JsonProcessingException e) {
 			logger.warn("cannot read json: " + str, e);
 			throw new RuntimeException(e);
-		} catch (IOException e) {
-			throw new RuntimeException(e);
 		}
 	}
 
@@ -124,8 +122,6 @@ public class JsonUtil {
 			return OBJECT_MAPPER.readValue(str, ref);
 		} catch (JsonProcessingException e) {
 			logger.warn("cannot read json: " + str, e);
-			throw new RuntimeException(e);
-		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
 	}

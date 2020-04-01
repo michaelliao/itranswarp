@@ -29,6 +29,10 @@ spring:
       database: ${REDIS_DATABASE:0}
       password: ${REDIS_PASSWORD:}
       timeout: ${REDIS_TIMEOUT:1}
+  # Security configuration:
+  security:
+    anti-spam:
+      lock-days: ${SECURITY_ANTI_SPAM_LOCK_DAYS:3650}
   # Markdown plugins:
   markdown:
     plugins:

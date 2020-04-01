@@ -312,7 +312,24 @@ $(function () {
 
 // markdown ///////////////////////////////////////////////////////////////////
 
-function html2md(s) {
+function html2md(input) {
+	// convert <p><code>...</code></p> to <pre><code>...</code></pre>:
+	var s = '';
+	while (true) {
+		n1 = input.indexOf('<p><code>');
+		n2 = input.indexOf('</code></p>');
+		n3 = input.indexOf('</code>');
+		if (n1 >= 0 && n2 > n1 && n2 == n3) {
+			s = s + input.substring(0, n1);
+			s = s + '<pre><code>';
+			s = s + input.substring(n1+9, n2).replace(/<p>/g, '').replace(/<\/p>/g, '\n').replace(/<br>/g, '\n');
+			s = s + '</code></pre>';
+			input = input.substring(n2+11);
+		} else {
+			s = s + input;
+			break;
+		}
+	}
 	return new TurndownService({
 		headingStyle: 'atx',
 		codeBlockStyle: 'fenced',

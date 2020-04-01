@@ -100,7 +100,14 @@ public class MvcController extends AbstractController {
 
 	@GetMapping("/locale/{lo}")
 	public String locale(@PathVariable("lo") String lo, HttpServletRequest request, HttpServletResponse response) {
-		this.localeResolver.setLocale(request, response, new Locale(lo));
+		String language = lo;
+		String country = "";
+		int n = lo.indexOf('_');
+		if (n > 0) {
+			language = lo.substring(0, n);
+			country = lo.substring(n + 1);
+		}
+		this.localeResolver.setLocale(request, response, new Locale(language, country));
 		return "redirect:" + HttpUtil.getReferer(request);
 	}
 
@@ -448,7 +455,6 @@ public class MvcController extends AbstractController {
 	}
 
 	private void appendGlobalModel(ModelAndView mv) {
-		@SuppressWarnings("resource")
 		HttpContext ctx = HttpContext.getContext();
 		// development mode?
 		mv.addObject("__dev__", this.dev);

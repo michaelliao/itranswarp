@@ -187,6 +187,9 @@ public class UserService extends AbstractService<User> {
 
 	@Transactional
 	public void lockUser(User user, int days) {
+		if (user.role == Role.ADMIN) {
+			throw new ApiException(ApiError.OPERATION_FAILED, null, "Could not lock admin user.");
+		}
 		user.lockedUntil = System.currentTimeMillis() + TimeUnit.DAYS.toMillis(days);
 		this.db.updateProperties(user, "lockedUntil");
 	}

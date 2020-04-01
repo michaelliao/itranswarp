@@ -2,9 +2,9 @@
 
 # define upstream:
 upstream itw_upstream {
-{% for host in groups["itranswarp"] %}
+  {% for host in groups["itranswarp"] %}
     server {% if inventory_hostname == host %}127.0.0.1{% else %}{{ host }}{% endif %}:2019 fail_timeout=3s;
-{% endfor %}
+  {% endfor %}
 }
 
 # define access log format:
@@ -70,7 +70,10 @@ server {
 	}
 
 	location = /robots.txt {
-		expires 10d;
+		expires 1d;
+	}
+
+	location = /ads.txt {
 	}
 
 	location ~ /static/ {
@@ -122,7 +125,7 @@ server {
 	rewrite ^/cdn/(.+)$ /$1 last;
 
 	location ~ /static/ {
-		expires    300d;
+		expires 300d;
 	}
 
 	location ~ /files/ {
@@ -137,7 +140,7 @@ server {
 		proxy_cache_key   $uri;
 		proxy_cache_valid 300d;
 
-		expires    300d;
+		expires 300d;
 	}
 }
 
@@ -177,7 +180,7 @@ server {
 		}
 
 		proxy_pass         https://source.{{ env.DOMAIN }};
-		proxy_read_timeout 3s;
+		proxy_read_timeout 5s;
 	}
 
 	location ~ /files/ {
@@ -194,6 +197,6 @@ server {
 		}
 
 		proxy_pass         https://source.{{ env.DOMAIN }};
-		proxy_read_timeout 3s;
+		proxy_read_timeout 5s;
 	}
 }

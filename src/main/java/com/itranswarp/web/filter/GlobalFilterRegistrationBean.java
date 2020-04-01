@@ -17,6 +17,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.stereotype.Component;
 
@@ -27,13 +28,24 @@ import com.itranswarp.model.OAuth;
 import com.itranswarp.model.User;
 import com.itranswarp.oauth.OAuthProviders;
 import com.itranswarp.service.EncryptService;
+import com.itranswarp.service.RedisRateLimiter;
 import com.itranswarp.service.UserService;
 import com.itranswarp.util.CookieUtil;
+import com.itranswarp.util.HttpUtil;
 
 @Component
 public class GlobalFilterRegistrationBean extends FilterRegistrationBean<Filter> {
 
 	final Logger logger = LoggerFactory.getLogger(getClass());
+
+	@Value("${spring.security.rate-limit.error-code:429}")
+	int rateLimitErrorCode = 429;
+
+	@Value("${spring.security.rate-limit.limit:5}")
+	int rateLimit = 5;
+
+	@Value("${spring.security.rate-limit.burst:10}")
+	int rateLimitBurst = 10;
 
 	@Autowired
 	EncryptService encryptService;
@@ -43,6 +55,9 @@ public class GlobalFilterRegistrationBean extends FilterRegistrationBean<Filter>
 
 	@Autowired
 	UserService userService;
+
+	@Autowired
+	RedisRateLimiter rateLimiter;
 
 	String serverId = getServerId();
 
@@ -71,6 +86,18 @@ public class GlobalFilterRegistrationBean extends FilterRegistrationBean<Filter>
 			HttpServletResponse response = (HttpServletResponse) resp;
 			request.setCharacterEncoding("UTF-8");
 			response.setHeader("X-Server-ID", serverId);
+			// check rate limit but except static file:
+			String path = request.getRequestURI();
+			if (!path.startsWith("/static/") && !path.startsWith("/files/")) {
+				String ip = HttpUtil.getIPAddress(request);
+				int remaining = rateLimiter.getRateLimit("www", ip, rateLimit, rateLimitBurst);
+				response.setIntHeader("X-RateLimit-Limit", rateLimit);
+				response.setIntHeader("X-RateLimit-Remaining", remaining);
+				if (remaining <= 0) {
+					response.setStatus(rateLimitErrorCode);
+					return;
+				}
+			}
 			User user = null;
 			String cookieStr = CookieUtil.findSessionCookie(request);
 			if (cookieStr != null) {

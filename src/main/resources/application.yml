@@ -31,6 +31,10 @@ spring:
       timeout: ${REDIS_TIMEOUT:1}
   # Security configuration:
   security:
+    rate-limit:
+      error-code: ${SECURITY_RATE_LIMIT_ERROR_CODE:429}
+      limit: ${SECURITY_RATE_LIMIT_LIMIT:5}
+      burst: ${SECURITY_RATE_LIMIT_BURST:10}
     anti-spam:
       lock-days: ${SECURITY_ANTI_SPAM_LOCK_DAYS:3650}
   # Markdown plugins:

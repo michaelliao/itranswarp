@@ -1,6 +1,7 @@
 package com.itranswarp.util;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Arrays;
 import java.util.function.Predicate;
 
@@ -30,5 +31,14 @@ public class ClassPathUtil {
 	static String resolveBasePackage(String basePackage) {
 		Environment env = new StandardEnvironment();
 		return ClassUtils.convertClassNameToResourcePath(env.resolveRequiredPlaceholders(basePackage));
+	}
+
+	public static String readFile(String classPathFile) throws IOException {
+		try (InputStream input = ClassPathUtil.class.getResourceAsStream(classPathFile)) {
+			if (input == null) {
+				throw new IOException("Classpath file not found: " + classPathFile);
+			}
+			return IOUtil.readAsString(input);
+		}
 	}
 }

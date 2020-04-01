@@ -1,5 +1,7 @@
 package com.itranswarp.redis;
 
+import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -15,10 +17,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.itranswarp.util.ClassPathUtil;
 import com.itranswarp.util.JsonUtil;
 
 import io.lettuce.core.KeyValue;
 import io.lettuce.core.RedisClient;
+import io.lettuce.core.ScriptOutputType;
 import io.lettuce.core.api.StatefulRedisConnection;
 import io.lettuce.core.api.async.RedisAsyncCommands;
 import io.lettuce.core.api.sync.RedisCommands;
@@ -188,9 +192,41 @@ public class RedisService {
 		});
 	}
 
+	/**
+	 * Load Lua script from classpath file and return SHA as string.
+	 *
+	 * @param classpathFile Script path.
+	 * @return SHA as string.
+	 */
+	public String loadScriptFromClassPath(String classpathFile) {
+		String sha = executeSync(commands -> {
+			try {
+				return commands.scriptLoad(ClassPathUtil.readFile(classpathFile));
+			} catch (IOException e) {
+				throw new UncheckedIOException("load file from classpath failed: " + classpathFile, e);
+			}
+		});
+		if (logger.isInfoEnabled()) {
+			logger.info("loaded script {} from {}.", sha, classpathFile);
+		}
+		return sha;
+	}
+
 	public CompletableFuture<Long> hincrbyAsync(String key, Object field) {
 		return executeAsync(commands -> {
 			return commands.hincrby(key, field.toString(), 1).toCompletableFuture();
+		});
+	}
+
+	public Number executeScriptReturnInt(String sha, String[] keys) {
+		return executeSync(commands -> {
+			return commands.evalsha(sha, ScriptOutputType.INTEGER, keys);
+		});
+	}
+
+	public Number executeScriptReturnInt(String sha, String[] keys, String[] values) {
+		return executeSync(commands -> {
+			return commands.evalsha(sha, ScriptOutputType.INTEGER, keys, values);
 		});
 	}
 

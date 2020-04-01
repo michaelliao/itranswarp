@@ -8,7 +8,7 @@ Full-featured CMS including blog, wiki, discussion, etc. powered by SpringBoot.
 * OAuth2 integration (weibo, QQ, facebook, etc.)
 * SEO support
 * REST API
-* customized css with uikit2
+* customized CSS with UIkit2
 
 ### Environment
 
@@ -44,7 +44,7 @@ $ mysql -u root -p it < release/init.sql
 ```
 
 ### Run
- 
+
 ```
 java -jar itranswarp.jar
 ```

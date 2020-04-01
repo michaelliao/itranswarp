@@ -15,8 +15,8 @@ import org.springframework.web.servlet.LocaleResolver;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.itranswarp.Application;
-import com.itranswarp.bean.SettingDefinition;
 import com.itranswarp.bean.setting.AbstractSettingBean;
+import com.itranswarp.bean.setting.SettingDefinition;
 import com.itranswarp.common.ApiException;
 import com.itranswarp.enums.ApiError;
 import com.itranswarp.enums.Role;

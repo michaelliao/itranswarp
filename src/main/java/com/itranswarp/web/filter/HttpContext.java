@@ -45,10 +45,12 @@ public class HttpContext implements AutoCloseable {
 		return CONTEXT_THREAD_LOCAL.get();
 	}
 
+	@SuppressWarnings("resource")
 	public static long getTimestamp() {
 		return CONTEXT_THREAD_LOCAL.get().timestamp;
 	}
 
+	@SuppressWarnings("resource")
 	public static User getCurrentUser() {
 		return CONTEXT_THREAD_LOCAL.get().user;
 	}

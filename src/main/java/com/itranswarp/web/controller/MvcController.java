@@ -401,7 +401,7 @@ public class MvcController extends AbstractController {
 		}
 		String cookieStr = CookieUtil.encodeSessionCookie(auth, encryptService.getSessionHmacKey());
 		CookieUtil.setSessionCookie(request, response, cookieStr, (int) authentication.getExpires().toSeconds());
-		return "redirect:" + HttpUtil.getReferer(request);
+		return "redirect:/";
 	}
 
 	@GetMapping("/auth/signout")

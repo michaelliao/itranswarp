@@ -6,7 +6,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import com.itranswarp.oauth.OAuthAuthentication;
-import com.itranswarp.oauth.provider.WeiboOAuthProvider;
 import com.itranswarp.oauth.provider.WeiboOAuthProvider.OAuthConfiguration;
 import com.itranswarp.util.JsonUtil;
 

@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import com.itranswarp.bean.Website;
+import com.itranswarp.bean.setting.Website;
 import com.itranswarp.enums.RefType;
 import com.itranswarp.enums.ResourceEncoding;
 import com.itranswarp.enums.Role;

@@ -32,6 +32,9 @@ public class BoardService extends AbstractService<Board> {
 	@Autowired
 	Markdown markdown;
 
+	@Autowired
+	AntiSpamService antiSpamService;
+
 	static final String KEY_BOARDS = "__boards__";
 	static final String KEY_TOPICS_FIRST_PAGE = "__topics__";
 	static final String KEY_RECENT_TOPICS = "__recent_topics__";
@@ -216,6 +219,9 @@ public class BoardService extends AbstractService<Board> {
 	@Transactional
 	public Topic createTopic(User user, Board board, TopicBean bean) {
 		bean.validate(true);
+		if (this.antiSpamService.isSpam(bean.name) || this.antiSpamService.isSpam(bean.content)) {
+			throw new ApiException(ApiError.SECURITY_ANTI_SPAM, "content", "Spam detected.");
+		}
 		Topic topic = new Topic();
 		topic.boardId = board.id;
 		topic.content = markdown.ugcToHtml(bean.content, AbstractEntity.TEXT);
@@ -259,6 +265,9 @@ public class BoardService extends AbstractService<Board> {
 	@Transactional
 	public Reply createReply(User user, Topic topic, ReplyBean bean) {
 		bean.validate(true);
+		if (this.antiSpamService.isSpam(bean.content)) {
+			throw new ApiException(ApiError.SECURITY_ANTI_SPAM, "content", "Spam detected.");
+		}
 		Reply reply = new Reply();
 		reply.userId = user.id;
 		reply.userName = user.name;

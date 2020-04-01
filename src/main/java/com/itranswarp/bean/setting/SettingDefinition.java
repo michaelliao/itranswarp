@@ -1,4 +1,4 @@
-package com.itranswarp.bean;
+package com.itranswarp.bean.setting;
 
 import com.itranswarp.anno.SettingInput;
 import com.itranswarp.enums.InputType;

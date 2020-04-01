@@ -15,8 +15,8 @@ import org.springframework.web.servlet.LocaleResolver;
 import org.springframework.web.servlet.ModelAndView;
 
 import com.itranswarp.Application;
-import com.itranswarp.bean.AbstractSettingBean;
 import com.itranswarp.bean.SettingDefinition;
+import com.itranswarp.bean.setting.AbstractSettingBean;
 import com.itranswarp.common.ApiException;
 import com.itranswarp.enums.ApiError;
 import com.itranswarp.enums.Role;
@@ -192,7 +192,7 @@ public class ManageController extends AbstractController {
 
 	@GetMapping("/setting/{group}")
 	public ModelAndView setting(@PathVariable("group") String group) {
-		final List<String> tabs = List.of("website", "snippet", "follow");
+		final List<String> tabs = List.of("website", "snippet", "follow", "security");
 		AbstractSettingBean settings = null;
 		String tab = null;
 		switch (group) {
@@ -207,6 +207,10 @@ public class ManageController extends AbstractController {
 		case "follow":
 			tab = "follow";
 			settings = this.settingService.getFollow();
+			break;
+		case "security":
+			tab = "security";
+			settings = this.settingService.getSecurity();
 			break;
 		default:
 			throw new ApiException(ApiError.PARAMETER_INVALID, "group", "Invalid group name: " + group);

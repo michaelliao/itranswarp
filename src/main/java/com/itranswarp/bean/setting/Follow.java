@@ -1,4 +1,4 @@
-package com.itranswarp.bean;
+package com.itranswarp.bean.setting;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;

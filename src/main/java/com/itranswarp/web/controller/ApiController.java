@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -19,17 +20,18 @@ import com.itranswarp.bean.ArticleBean;
 import com.itranswarp.bean.AttachmentBean;
 import com.itranswarp.bean.BoardBean;
 import com.itranswarp.bean.CategoryBean;
-import com.itranswarp.bean.Follow;
 import com.itranswarp.bean.NavigationBean;
 import com.itranswarp.bean.ReplyBean;
 import com.itranswarp.bean.SinglePageBean;
-import com.itranswarp.bean.Snippet;
 import com.itranswarp.bean.SortBean;
 import com.itranswarp.bean.TopicBean;
-import com.itranswarp.bean.Website;
 import com.itranswarp.bean.WikiBean;
 import com.itranswarp.bean.WikiPageBean;
 import com.itranswarp.bean.WikiPageMoveBean;
+import com.itranswarp.bean.setting.Follow;
+import com.itranswarp.bean.setting.Security;
+import com.itranswarp.bean.setting.Snippet;
+import com.itranswarp.bean.setting.Website;
 import com.itranswarp.common.ApiException;
 import com.itranswarp.enums.ApiError;
 import com.itranswarp.enums.RefType;
@@ -56,6 +58,9 @@ import com.itranswarp.web.support.RoleWith;
 
 @RestController
 public class ApiController extends AbstractController {
+
+	@Value("${spring.security.anti-spam.lock-days:3650}")
+	int lockDaysForSpam = 0;
 
 	///////////////////////////////////////////////////////////////////////////////////////////////
 	// ad
@@ -408,7 +413,15 @@ public class ApiController extends AbstractController {
 	public Reply replyCreate(@PathVariable("id") long id, @RequestBody ReplyBean bean) {
 		User user = HttpContext.getRequiredCurrentUser();
 		Topic topic = this.boardService.getTopicById(id);
-		Reply reply = this.boardService.createReply(user, topic, bean);
+		Reply reply = null;
+		try {
+			reply = this.boardService.createReply(user, topic, bean);
+		} catch (ApiException e) {
+			if (e.error == ApiError.SECURITY_ANTI_SPAM && lockDaysForSpam > 0) {
+				this.userService.lockUser(user, lockDaysForSpam);
+			}
+			throw e;
+		}
 		this.boardService.deleteBoardFromCache(topic.boardId);
 		this.boardService.deleteTopicsFromCache(topic.boardId);
 		return reply;
@@ -443,6 +456,14 @@ public class ApiController extends AbstractController {
 	public Map<String, Boolean> settingFollowUpdate(@RequestBody Follow bean) {
 		this.settingService.setFollow(bean);
 		this.settingService.deleteFollowFromCache();
+		return API_RESULT_TRUE;
+	}
+
+	@PostMapping("/api/setting/security")
+	public Map<String, Boolean> settingSecurityUpdate(@RequestBody Security bean) {
+		this.settingService.setSecurity(bean);
+		this.settingService.deleteSecurityFromCache();
+		super.antiSpamService.setSpamKeywords(bean.getSpamKeywordsAsList());
 		return API_RESULT_TRUE;
 	}
 
@@ -525,7 +546,16 @@ public class ApiController extends AbstractController {
 		default:
 			throw new ApiException(ApiError.PARAMETER_INVALID, "refType", "Unsupported refType: " + bean.refType);
 		}
-		Topic topic = this.boardService.createTopic(HttpContext.getRequiredCurrentUser(), board, bean);
+		Topic topic = null;
+		User user = HttpContext.getRequiredCurrentUser();
+		try {
+			topic = this.boardService.createTopic(user, board, bean);
+		} catch (ApiException e) {
+			if (e.error == ApiError.SECURITY_ANTI_SPAM && lockDaysForSpam > 0) {
+				this.userService.lockUser(user, lockDaysForSpam);
+			}
+			throw e;
+		}
 		this.boardService.deleteBoardFromCache(topic.boardId);
 		this.boardService.deleteTopicsFromCache(topic.boardId);
 		return topic;
@@ -556,7 +586,16 @@ public class ApiController extends AbstractController {
 		default:
 			throw new ApiException(ApiError.PARAMETER_INVALID, "refType", "Unsupported refType: " + bean.refType);
 		}
-		Topic topic = this.boardService.createTopic(HttpContext.getRequiredCurrentUser(), board, bean);
+		Topic topic = null;
+		User user = HttpContext.getRequiredCurrentUser();
+		try {
+			topic = this.boardService.createTopic(user, board, bean);
+		} catch (ApiException e) {
+			if (e.error == ApiError.SECURITY_ANTI_SPAM && lockDaysForSpam > 0) {
+				this.userService.lockUser(user, lockDaysForSpam);
+			}
+			throw e;
+		}
 		this.boardService.deleteBoardFromCache(topic.boardId);
 		this.boardService.deleteTopicsFromCache(topic.boardId);
 		return topic;

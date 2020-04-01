@@ -1,4 +1,4 @@
-package com.itranswarp.bean;
+package com.itranswarp.bean.setting;
 
 import com.itranswarp.anno.SettingInput;
 import com.itranswarp.enums.InputType;
@@ -19,6 +19,9 @@ public class Website extends AbstractSettingBean {
 
 	@SettingInput(value = InputType.TEXT, order = 5, description = "XML namespace")
 	public String xmlns;
+
+	@SettingInput(value = InputType.TEXT, order = 6, description = "Copyright")
+	public String copyright;
 
 	@SettingInput(value = InputType.TEXTAREA, order = 6, description = "Custom header")
 	public String customHeader;

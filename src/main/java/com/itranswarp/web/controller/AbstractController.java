@@ -5,6 +5,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.itranswarp.service.AdService;
+import com.itranswarp.service.AntiSpamService;
 import com.itranswarp.service.ArticleService;
 import com.itranswarp.service.AttachmentService;
 import com.itranswarp.service.BoardService;
@@ -55,5 +56,8 @@ public abstract class AbstractController {
 
 	@Autowired
 	protected WikiService wikiService;
+
+	@Autowired
+	protected AntiSpamService antiSpamService;
 
 }

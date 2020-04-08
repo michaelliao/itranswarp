@@ -60,7 +60,6 @@ public class ApiFilterRegistrationBean extends FilterRegistrationBean<Filter> {
 			} else {
 				httpResponse.setStatus(HttpServletResponse.SC_BAD_REQUEST);
 				httpResponse.setContentType("application/json");
-				@SuppressWarnings("resource")
 				PrintWriter pw = httpResponse.getWriter();
 				pw.write(JsonUtil.writeJson(e.toMap()));
 				pw.flush();

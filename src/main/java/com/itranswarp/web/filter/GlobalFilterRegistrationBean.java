@@ -86,17 +86,18 @@ public class GlobalFilterRegistrationBean extends FilterRegistrationBean<Filter>
 			HttpServletResponse response = (HttpServletResponse) resp;
 			request.setCharacterEncoding("UTF-8");
 			response.setHeader("X-Server-ID", serverId);
+			final String ip = HttpUtil.getIPAddress(request);
 			// check rate limit but except static file:
 			String path = request.getRequestURI();
 			if (!path.startsWith("/static/") && !path.startsWith("/files/")) {
-				String ip = HttpUtil.getIPAddress(request);
 				int remaining = rateLimiter.getRateLimit("www", ip, rateLimit, rateLimitBurst);
 				response.setIntHeader("X-RateLimit-Limit", rateLimit);
-				response.setIntHeader("X-RateLimit-Remaining", remaining);
 				if (remaining <= 0) {
+					response.setIntHeader("X-RateLimit-Remaining", 0);
 					response.setStatus(rateLimitErrorCode);
 					return;
 				}
+				response.setIntHeader("X-RateLimit-Remaining", remaining - 1);
 			}
 			User user = null;
 			String cookieStr = CookieUtil.findSessionCookie(request);
@@ -137,7 +138,7 @@ public class GlobalFilterRegistrationBean extends FilterRegistrationBean<Filter>
 					return;
 				}
 			}
-			try (HttpContext context = new HttpContext(user, request, response)) {
+			try (HttpContext context = new HttpContext(user, request, response, ip)) {
 				chain.doFilter(req, resp);
 			}
 		}

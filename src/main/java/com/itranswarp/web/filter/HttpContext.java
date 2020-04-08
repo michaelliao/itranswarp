@@ -26,8 +26,9 @@ public class HttpContext implements AutoCloseable {
 	public final String host;
 	public final String path;
 	public final String url;
+	public final String ip;
 
-	HttpContext(User user, HttpServletRequest request, HttpServletResponse response) {
+	HttpContext(User user, HttpServletRequest request, HttpServletResponse response, String ip) {
 		this.user = user;
 		this.timestamp = System.currentTimeMillis();
 		this.request = request;
@@ -37,6 +38,7 @@ public class HttpContext implements AutoCloseable {
 		this.path = request.getRequestURI();
 		String query = request.getQueryString();
 		this.url = this.scheme + "://" + this.host + this.path + (query == null ? "" : "?" + query);
+		this.ip = ip;
 		logger.info("process new http context: {} {}...", request.getMethod(), this.url);
 		CONTEXT_THREAD_LOCAL.set(this);
 	}

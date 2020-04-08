@@ -1,5 +1,9 @@
 package com.itranswarp.markdown;
 
+import java.io.IOException;
+import java.io.Reader;
+import java.io.StringReader;
+import java.io.UncheckedIOException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -7,6 +11,9 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.annotation.PostConstruct;
+import javax.swing.text.html.HTML.Tag;
+import javax.swing.text.html.HTMLEditorKit.ParserCallback;
+import javax.swing.text.html.parser.ParserDelegator;
 
 import org.commonmark.Extension;
 import org.commonmark.ext.gfm.strikethrough.StrikethroughExtension;
@@ -54,11 +61,36 @@ public class Markdown {
 		this.parser = Parser.builder().extensions(extensionList).build();
 
 		this.sysRenderer = HtmlRenderer.builder().extensions(extensionList)
-				.nodeRendererFactory(context -> new CustomImageNodeRenderer(context, loadingUrl))
-				.nodeRendererFactory(context -> new CustomLinkNodeRenderer(context, patternLinkRenderers)).build();
+				.nodeRendererFactory(context -> new CustomImageHtmlNodeRenderer(context, loadingUrl))
+				.nodeRendererFactory(context -> new CustomLinkHtmlNodeRenderer(context, patternLinkRenderers)).build();
 
 		this.ugcRenderer = HtmlRenderer.builder().extensions(extensionList).escapeHtml(true)
 				.nodeRendererFactory(context -> new SafeLinkNodeRenderer(context)).build();
+	}
+
+	public String toText(String md) {
+		Node document = this.parser.parse(md);
+		String html = this.sysRenderer.render(document);
+		ParserDelegator parser = new ParserDelegator();
+		StringBuilder sb = new StringBuilder(md.length());
+		try (Reader reader = new StringReader(html)) {
+			parser.parse(reader, new ParserCallback() {
+				@Override
+				public void handleText(char[] data, int pos) {
+					sb.append(data);
+				}
+
+				@Override
+				public void handleEndTag(Tag t, int pos) {
+					if (t.breaksFlow()) {
+						sb.append('\n');
+					}
+				}
+			}, true);
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
+		}
+		return sb.toString().strip();
 	}
 
 	public String toHtml(String md) {
@@ -81,13 +113,13 @@ public class Markdown {
 
 }
 
-class CustomImageNodeRenderer implements NodeRenderer {
+class CustomImageHtmlNodeRenderer implements NodeRenderer {
 
 	private final HtmlNodeRendererContext context;
 	private final HtmlWriter html;
 	private final String loadingUrl;
 
-	CustomImageNodeRenderer(HtmlNodeRendererContext context, String loadingUrl) {
+	CustomImageHtmlNodeRenderer(HtmlNodeRendererContext context, String loadingUrl) {
 		this.context = context;
 		this.html = context.getWriter();
 		this.loadingUrl = loadingUrl;
@@ -121,13 +153,13 @@ class CustomImageNodeRenderer implements NodeRenderer {
  * 
  * @author liaoxuefeng
  */
-class CustomLinkNodeRenderer implements NodeRenderer {
+class CustomLinkHtmlNodeRenderer implements NodeRenderer {
 
 	private final List<PatternLinkRenderer> patternLinkRenderers;
 	private final HtmlNodeRendererContext context;
 	private final HtmlWriter html;
 
-	CustomLinkNodeRenderer(HtmlNodeRendererContext context, List<PatternLinkRenderer> patternLinkRenderers) {
+	CustomLinkHtmlNodeRenderer(HtmlNodeRendererContext context, List<PatternLinkRenderer> patternLinkRenderers) {
 		this.patternLinkRenderers = patternLinkRenderers;
 		this.context = context;
 		this.html = context.getWriter();

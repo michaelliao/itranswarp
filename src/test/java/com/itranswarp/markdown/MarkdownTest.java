@@ -85,6 +85,62 @@ public class MarkdownTest {
 				+ "</tbody>\n" //
 				+ "</table>\n";
 		assertEquals(html, markdown.toHtml(md));
+		// script:
+		assertEquals("<script>\nalert('hello');\n</script>\n", markdown.toHtml("<script>\nalert('hello');\n</script>"));
+	}
+
+	@Test
+	void testToText() {
+		// em:
+		assertEquals("This is Sparta", markdown.toText("This is *Sparta*"));
+		// strong:
+		assertEquals("This is Sparta", markdown.toText("This is **Sparta**"));
+		// code:
+		assertEquals("This is Sparta", markdown.toText("This is `Sparta`"));
+		// code:
+		assertEquals("This is`Sparta", markdown.toText("This ``is`Sparta``"));
+		// multiline:
+		assertEquals("This is Sparta", markdown.toText("This is\nSparta"));
+		// multiline:
+		assertEquals("This is\nSparta", markdown.toText("This is\n\nSparta"));
+		// line:
+		assertEquals("This is\nSparta", markdown.toText("This is\n\n---\n\nSparta"));
+		// quote:
+		assertEquals("This is Sparta", markdown.toText("> This is *Sparta*"));
+		// h1:
+		assertEquals("This is Sparta", markdown.toText("# This is Sparta"));
+		// h2:
+		assertEquals("This is Sparta", markdown.toText("## This is Sparta"));
+		// h3:
+		assertEquals("This is Sparta", markdown.toText("### This is Sparta"));
+		// h4:
+		assertEquals("This is Sparta", markdown.toText("#### This is Sparta"));
+		// h5:
+		assertEquals("This is Sparta", markdown.toText("##### This is Sparta"));
+		// h6:
+		assertEquals("This is Sparta", markdown.toText("###### This is Sparta"));
+		// code:
+		assertEquals("This is Sparta", markdown.toText("    This is Sparta"));
+		// code:
+		assertEquals("int a = x < 1 || x > 3 ? a & b: 0;",
+				markdown.toText("```java\nint a = x < 1 || x > 3 ? a & b: 0;\n```"));
+		// a:
+		assertEquals("This is Sparta", markdown.toText("This is [Sparta](https://www.example.com/test?a=1&b=2)"));
+		// img:
+		assertEquals("This is", markdown.toText("This is ![Sparta](https://www.example.com/test.jpg)"));
+		// del:
+		assertEquals("This is Sparta", markdown.toText("This is ~~Sparta~~"));
+		// html:
+		assertEquals("Hello", markdown.toText("<p style=\"width:100px\">Hello</p>"));
+		// table:
+		String md = "| ID | city   |    zip |\n" //
+				+ "|----|:--------:|-------:|\n" //
+				+ "| 1  |  Beijing | 100101 |\n" //
+				+ "| 2  | Shanghai | 200258 |\n" //
+				+ "| 3  |  Tianjin | 300688 |\n";
+		assertEquals("ID\ncity\nzip\n1\nBeijing\n100101\n2\nShanghai\n200258\n3\nTianjin\n300688", markdown.toText(md));
+		// script:
+		assertEquals("", markdown.toText("<script>\nalert('hello');\n</script>"));
 	}
 
 	@Test
@@ -133,8 +189,9 @@ public class MarkdownTest {
 				markdown.ugcToHtml("This is [Sparta](https://www.example.com/test?a=1&b=2)"));
 		assertEquals("<p>&lt;script&gt;alert('hi');&lt;/script&gt;</p>\n",
 				markdown.ugcToHtml("<script>alert('hi');</script>"));
-		assertEquals(
-				"<p>This is <a rel=\"nofollow\" href=\"javascript:void(0)\" target=\"_blank\">Sparta</a></p>\n",
+		assertEquals("<p>This is <a rel=\"nofollow\" href=\"javascript:void(0)\" target=\"_blank\">Sparta</a></p>\n",
 				markdown.ugcToHtml("This is [Sparta](javascript:alert('hi'))"));
+		assertEquals("<p>&lt;script&gt;\nalert('hello');\n&lt;/script&gt;</p>\n",
+				markdown.ugcToHtml("<script>\nalert('hello');\n</script>"));
 	}
 }

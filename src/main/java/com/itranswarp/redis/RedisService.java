@@ -52,7 +52,6 @@ public class RedisService {
 	}
 
 	public void subscribe(String channel, Consumer<String> listener) {
-		@SuppressWarnings("resource")
 		StatefulRedisPubSubConnection<String, String> conn = this.redisClient.connectPubSub();
 		conn.addListener(new RedisPubSubAdapter<String, String>() {
 			@Override

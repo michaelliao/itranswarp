@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.LocaleResolver;
@@ -22,6 +23,8 @@ import com.itranswarp.enums.ApiError;
 import com.itranswarp.enums.Role;
 import com.itranswarp.markdown.Markdown;
 import com.itranswarp.model.User;
+import com.itranswarp.redis.RedisService;
+import com.itranswarp.search.AbstractSearcher;
 import com.itranswarp.web.filter.HttpContext;
 import com.itranswarp.web.view.i18n.Translators;
 
@@ -43,6 +46,12 @@ public class ManageController extends AbstractController {
 
 	@Autowired
 	Markdown markdown;
+
+	@Autowired
+	RedisService redisService;
+
+	@Autowired(required = false)
+	AbstractSearcher searcher;
 
 	@GetMapping("/")
 	public ModelAndView index() {
@@ -269,6 +278,21 @@ public class ManageController extends AbstractController {
 	public ModelAndView wikipageUpdate(@RequestParam("id") long id) {
 		return prepareModelAndView("manage/wiki/wikipage_form.html",
 				Map.of("id", id, "action", "/api/wikiPages/" + id));
+	}
+
+	///////////////////////////////////////////////////////////////////////////////////////////////
+	// search
+	///////////////////////////////////////////////////////////////////////////////////////////////
+
+	@GetMapping("/search/")
+	public ModelAndView searchStatus() {
+		return prepareModelAndView("manage/search/search_status.html", Map.of("searchEnabled", searcher != null,
+				"searchEngineName", searcher == null ? "None" : searcher.getEngineName()));
+	}
+
+	@PostMapping("/search/reindex")
+	public ModelAndView searchReindex() {
+		return prepareModelAndView("manage/search/search_reindex.html");
 	}
 
 	///////////////////////////////////////////////////////////////////////////////////////////////

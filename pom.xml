@@ -34,6 +34,7 @@
 		<commonmark.version>0.12.1</commonmark.version>
 		<commons-validator.version>1.6</commons-validator.version>
 		<lesscss.version>1.7.0.1.1</lesscss.version>
+		<lucene.version>8.5.0</lucene.version>
 		<pebble.version>3.1.2</pebble.version>
 		<warpdb.version>5.0.0</warpdb.version>
 	</properties>
@@ -103,6 +104,28 @@
 			<groupId>com.itranswarp</groupId>
 			<artifactId>warpdb</artifactId>
 			<version>${warpdb.version}</version>
+		</dependency>
+
+		<!-- lucene -->
+		<dependency>
+			<groupId>org.apache.lucene</groupId>
+			<artifactId>lucene-core</artifactId>
+			<version>${lucene.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.lucene</groupId>
+			<artifactId>lucene-queries</artifactId>
+			<version>${lucene.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.lucene</groupId>
+			<artifactId>lucene-queryparser</artifactId>
+			<version>${lucene.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.lucene</groupId>
+			<artifactId>lucene-highlighter</artifactId>
+			<version>${lucene.version}</version>
 		</dependency>
 
 		<!-- junit5 -->

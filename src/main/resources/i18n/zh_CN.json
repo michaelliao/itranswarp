@@ -2,6 +2,9 @@
 
     "__name__": "简体中文",
 
+    "~search-not-found-error": "很抱歉，未找到相关结果。",
+    "~search-not-found-message": "请检查输入字词有无错误，或者尝试使用其他关键字再搜索。",
+
     "Action": "操作",
     "Active": "正常",
     "AD": "广告",

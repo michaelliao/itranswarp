@@ -4,6 +4,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import com.itranswarp.redis.RedisService;
+import com.itranswarp.search.AbstractSearcher;
 import com.itranswarp.service.AdService;
 import com.itranswarp.service.AntiSpamService;
 import com.itranswarp.service.ArticleService;
@@ -26,6 +28,9 @@ public abstract class AbstractController {
 
 	@Autowired
 	protected EncryptService encryptService;
+
+	@Autowired
+	protected RedisService redisService;
 
 	@Autowired
 	protected AdService adService;
@@ -60,4 +65,6 @@ public abstract class AbstractController {
 	@Autowired
 	protected AntiSpamService antiSpamService;
 
+	@Autowired(required = false)
+	protected AbstractSearcher searcher;
 }

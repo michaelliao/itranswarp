@@ -26,8 +26,7 @@ public class Translators {
 
 	final Logger logger = LoggerFactory.getLogger(getClass());
 
-	final Translator DEFAULT = new DefaultTranslator();
-
+	Translator defaultTranslator;
 	Map<String, Translator> translators;
 	List<Language> languages;
 
@@ -37,6 +36,7 @@ public class Translators {
 		this.languages = list.stream().map(t -> new Language(t.getDisplayName(), t.getLocaleName()))
 				.collect(Collectors.toList());
 		this.translators = list.stream().collect(Collectors.toMap(Translator::getLocaleName, t -> t));
+		this.defaultTranslator = this.translators.getOrDefault("en", new DefaultTranslator());
 	}
 
 	public Translator getTranslator(Locale locale) {
@@ -52,7 +52,7 @@ public class Translators {
 			t = this.translators.get(l);
 		}
 		if (t == null) {
-			t = DEFAULT;
+			t = defaultTranslator;
 		}
 		return t;
 	}
@@ -84,7 +84,6 @@ public class Translators {
 			}
 		}
 		Collections.sort(translators, (t1, t2) -> t1.getLocaleName().compareTo(t2.getLocaleName()));
-		translators.add(0, DEFAULT);
 		return translators;
 	}
 

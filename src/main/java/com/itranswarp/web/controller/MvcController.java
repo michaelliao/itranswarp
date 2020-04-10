@@ -46,6 +46,8 @@ import com.itranswarp.model.WikiPage;
 import com.itranswarp.oauth.OAuthAuthentication;
 import com.itranswarp.oauth.OAuthProviders;
 import com.itranswarp.oauth.provider.AbstractOAuthProvider;
+import com.itranswarp.search.AbstractSearcher;
+import com.itranswarp.search.SearchableDocument;
 import com.itranswarp.service.ViewService;
 import com.itranswarp.util.CookieUtil;
 import com.itranswarp.util.HashUtil;
@@ -86,6 +88,9 @@ public class MvcController extends AbstractController {
 	@Autowired
 	ViewService viewService;
 
+	@Autowired(required = false)
+	AbstractSearcher searcher;
+
 	///////////////////////////////////////////////////////////////////////////////////////////////
 	// index
 	///////////////////////////////////////////////////////////////////////////////////////////////
@@ -109,6 +114,21 @@ public class MvcController extends AbstractController {
 		}
 		this.localeResolver.setLocale(request, response, new Locale(language, country));
 		return "redirect:" + HttpUtil.getReferer(request);
+	}
+
+	@GetMapping("/search")
+	public ModelAndView search(@RequestParam(value = "q", defaultValue = "") String q,
+			@RequestParam(value = "page", defaultValue = "1") int page, HttpServletResponse response) throws Exception {
+		if (this.searcher == null) {
+			response.sendError(HttpServletResponse.SC_NOT_FOUND);
+			return null;
+		}
+		q = q.strip();
+		PagedResults<SearchableDocument> pr = this.searcher.search(q, page);
+		if (pr == null) {
+			return prepareModelAndView("search.html");
+		}
+		return prepareModelAndView("search.html", Map.of("q", q, "page", pr.page, "results", pr.results));
 	}
 
 	@GetMapping("/ref/{refType}/" + ID)

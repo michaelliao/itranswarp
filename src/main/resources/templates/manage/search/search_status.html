@@ -1,0 +1,76 @@
+{% extends '../_manage.html' %}
+
+{% block title %} {{ _('Search Status') }} {% endblock %}
+
+{% block head %}
+<script>
+
+$(function () {
+	$('#btnReindex').click(function () {
+		UIkit.modal.confirm('Are you sure you want to reindex all documents?', function () {
+			var modal = UIkit.modal('#modalIndexing', {bgclose: false, keyboard: false});
+			modal.show();
+			postJSON('/api/search/reindex', {}, function (err, resp) {
+				modal.hide();
+				if (err) {
+					return showError(err);
+				}
+			});
+		});
+	});
+});
+
+</script>
+{% endblock %}
+
+{% block main %}
+
+	<div id="modalIndexing" class="uk-modal">
+		<div class="uk-modal-dialog">
+			<p><i class="uk-icon-spinner uk-icon-spin"></i> Indexing... Please wait...</p>
+		</div>
+	</div>
+
+    <div class="uk-width-1-1">
+
+        <h3>Search</h3>
+
+        <p>Search Engine: {{ searchEngineName }}</p>
+
+    {% if searchEnabled %}
+
+        <form method="get" target="_blank" action="/search" class="uk-form uk-form-stacked uk-margin">
+            <legend>Search</legend>
+            <fieldset>
+                <div class="uk-form-row">
+                    <label class="uk-form-label">{{ _('Keyword') }}:</label>
+                    <div class="uk-form-controls">
+						<div class="uk-form-icon">
+							<i class="uk-icon-search"></i>
+							<input name="q" type="text" maxlength="50" class="uk-form-width-large" placeholder="keyword">
+						</div>
+                    </div>
+                </div>
+                <div class="uk-form-row">
+                    <div class="uk-form-controls">
+						<button type="submit" class="uk-button uk-button-primary">Search</button>
+                    </div>
+                </div>
+            </fieldset>
+        </form>
+
+		<div class="uk-alert uk-alert-danger">
+			<h3>DANGER ZONE</h3>
+			<p>You can reindex all documents. Please clean the search index before reindex.</p>
+	    	<p><button id="btnReindex" class="uk-button uk-button-danger">Reindex All Documents</button></p>
+	    </div>
+
+    {% else %}
+
+    	<p>Search engine must be configured in <code>application.yml</code>.</p>
+
+    {% endif %}
+
+    </div>
+
+{% endblock %}

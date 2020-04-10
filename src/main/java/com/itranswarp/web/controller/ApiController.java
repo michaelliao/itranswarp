@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -57,6 +58,7 @@ import com.itranswarp.web.filter.HttpContext;
 import com.itranswarp.web.support.RoleWith;
 
 @RestController
+@RequestMapping("/api")
 public class ApiController extends AbstractController {
 
 	@Value("${spring.security.anti-spam.lock-days:3650}")
@@ -66,13 +68,13 @@ public class ApiController extends AbstractController {
 	// ad
 	///////////////////////////////////////////////////////////////////////////////////////////////
 
-	@GetMapping("/api/adSlots")
+	@GetMapping("/adSlots")
 	@RoleWith(Role.ADMIN)
 	public Map<String, List<AdSlot>> adSlotList() {
 		return Map.of(RESULTS, this.adService.getAdSlots());
 	}
 
-	@PostMapping("/api/adSlots")
+	@PostMapping("/adSlots")
 	@RoleWith(Role.ADMIN)
 	public AdSlot adSlotCreate(@RequestBody AdSlotBean bean) {
 		AdSlot as = this.adService.createAdSlot(bean);
@@ -80,13 +82,13 @@ public class ApiController extends AbstractController {
 		return as;
 	}
 
-	@GetMapping("/api/adSlots/" + ID)
+	@GetMapping("/adSlots/" + ID)
 	@RoleWith(Role.ADMIN)
 	public AdSlot adSlot(@PathVariable("id") long id) {
 		return this.adService.getById(id);
 	}
 
-	@PostMapping("/api/adSlots/" + ID)
+	@PostMapping("/adSlots/" + ID)
 	@RoleWith(Role.ADMIN)
 	public AdSlot adSlotUpdate(@PathVariable("id") long id, @RequestBody AdSlotBean bean) {
 		AdSlot as = this.adService.updateAdSlot(id, bean);
@@ -94,7 +96,7 @@ public class ApiController extends AbstractController {
 		return as;
 	}
 
-	@PostMapping("/api/adSlots/" + ID + "/delete")
+	@PostMapping("/adSlots/" + ID + "/delete")
 	@RoleWith(Role.ADMIN)
 	public Map<String, Boolean> adSlotDelete(@PathVariable("id") long id) {
 		this.adService.deleteAdSlot(id);
@@ -102,19 +104,19 @@ public class ApiController extends AbstractController {
 		return API_RESULT_TRUE;
 	}
 
-	@GetMapping("/api/adPeriods")
+	@GetMapping("/adPeriods")
 	@RoleWith(Role.ADMIN)
 	public Map<String, List<AdPeriod>> adPeriodList() {
 		return Map.of(RESULTS, this.adService.getAdPeriods());
 	}
 
-	@GetMapping("/api/adPeriods/" + ID)
+	@GetMapping("/adPeriods/" + ID)
 	@RoleWith(Role.ADMIN)
 	public AdPeriod adPeriodGet(@PathVariable("id") long id) {
 		return this.adService.getAdPeriodById(id);
 	}
 
-	@PostMapping("/api/adPeriods")
+	@PostMapping("/adPeriods")
 	@RoleWith(Role.ADMIN)
 	public AdPeriod adPeriodCreate(@RequestBody AdPeriodBean bean) {
 		AdPeriod ap = this.adService.createAdPeriod(bean);
@@ -122,7 +124,7 @@ public class ApiController extends AbstractController {
 		return ap;
 	}
 
-	@PostMapping("/api/adPeriods/" + ID)
+	@PostMapping("/adPeriods/" + ID)
 	@RoleWith(Role.ADMIN)
 	public AdPeriod adPeriodUpdate(@PathVariable("id") long id, @RequestBody AdPeriodBean bean) {
 		AdPeriod ap = this.adService.updateAdPeriod(id, bean);
@@ -130,7 +132,7 @@ public class ApiController extends AbstractController {
 		return ap;
 	}
 
-	@PostMapping("/api/adPeriods/" + ID + "/delete")
+	@PostMapping("/adPeriods/" + ID + "/delete")
 	@RoleWith(Role.ADMIN)
 	public Map<String, Boolean> adPeriodDelete(@PathVariable("id") long id) {
 		this.adService.deleteAdPeriod(id);
@@ -138,13 +140,13 @@ public class ApiController extends AbstractController {
 		return API_RESULT_TRUE;
 	}
 
-	@GetMapping("/api/adMaterials")
+	@GetMapping("/adMaterials")
 	@RoleWith(Role.ADMIN)
 	public PagedResults<AdMaterial> adMaterialList(@RequestParam(value = "page", defaultValue = "1") int pageIndex) {
 		return this.adService.getAdMaterials(pageIndex);
 	}
 
-	@PostMapping("/api/adPeriods/" + ID + "/adMaterials")
+	@PostMapping("/adPeriods/" + ID + "/adMaterials")
 	@RoleWith(Role.SPONSOR)
 	public AdMaterial adMaterialCreate(@PathVariable("id") long id, @RequestBody AdMaterialBean bean) {
 		User user = HttpContext.getRequiredCurrentUser();
@@ -157,7 +159,7 @@ public class ApiController extends AbstractController {
 		return am;
 	}
 
-	@PostMapping("/api/adMaterials/" + ID + "/delete")
+	@PostMapping("/adMaterials/" + ID + "/delete")
 	@RoleWith(Role.SPONSOR)
 	public Map<String, Boolean> adMaterialDelete(@PathVariable("id") long id) {
 		User user = HttpContext.getRequiredCurrentUser();
@@ -170,7 +172,7 @@ public class ApiController extends AbstractController {
 	// article
 	///////////////////////////////////////////////////////////////////////////////////////////////
 
-	@GetMapping("/api/articles/" + ID)
+	@GetMapping("/articles/" + ID)
 	@RoleWith(Role.CONTRIBUTOR)
 	public ArticleWithContent article(@PathVariable("id") long id) {
 		Article article = this.articleService.getById(id);
@@ -178,13 +180,13 @@ public class ApiController extends AbstractController {
 		return new ArticleWithContent(article, content);
 	}
 
-	@GetMapping("/api/articles")
+	@GetMapping("/articles")
 	@RoleWith(Role.CONTRIBUTOR)
 	public PagedResults<Article> articles(@RequestParam(value = "page", defaultValue = "1") int pageIndex) {
 		return this.articleService.getArticles(pageIndex);
 	}
 
-	@PostMapping("/api/articles")
+	@PostMapping("/articles")
 	@RoleWith(Role.CONTRIBUTOR)
 	public Article articleCreate(@RequestBody ArticleBean bean) {
 		Article article = this.articleService.createArticle(HttpContext.getRequiredCurrentUser(), bean);
@@ -192,7 +194,7 @@ public class ApiController extends AbstractController {
 		return article;
 	}
 
-	@PostMapping("/api/articles/" + ID)
+	@PostMapping("/articles/" + ID)
 	@RoleWith(Role.CONTRIBUTOR)
 	public Article articleUpdate(@PathVariable("id") long id, @RequestBody ArticleBean bean) {
 		Article article = this.articleService.updateArticle(HttpContext.getRequiredCurrentUser(), id, bean);
@@ -200,7 +202,7 @@ public class ApiController extends AbstractController {
 		return article;
 	}
 
-	@PostMapping("/api/articles/" + ID + "/delete")
+	@PostMapping("/articles/" + ID + "/delete")
 	@RoleWith(Role.CONTRIBUTOR)
 	public Map<String, Boolean> articleDelete(@PathVariable("id") long id) {
 		Article article = this.articleService.deleteArticle(HttpContext.getRequiredCurrentUser(), id);
@@ -212,25 +214,25 @@ public class ApiController extends AbstractController {
 	// attachment
 	///////////////////////////////////////////////////////////////////////////////////////////////
 
-	@GetMapping("/api/attachments")
+	@GetMapping("/attachments")
 	@RoleWith(Role.CONTRIBUTOR)
 	public PagedResults<Attachment> attachments(@RequestParam(value = "page", defaultValue = "1") int pageIndex) {
 		return this.attachmentService.getAttachments(pageIndex);
 	}
 
-	@GetMapping("/api/attachments/" + ID)
+	@GetMapping("/attachments/" + ID)
 	@RoleWith(Role.SPONSOR)
 	public Attachment attachment(@PathVariable("id") long id) {
 		return this.attachmentService.getById(id);
 	}
 
-	@PostMapping("/api/attachments")
+	@PostMapping("/attachments")
 	@RoleWith(Role.SPONSOR)
 	public Attachment attachmentCreate(@RequestBody AttachmentBean bean) {
 		return this.attachmentService.createAttachment(HttpContext.getRequiredCurrentUser(), bean);
 	}
 
-	@PostMapping("/api/attachments/" + ID + "/delete")
+	@PostMapping("/attachments/" + ID + "/delete")
 	@RoleWith(Role.SPONSOR)
 	public Map<String, Boolean> attachmentDelete(@PathVariable("id") long id) {
 		this.attachmentService.deleteAttachment(HttpContext.getRequiredCurrentUser(), id);
@@ -241,19 +243,19 @@ public class ApiController extends AbstractController {
 	// board
 	///////////////////////////////////////////////////////////////////////////////////////////////
 
-	@GetMapping("/api/boards")
+	@GetMapping("/boards")
 	@RoleWith(Role.CONTRIBUTOR)
 	public Map<String, List<Board>> boards() {
 		return Map.of(RESULTS, this.boardService.getBoards());
 	}
 
-	@GetMapping("/api/boards/" + ID)
+	@GetMapping("/boards/" + ID)
 	@RoleWith(Role.CONTRIBUTOR)
 	public Board board(@PathVariable("id") long id) {
 		return this.boardService.getById(id);
 	}
 
-	@PostMapping("/api/boards/sort")
+	@PostMapping("/boards/sort")
 	@RoleWith(Role.ADMIN)
 	public Map<String, Boolean> boardsSort(@RequestBody SortBean bean) {
 		this.boardService.sortBoards(bean.ids);
@@ -261,7 +263,7 @@ public class ApiController extends AbstractController {
 		return API_RESULT_TRUE;
 	}
 
-	@PostMapping("/api/boards")
+	@PostMapping("/boards")
 	@RoleWith(Role.ADMIN)
 	public Board boardCreate(@RequestBody BoardBean bean) {
 		Board board = this.boardService.createBoard(bean);
@@ -269,7 +271,7 @@ public class ApiController extends AbstractController {
 		return board;
 	}
 
-	@PostMapping("/api/boards/" + ID)
+	@PostMapping("/boards/" + ID)
 	@RoleWith(Role.ADMIN)
 	public Board boardUpdate(@PathVariable("id") long id, @RequestBody BoardBean bean) {
 		Board board = this.boardService.updateBoard(id, bean);
@@ -277,7 +279,7 @@ public class ApiController extends AbstractController {
 		return board;
 	}
 
-	@PostMapping("/api/boards/" + ID + "/delete")
+	@PostMapping("/boards/" + ID + "/delete")
 	@RoleWith(Role.ADMIN)
 	public Map<String, Boolean> boardDelete(@PathVariable("id") long id) {
 		this.boardService.deleteBoard(id);
@@ -290,19 +292,19 @@ public class ApiController extends AbstractController {
 	// category
 	///////////////////////////////////////////////////////////////////////////////////////////////
 
-	@GetMapping("/api/categories")
+	@GetMapping("/categories")
 	@RoleWith(Role.CONTRIBUTOR)
 	public Map<String, List<Category>> categories() {
 		return Map.of(RESULTS, this.articleService.getCategories());
 	}
 
-	@GetMapping("/api/categories/" + ID)
+	@GetMapping("/categories/" + ID)
 	@RoleWith(Role.CONTRIBUTOR)
 	public Category category(@PathVariable("id") long id) {
 		return this.articleService.getCategoryById(id);
 	}
 
-	@PostMapping("/api/categories/sort")
+	@PostMapping("/categories/sort")
 	@RoleWith(Role.ADMIN)
 	public Map<String, Boolean> categoriesSort(@RequestBody SortBean bean) {
 		this.articleService.sortCategories(bean.ids);
@@ -310,13 +312,13 @@ public class ApiController extends AbstractController {
 		return API_RESULT_TRUE;
 	}
 
-	@PostMapping("/api/categories")
+	@PostMapping("/categories")
 	@RoleWith(Role.ADMIN)
 	public Category categoryCreate(@RequestBody CategoryBean bean) {
 		return this.articleService.createCategory(bean);
 	}
 
-	@PostMapping("/api/categories/" + ID)
+	@PostMapping("/categories/" + ID)
 	@RoleWith(Role.ADMIN)
 	public Category categoryUpdate(@PathVariable("id") long id, @RequestBody CategoryBean bean) {
 		Category category = this.articleService.updateCategory(id, bean);
@@ -324,7 +326,7 @@ public class ApiController extends AbstractController {
 		return category;
 	}
 
-	@PostMapping("/api/categories/" + ID + "/delete")
+	@PostMapping("/categories/" + ID + "/delete")
 	@RoleWith(Role.ADMIN)
 	public Map<String, Boolean> categoryDelete(@PathVariable("id") long id) {
 		this.articleService.deleteCategory(id);
@@ -336,19 +338,19 @@ public class ApiController extends AbstractController {
 	// navigation
 	///////////////////////////////////////////////////////////////////////////////////////////////
 
-	@GetMapping("/api/navigations")
+	@GetMapping("/navigations")
 	@RoleWith(Role.CONTRIBUTOR)
 	public Map<String, List<Navigation>> navigations() {
 		return Map.of(RESULTS, this.navigationService.getNavigations());
 	}
 
-	@GetMapping("/api/navigations/" + ID)
+	@GetMapping("/navigations/" + ID)
 	@RoleWith(Role.CONTRIBUTOR)
 	public Navigation navigationGet(@PathVariable("id") long id) {
 		return this.navigationService.getById(id);
 	}
 
-	@GetMapping("/api/navigations/urls")
+	@GetMapping("/navigations/urls")
 	@RoleWith(Role.CONTRIBUTOR)
 	public Map<String, List<NavigationMenu>> navigationUrls() {
 		List<NavigationMenu> list = new ArrayList<>();
@@ -366,7 +368,7 @@ public class ApiController extends AbstractController {
 		return Map.of(RESULTS, list);
 	}
 
-	@PostMapping("/api/navigations")
+	@PostMapping("/navigations")
 	@RoleWith(Role.ADMIN)
 	public Navigation navigationCreate(@RequestBody NavigationBean bean) {
 		Navigation nav = this.navigationService.createNavigation(bean);
@@ -374,7 +376,7 @@ public class ApiController extends AbstractController {
 		return nav;
 	}
 
-	@PostMapping("/api/navigations/" + ID + "/delete")
+	@PostMapping("/navigations/" + ID + "/delete")
 	@RoleWith(Role.ADMIN)
 	public Map<String, Boolean> navigationDelete(@PathVariable("id") long id) {
 		this.navigationService.deleteNavigation(id);
@@ -382,7 +384,7 @@ public class ApiController extends AbstractController {
 		return API_RESULT_TRUE;
 	}
 
-	@PostMapping("/api/navigations/sort")
+	@PostMapping("/navigations/sort")
 	@RoleWith(Role.ADMIN)
 	public Map<String, Boolean> navigationsSort(@RequestBody SortBean bean) {
 		this.navigationService.sortNavigations(bean.ids);
@@ -390,7 +392,7 @@ public class ApiController extends AbstractController {
 		return API_RESULT_TRUE;
 	}
 
-	@PostMapping("/api/navigations/" + ID)
+	@PostMapping("/navigations/" + ID)
 	@RoleWith(Role.ADMIN)
 	public Navigation navigationUpdate(@PathVariable("id") long id, @RequestBody NavigationBean bean) {
 		Navigation navigation = this.navigationService.updateNavigation(id, bean);
@@ -399,16 +401,65 @@ public class ApiController extends AbstractController {
 	}
 
 	///////////////////////////////////////////////////////////////////////////////////////////////
+	// search
+	///////////////////////////////////////////////////////////////////////////////////////////////
+
+	private String KEY_REINDEX_STATUS = "__reindex_status__";
+	private String KEY_REINDEX_PROGRESS = "__reindex_progress__";
+
+	@PostMapping("/search/reindex")
+	@RoleWith(Role.ADMIN)
+	public Map<String, Boolean> searchReindex() throws Exception {
+		if (this.redisService.get(KEY_REINDEX_STATUS) != null) {
+			throw new ApiException(ApiError.OPERATION_FAILED, "reindex", "Reindex is in progress...");
+		}
+		searchReindexAsync();
+		return API_RESULT_TRUE;
+	}
+
+	private void searchReindexAsync() throws Exception {
+		logger.warn("START reindex all documents...");
+		int indexedDocuments = 0;
+		this.redisService.set(KEY_REINDEX_PROGRESS, indexedDocuments);
+		this.redisService.set(KEY_REINDEX_STATUS, "indexing");
+		try {
+			logger.warn("reindex all articles...");
+			for (int i = 1; i < 100000; i++) {
+				PagedResults<Article> pr = this.articleService.getArticles(i);
+				if (pr.results.isEmpty()) {
+					break;
+				}
+				this.searcher.indexArticles(pr.results.stream().toArray(Article[]::new));
+				indexedDocuments += pr.results.size();
+				this.redisService.set(KEY_REINDEX_PROGRESS, indexedDocuments);
+			}
+			logger.warn("END reindex all documents.");
+		} finally {
+			this.redisService.del(KEY_REINDEX_STATUS);
+		}
+	}
+
+	@GetMapping("/search/reindex")
+	@RoleWith(Role.ADMIN)
+	public Map<String, Object> searchReindexStatus() {
+		if (this.redisService.get(KEY_REINDEX_STATUS) == null) {
+			return Map.of("process", Boolean.FALSE);
+		}
+		var n = this.redisService.get(KEY_REINDEX_PROGRESS, Integer.class);
+		return Map.of("process", Boolean.TRUE, "progress", n);
+	}
+
+	///////////////////////////////////////////////////////////////////////////////////////////////
 	// reply
 	///////////////////////////////////////////////////////////////////////////////////////////////
 
-	@GetMapping("/api/replies")
+	@GetMapping("/replies")
 	@RoleWith(Role.CONTRIBUTOR)
 	public PagedResults<Reply> replyList(@RequestParam(value = "page", defaultValue = "1") int pageIndex) {
 		return this.boardService.getReplies(pageIndex);
 	}
 
-	@PostMapping("/api/topics/" + ID + "/replies")
+	@PostMapping("/topics/" + ID + "/replies")
 	@RoleWith(Role.SUBSCRIBER)
 	public Reply replyCreate(@PathVariable("id") long id, @RequestBody ReplyBean bean) {
 		User user = HttpContext.getRequiredCurrentUser();
@@ -427,7 +478,7 @@ public class ApiController extends AbstractController {
 		return reply;
 	}
 
-	@PostMapping("/api/replies/" + ID + "/delete")
+	@PostMapping("/replies/" + ID + "/delete")
 	@RoleWith(Role.EDITOR)
 	public Map<String, Boolean> replyDelete(@PathVariable("id") long id) {
 		this.boardService.deleteReply(HttpContext.getRequiredCurrentUser(), id);
@@ -438,28 +489,28 @@ public class ApiController extends AbstractController {
 	// settings
 	///////////////////////////////////////////////////////////////////////////////////////////////
 
-	@PostMapping("/api/setting/website")
+	@PostMapping("/setting/website")
 	public Map<String, Boolean> settingWebsiteUpdate(@RequestBody Website bean) {
 		this.settingService.setWebsite(bean);
 		this.settingService.deleteWebsiteFromCache();
 		return API_RESULT_TRUE;
 	}
 
-	@PostMapping("/api/setting/snippet")
+	@PostMapping("/setting/snippet")
 	public Map<String, Boolean> settingSnippetUpdate(@RequestBody Snippet bean) {
 		this.settingService.setSnippet(bean);
 		this.settingService.deleteSnippetFromCache();
 		return API_RESULT_TRUE;
 	}
 
-	@PostMapping("/api/setting/follow")
+	@PostMapping("/setting/follow")
 	public Map<String, Boolean> settingFollowUpdate(@RequestBody Follow bean) {
 		this.settingService.setFollow(bean);
 		this.settingService.deleteFollowFromCache();
 		return API_RESULT_TRUE;
 	}
 
-	@PostMapping("/api/setting/security")
+	@PostMapping("/setting/security")
 	public Map<String, Boolean> settingSecurityUpdate(@RequestBody Security bean) {
 		this.settingService.setSecurity(bean);
 		this.settingService.deleteSecurityFromCache();
@@ -471,13 +522,13 @@ public class ApiController extends AbstractController {
 	// single page
 	///////////////////////////////////////////////////////////////////////////////////////////////
 
-	@GetMapping("/api/singlePages")
+	@GetMapping("/singlePages")
 	@RoleWith(Role.CONTRIBUTOR)
 	public Map<String, List<SinglePage>> singlePages() {
 		return Map.of(RESULTS, this.singlePageService.getAll());
 	}
 
-	@GetMapping("/api/singlePages/" + ID)
+	@GetMapping("/singlePages/" + ID)
 	@RoleWith(Role.CONTRIBUTOR)
 	public SinglePageWithContent singlePage(@PathVariable("id") long id) {
 		SinglePage sp = this.singlePageService.getById(id);
@@ -485,13 +536,13 @@ public class ApiController extends AbstractController {
 		return new SinglePageWithContent(sp, content);
 	}
 
-	@PostMapping("/api/singlePages")
+	@PostMapping("/singlePages")
 	@RoleWith(Role.ADMIN)
 	public SinglePage singlePageCreate(@RequestBody SinglePageBean bean) {
 		return this.singlePageService.createSinglePage(bean);
 	}
 
-	@PostMapping("/api/singlePages/" + ID)
+	@PostMapping("/singlePages/" + ID)
 	@RoleWith(Role.ADMIN)
 	public SinglePage singlePageUpdate(@PathVariable("id") long id, @RequestBody SinglePageBean bean) {
 		SinglePage sp = this.singlePageService.updateSinglePage(id, bean);
@@ -499,7 +550,7 @@ public class ApiController extends AbstractController {
 		return sp;
 	}
 
-	@PostMapping("/api/singlePages/" + ID + "/delete")
+	@PostMapping("/singlePages/" + ID + "/delete")
 	@RoleWith(Role.ADMIN)
 	public Map<String, Boolean> singlePageDelete(@PathVariable("id") long id) {
 		this.singlePageService.deleteSinglePage(id);
@@ -511,18 +562,18 @@ public class ApiController extends AbstractController {
 	// topic
 	///////////////////////////////////////////////////////////////////////////////////////////////
 
-	@GetMapping("/api/topics")
+	@GetMapping("/topics")
 	@RoleWith(Role.CONTRIBUTOR)
 	public PagedResults<Topic> topics(@RequestParam(value = "page", defaultValue = "1") int pageIndex) {
 		return this.boardService.getTopics(pageIndex);
 	}
 
-	@GetMapping("/api/ref/" + ID + "/topics")
+	@GetMapping("/ref/" + ID + "/topics")
 	public Map<String, List<TopicWithReplies>> topicsByRefId(@PathVariable("id") long refId) {
 		return Map.of(RESULTS, this.boardService.getTopicsByRefId(refId));
 	}
 
-	@PostMapping("/api/comments/{tag}")
+	@PostMapping("/comments/{tag}")
 	@RoleWith(Role.SUBSCRIBER)
 	public Topic topicCreateByRefType(@PathVariable("tag") String tag, @RequestBody TopicBean bean) {
 		Board board = this.boardService.getBoardByTagFromCache(tag);
@@ -561,7 +612,7 @@ public class ApiController extends AbstractController {
 		return topic;
 	}
 
-	@PostMapping("/api/boards/" + ID + "/topics")
+	@PostMapping("/boards/" + ID + "/topics")
 	@RoleWith(Role.SUBSCRIBER)
 	public Topic topicCreate(@PathVariable("id") long id, @RequestBody TopicBean bean) {
 		Board board = this.boardService.getBoardFromCache(id);
@@ -601,7 +652,7 @@ public class ApiController extends AbstractController {
 		return topic;
 	}
 
-	@PostMapping("/api/topics/" + ID + "/delete")
+	@PostMapping("/topics/" + ID + "/delete")
 	@RoleWith(Role.EDITOR)
 	public Map<String, Boolean> topicDelete(@PathVariable("id") long id) {
 		Topic topic = this.boardService.deleteTopic(HttpContext.getRequiredCurrentUser(), id);
@@ -614,7 +665,7 @@ public class ApiController extends AbstractController {
 	// user
 	///////////////////////////////////////////////////////////////////////////////////////////////
 
-	@GetMapping("/api/users")
+	@GetMapping("/users")
 	@RoleWith(Role.CONTRIBUTOR)
 	public PagedResults<User> users(@RequestParam(value = "q", defaultValue = "") String q,
 			@RequestParam(value = "page", defaultValue = "1") int pageIndex) {
@@ -634,20 +685,20 @@ public class ApiController extends AbstractController {
 		return new PagedResults<>(new Page(1, users.size(), 1, users.size()), users);
 	}
 
-	@GetMapping("/api/users/ids")
+	@GetMapping("/users/ids")
 	@RoleWith(Role.CONTRIBUTOR)
 	public Map<Long, User> usersByIds(@RequestParam("id") long[] ids) {
 		List<User> users = this.userService.getUsersByIds(ids);
 		return users.stream().collect(Collectors.toMap(u -> u.id, u -> u));
 	}
 
-	@PostMapping("/api/users/" + ID + "/role/{role}")
+	@PostMapping("/users/" + ID + "/role/{role}")
 	@RoleWith(Role.ADMIN)
 	public User userUpdateRole(@PathVariable("id") long id, @PathVariable("role") Role role) {
 		return this.userService.updateUserRole(id, role);
 	}
 
-	@PostMapping("/api/users/" + ID + "/lock/{timestamp}")
+	@PostMapping("/users/" + ID + "/lock/{timestamp}")
 	@RoleWith(Role.ADMIN)
 	public User userUpdateLock(@PathVariable("id") long id, @PathVariable("timestamp") long timestamp) {
 		if (timestamp < 0) {
@@ -660,13 +711,13 @@ public class ApiController extends AbstractController {
 	// wiki and wiki page
 	///////////////////////////////////////////////////////////////////////////////////////////////
 
-	@GetMapping("/api/wikis")
+	@GetMapping("/wikis")
 	@RoleWith(Role.CONTRIBUTOR)
 	public Map<String, List<Wiki>> wikis() {
 		return Map.of(RESULTS, this.wikiService.getWikis());
 	}
 
-	@GetMapping("/api/wikis/" + ID)
+	@GetMapping("/wikis/" + ID)
 	@RoleWith(Role.CONTRIBUTOR)
 	public WikiWithContent wiki(@PathVariable("id") long id) {
 		Wiki wiki = this.wikiService.getById(id);
@@ -674,13 +725,13 @@ public class ApiController extends AbstractController {
 		return new WikiWithContent(wiki, content);
 	}
 
-	@GetMapping("/api/wikis/" + ID + "/tree")
+	@GetMapping("/wikis/" + ID + "/tree")
 	@RoleWith(Role.CONTRIBUTOR)
 	public Wiki wikiTree(@PathVariable("id") long id) {
 		return this.wikiService.getWikiTree(id);
 	}
 
-	@PostMapping("/api/wikis")
+	@PostMapping("/wikis")
 	@RoleWith(Role.EDITOR)
 	public Wiki wikiCreate(@RequestBody WikiBean bean) {
 		Wiki wiki = this.wikiService.createWiki(HttpContext.getRequiredCurrentUser(), bean);
@@ -688,7 +739,7 @@ public class ApiController extends AbstractController {
 		return wiki;
 	}
 
-	@PostMapping("/api/wikis/" + ID)
+	@PostMapping("/wikis/" + ID)
 	@RoleWith(Role.EDITOR)
 	public Wiki wikiUpdate(@PathVariable("id") long id, @RequestBody WikiBean bean) {
 		Wiki wiki = this.wikiService.updateWiki(HttpContext.getRequiredCurrentUser(), id, bean);
@@ -696,7 +747,7 @@ public class ApiController extends AbstractController {
 		return wiki;
 	}
 
-	@PostMapping("/api/wikis/" + ID + "/delete")
+	@PostMapping("/wikis/" + ID + "/delete")
 	@RoleWith(Role.EDITOR)
 	public Map<String, Boolean> wikiDelete(@PathVariable("id") long id) {
 		this.wikiService.deleteWiki(HttpContext.getRequiredCurrentUser(), id);
@@ -704,7 +755,7 @@ public class ApiController extends AbstractController {
 		return API_RESULT_TRUE;
 	}
 
-	@PostMapping("/api/wikis/" + ID + "/wikiPages")
+	@PostMapping("/wikis/" + ID + "/wikiPages")
 	@RoleWith(Role.EDITOR)
 	public WikiPage wikiPageCreate(@PathVariable("id") long id, @RequestBody WikiPageBean bean) {
 		Wiki wiki = this.wikiService.getById(id);
@@ -713,7 +764,7 @@ public class ApiController extends AbstractController {
 		return wikiPage;
 	}
 
-	@GetMapping("/api/wikiPages/" + ID)
+	@GetMapping("/wikiPages/" + ID)
 	@RoleWith(Role.EDITOR)
 	public WikiPageWithContent wikiPage(@PathVariable("id") long id) {
 		WikiPage wp = this.wikiService.getWikiPageById(id);
@@ -721,7 +772,7 @@ public class ApiController extends AbstractController {
 		return new WikiPageWithContent(wp, content);
 	}
 
-	@PostMapping("/api/wikiPages/" + ID)
+	@PostMapping("/wikiPages/" + ID)
 	@RoleWith(Role.EDITOR)
 	public WikiPage wikiPageUpdate(@PathVariable("id") long id, @RequestBody WikiPageBean bean) {
 		WikiPage wikiPage = this.wikiService.updateWikiPage(HttpContext.getRequiredCurrentUser(), id, bean);
@@ -729,7 +780,7 @@ public class ApiController extends AbstractController {
 		return wikiPage;
 	}
 
-	@PostMapping("/api/wikiPages/" + ID + "/move")
+	@PostMapping("/wikiPages/" + ID + "/move")
 	@RoleWith(Role.EDITOR)
 	public WikiPage wikiPageUpdate(@PathVariable("id") long wikiPageId, @RequestBody WikiPageMoveBean bean) {
 		bean.validate(true);
@@ -739,7 +790,7 @@ public class ApiController extends AbstractController {
 		return wikiPage;
 	}
 
-	@PostMapping("/api/wikiPages/" + ID + "/delete")
+	@PostMapping("/wikiPages/" + ID + "/delete")
 	@RoleWith(Role.EDITOR)
 	public Map<String, Boolean> wikiPageDelete(@PathVariable("id") long id) {
 		WikiPage wikiPage = this.wikiService.deleteWikiPage(HttpContext.getRequiredCurrentUser(), id);

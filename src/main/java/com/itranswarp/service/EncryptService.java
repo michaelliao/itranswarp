@@ -10,7 +10,7 @@ import com.itranswarp.util.HashUtil;
 @Component
 public class EncryptService {
 
-	@Value("${encrypt.key:ChangeTheKeyWhenDeployProduction}")
+	@Value("${spring.security.encrypt.key:ChangeTheKeyWhenDeployProduction}")
 	String encryptKey = "ChangeTheKeyWhenDeployProduction";
 
 	String sessionHmacKey;

@@ -1,13 +1,18 @@
 # configuration for itranswarp:
 
+# tomcat configuration:
+server:
+  port: ${SERVER_PORT:2019}
+
 spring:
   profiles:
     active: ${PROFILES:native}
   application:
     name: ${NAME:itranswarp}
-    # default to empty (using server default timezone)
+    # default to empty (use default timezone of server):
     timezone: ${TIMEZONE:}
-  # MySQL configuration:
+
+  # mysql configuration:
   datasource:
     url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:it}?useSSL=${DB_SSL:false}&characterEncoding=${DB_ENCODING:utf8}
     username: ${DB_USERNAME:root}
@@ -21,7 +26,8 @@ spring:
       max-lifetime: ${DB_MAX_LIFETIME:600000}
       maximum-pool-size: ${DB_POOL_SIZE:100}
       minimum-idle: ${DB_MIN_IDLE:1}
-  # Redis configuration:
+
+  # redis configuration:
   redis:
     standalone:
       host: ${REDIS_HOST:localhost}
@@ -29,18 +35,23 @@ spring:
       database: ${REDIS_DATABASE:0}
       password: ${REDIS_PASSWORD:}
       timeout: ${REDIS_TIMEOUT:1}
-  # Security configuration:
+
+  # security configuration:
   security:
+    encrypt:
+      key: ${ENCRYPT_KEY:ChangeTheKeyWhenDeployProduction}
+    # rate limit: how many requests per minute:
     rate-limit:
-      error-code: ${SECURITY_RATE_LIMIT_ERROR_CODE:429}
-      limit: ${SECURITY_RATE_LIMIT_LIMIT:5}
-      burst: ${SECURITY_RATE_LIMIT_BURST:10}
+      error-code: ${RATE_LIMIT_ERROR_CODE:429}
+      limit: ${RATE_LIMIT_LIMIT:3}
+      burst: ${RATE_LIMIT_BURST:10}
     anti-spam:
-      lock-days: ${SECURITY_ANTI_SPAM_LOCK_DAYS:3650}
-  # Markdown plugins:
+      lock-days: ${ANTI_SPAM_LOCK_DAYS:3650}
+
+  # markdown configurations:
   markdown:
     plugins:
-      # convert link to Bilibili video player, e.g. https://www.bilibili.com/video/av21322566
+      # convert link to Bilibili video player, e.g. https://www.bilibili.com/video/BV1XW411M7Gu
       bilibili:
         enabled: ${MARKDOWN_BILIBILI_ENABLED:true}
         width:   ${MARKDOWN_BILIBILI_WIDTH:100%}
@@ -61,13 +72,26 @@ spring:
         enabled: ${MARKDOWN_TRADING_VIEW_ENABLED:true}
         width:   ${MARKDOWN_TRADING_VIEW_WIDTH:100%}
         height:  ${MARKDOWN_TRADING_VIEW_HEIGHT:480px}
+
+  # search configurations:
+  search:
+    lucene:
+      enabled: ${LUCENE_ENABLED:false}
+      index-dir: ${LUCENE_INDEX_DIR:/var/search-index}
+    elastic:
+      enabled: ${ELASTIC_SEARCH_ENABLED:false}
+      url: ${ELASTIC_SEARCH_URL:http://localhost:9200/_search}
+
+  # 3rd-party signin configurations:
   signin:
     password:
+      # enable password signin:
       enabled: ${SIGNIN_PASSWORD_ENABLED:true}
-    # OAuth authentication configuration:
+    # oauth authentication configuration:
     # - name: display name
     # - icon: icon name, check https://getuikit.com/v2/docs/icon.html
     # - color: the button css background color, must be quoted by "".
+    # an oauth provider is enabled if client-id and client-secret are both set.
     oauth:
       facebook:
         name:          "${OAUTH_FACEBOOK_NAME:Facebook}"
@@ -124,8 +148,15 @@ spring:
         client-id:     "${OAUTH_YAHOO_CLIENT_ID:}"
         client-secret: "${OAUTH_YAHOO_CLIENT_SECRET:}"
 
-server:
-  port: ${SERVER_PORT:2019}
+  # external configuration:
+  external:
+    remote-code-runner:
+      enabled: ${REMOTE_CODE_RUNNER_ENABLED:false}
+      url: ${REMOTE_CODE_RUNNER_URL:http://localhost:8080/run}
+      languages: ${REMOTE_CODE_RUNNER_LANGUAGES:java,python}
+      wait: ${REMOTE_CODE_RUNNER_WAIT:15}
+      timeout: ${REMOTE_CODE_RUNNER_TIMEOUT:10}
+      max-concurrent: ${REMOTE_CODE_RUNNER_MAX_CONCURRENT:10}
 
-encrypt:
-  key: ${ENCRYPT_KEY:ChangeTheKeyWhenDeployProduction}
+# END
+    

@@ -6,7 +6,7 @@ function execute_html(tid, btn) {
 	w.document.close();
 }
 
-function execute_java(tid, btn) {
+function execute_remote(tid, btn, language) {
 	var
 		code = _mdGetCode(tid),
 		$button = $(btn),
@@ -14,21 +14,52 @@ function execute_java(tid, btn) {
 	$button.attr('disabled', 'disabled');
 	$i.addClass('uk-icon-spinner');
 	$i.addClass('uk-icon-spin');
-	$.post('https://local.liaoxuefeng.com:39193/run', $.param({
-		code: code
-	})).done(function (r) {
-		if (r.exitCode === 0) {
-			_mdShowCodeResult(btn, r.output);
+	var opt = {
+        type: 'post',
+        url: '/api/external/remoteCodeRun',
+        contentType: 'application/json',
+        dataType: 'json',
+        data: JSON.stringify({
+        	language: language,
+        	code: code
+        })
+    };
+    $.ajax(opt).done(function (r) {
+    	console.log('done:');
+    	console.log(r);
+        if (r.timeout) {
+			_mdShowCodeError(btn, '代码执行超时，请修复后等待60秒再执行。', false);
+		} else if (r.error) {
+			_mdShowCodeError(btn, r.output || '代码执行失败', false);
 		} else {
-			_mdShowCodeError(btn, r.output, false);
+			if (r.truncated) {
+				r.output = r.output + '\n...';
+			}
+			_mdShowCodeResult(btn, r.output, false);
 		}
-	}).fail(function (r) {
-		_mdShowCodeError(btn, '<p>无法连接到Java代码运行助手。请检查<a target="_blank" href="/wiki/001543970808338ad98bbeaa6fc405c8df49d6a015b6e67000/001543970112198a66c30326d4c4ba38684767edcc16912000">本机的设置</a>。</p>', true);
-	}).always(function () {
+    }).fail(function (jqXHR, textStatus) {
+    	console.log('fail:');
+    	console.log(jqXHR);
+    	if (jqXHR.status === 429 || (jqXHR.responseJSON && jqXHR.responseJSON.error === 'RATE_LIMIT')) {
+    		_mdShowCodeError(btn, '超出执行限额：请等待20秒后再试。', false);
+    	} else if (jqXHR.responseJSON) {
+			_mdShowCodeError(btn, jqXHR.responseJSON.output || jqXHR.responseJSON.message || jqXHR.responseJSON.error, false);
+    	} else {
+			_mdShowCodeError(btn, '远程代码执行服务暂时不可用，请稍后再试。', false);
+    	}
+    }).always(function () {
 		$i.removeClass('uk-icon-spinner');
 		$i.removeClass('uk-icon-spin');
 		$button.removeAttr('disabled');
-	});
+    });
+}
+
+function execute_java(tid, btn) {
+	execute_remote(tid, btn, 'java');
+}
+
+function execute_python(tid, btn) {
+	execute_remote(tid, btn, 'python');
 }
 
 function execute_javascript(tid, btn) {
@@ -148,27 +179,6 @@ function execute_sql(tid, btn) {
 			}
 		}
 	})();
-}
-
-function execute_python(tid, btn) {
-	var
-		code = _mdGetCode(tid),
-		$button = $(btn),
-		$i = $button.find('i');
-	$button.attr('disabled', 'disabled');
-	$i.addClass('uk-icon-spinner');
-	$i.addClass('uk-icon-spin');
-	$.post('https://local.liaoxuefeng.com:39093/run', $.param({
-		code: code
-	})).done(function (r) {
-		_mdShowCodeResult(btn, r.output);
-	}).fail(function (r) {
-		_mdShowCodeError(btn, '<p>无法连接到Python代码运行助手。请检查<a target="_blank" href="/wiki/0014316089557264a6b348958f449949df42a6d3a2e542c000/001432523496782e0946b0f454549c0888d05959b99860f000">本机的设置</a>。</p>', true);
-	}).always(function () {
-		$i.removeClass('uk-icon-spinner');
-		$i.removeClass('uk-icon-spin');
-		$button.removeAttr('disabled');
-	});
 }
 
 // init markdown table:

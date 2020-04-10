@@ -4,7 +4,7 @@
 export JAVA_HOME=`/usr/libexec/java_home -v 11`
 
 # maven build:
-mvn -DskipTests clean package
+./mvnw -DskipTests clean package
 
 cp target/itranswarp.jar release/
 
@@ -12,3 +12,5 @@ cp target/itranswarp.jar release/
 cd src/main/resources
 tar --exclude ".*" -czvf ../../../release/resources.tar.gz favicon.ico robots.txt static/
 cd ../../..
+
+echo "DONE"

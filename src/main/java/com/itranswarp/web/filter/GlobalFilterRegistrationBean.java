@@ -41,8 +41,8 @@ public class GlobalFilterRegistrationBean extends FilterRegistrationBean<Filter>
 	@Value("${spring.security.rate-limit.error-code:429}")
 	int rateLimitErrorCode = 429;
 
-	@Value("${spring.security.rate-limit.limit:5}")
-	int rateLimit = 5;
+	@Value("${spring.security.rate-limit.limit:3}")
+	int rateLimit = 3;
 
 	@Value("${spring.security.rate-limit.burst:10}")
 	int rateLimitBurst = 10;

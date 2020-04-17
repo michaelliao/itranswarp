@@ -190,12 +190,14 @@ function initTree() {
     $('#btn-add').click(function() {
         var $tree = $('#tree');
         var node = $tree.tree('getSelectedNode');
+        var now = Date.now();
+        var pub = node.publishAt <= now ? now + 3600000 : node.publishAt;
         UIkit.modal.prompt("{{ _('Name') }}:", "{{ _('New Wiki Page') }}", function (name) {
             postJSON('/api/wikis/' + g_wiki.id + '/wikiPages', {
                 parentId: node.id,
                 name: name,
-                content: 'New wiki page content',
-                publishAt: Date.now() + 3600000
+                publishAt: pub,
+                content: 'New wiki page content'
             }, function(err, result) {
                 if (err) {
                     showError(err);

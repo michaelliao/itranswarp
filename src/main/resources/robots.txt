@@ -1,3 +1,4 @@
 User-agent: *
 Disallow: /manage/
+Disallow: /search
 Disallow: /blog/

@@ -81,7 +81,7 @@ public class BilibiliLinkPlugin implements PatternLinkRenderer {
 		if (aid != null) {
 			src = "//player.bilibili.com/player.html?aid=" + aid;
 		} else {
-			src = "//player.bilibili.com/player.html?bvid=" + bvid;
+			src = "//player.bilibili.com/player.html?bvid=BV" + bvid;
 		}
 		// render as iframe:
 		Map<String, String> attrs = new LinkedHashMap<>();

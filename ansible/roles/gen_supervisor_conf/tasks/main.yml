@@ -14,9 +14,18 @@
     src: templates/supervisor.j2
     dest: /srv/itranswarp-{{ timestamp }}/supervisor.conf
 
-- name: make symbol link
+- name: make symbol link for ubuntu
   file:
-    src: /srv/itranswarp/supervisor.conf
+    src: /srv/itranswarp-{{ timestamp }}/supervisor.conf
     dest: /etc/supervisor/conf.d/itranswarp.conf
     state: link
     force: yes
+  when: dist == "ubuntu"
+
+- name: make symbol link for centos
+  file:
+    src: /srv/itranswarp-{{ timestamp }}/supervisor.conf
+    dest: /etc/supervisord.d/itranswarp.ini
+    state: link
+    force: yes
+  when: dist == "centos"

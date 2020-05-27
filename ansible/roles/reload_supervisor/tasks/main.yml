@@ -2,10 +2,17 @@
 
 ---
 
-- name: start supervisor if not running
+- name: start supervisor if not running for ubuntu
   service:
     name: supervisor
     state: started
+  when: dist == "ubuntu"
+
+- name: start supervisor if not running for centos
+  service:
+    name: supervisord
+    state: started
+  when: dist == "centos"
 
 - name: start service itranswarp
   supervisorctl:

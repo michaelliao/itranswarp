@@ -2,6 +2,36 @@
 
 ---
 
+# detect linux distribution:
+
+- name: detect linux distribution
+  debug: msg="ansible_distribution = {{ ansible_distribution }}"
+
+- name: detect linux distribution major version
+  debug: msg="ansible_distribution_major_version = {{ ansible_distribution_major_version }}"
+
+# init var dist:
+
+- name: try set var dist = ubuntu
+  set_fact: dist="ubuntu"
+  when:
+    - ansible_distribution == "Ubuntu"
+    - ansible_distribution_major_version == "18.04"
+
+- name: try set var dist = centos
+  set_fact: dist="centos"
+  when:
+    - ansible_distribution == "CentOS"
+    - ansible_distribution_major_version == "7" or ansible_distribution_major_version == "8"
+
+- name: check if linux distribution is supported
+  when: dist is undefined
+  fail:
+    msg: "The Linux distribution {{ ansible_distribution }} {{ ansible_distribution_major_version }} is not supported by this Ansible deployment script."
+
+- name: check and print global var "dist"
+  debug: msg="dist = {{ dist }}"
+
 # init var timestamp:
 
 - name: init var_timestamp by executing command

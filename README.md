@@ -90,7 +90,7 @@ The deploy script will do following:
 Support [.env.example](docker/.env.example) use local ip for test. 
 ```
 $ cd docker
-$ cp .env.example
+$ cp .env.example .env
 $ vim .env
 $ docker-compose up -d
 ```

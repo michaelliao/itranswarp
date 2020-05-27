@@ -80,7 +80,9 @@ spring:
       index-dir: ${LUCENE_INDEX_DIR:/var/search-index}
     elastic:
       enabled: ${ELASTIC_SEARCH_ENABLED:false}
-      url: ${ELASTIC_SEARCH_URL:http://localhost:9200/_search}
+      url: ${ELASTIC_SEARCH_URL:http://localhost:9200}
+      user: ${ELASTIC_SEARCH_USER:}
+      password: ${ELASTIC_SEARCH_PASSWORD:}
 
   # 3rd-party signin configurations:
   signin:

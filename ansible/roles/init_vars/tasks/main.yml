@@ -16,7 +16,7 @@
   set_fact: dist="ubuntu"
   when:
     - ansible_distribution == "Ubuntu"
-    - ansible_distribution_major_version == "18.04"
+    - ansible_distribution_major_version == "18"
 
 - name: try set var dist = centos
   set_fact: dist="centos"

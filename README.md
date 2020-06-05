@@ -64,7 +64,7 @@ Please check [application.yml](src/main/resources/application.yml) for environme
 
 ### Deploy
 
-iTranswarp is deployed by Ansible. Scripts is ready for Ubuntu Server 18.04 x64.
+iTranswarp is deployed by Ansible. Scripts is ready for Ubuntu Server 18.04 or CentOS 7/8.
 
 Deploy script:
 

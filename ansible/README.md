@@ -4,7 +4,7 @@
 
 OS:
 
-- Ubuntu Server 18.04 x64
+- Ubuntu Server 18.04 or CentOS 7/8
 - Python installed
 - SSH login enabled
 

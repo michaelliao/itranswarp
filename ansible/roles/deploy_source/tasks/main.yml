@@ -13,3 +13,10 @@
     dest: /srv/itranswarp-{{ timestamp }}/www
     owner: root
     group: root
+
+- name: copy additional static files
+  copy:
+    src: environments/{{ profile }}/www
+    dest: /srv/itranswarp-{{ timestamp }}
+    owner: root
+    group: root

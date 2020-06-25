@@ -3,7 +3,7 @@
 import os, sys, argparse, subprocess
 from os.path import expanduser
 
-basedir = os.path.join(os.path.dirname(os.path.abspath(__file__)))
+basedir = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'ansible')
 
 def run(cmd, cwd=None):
     if cwd is None:

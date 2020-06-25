@@ -156,7 +156,7 @@ $(function() {
 function initTree() {
     $('#tree').tree({
         data: [{'id': g_wiki.id, 'name': g_wiki.name, 'children': g_wiki.children}],
-        autoOpen: true,
+        autoOpen: false,
         dragAndDrop: true,
         onCreateLi: function(node, $li) {
         	var p = getPublishAt(node.id);

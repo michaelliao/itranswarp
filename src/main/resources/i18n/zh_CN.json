@@ -2,9 +2,6 @@
 
     "__name__": "简体中文",
 
-    "~search-not-found-error": "很抱歉，未找到相关结果。",
-    "~search-not-found-message": "请检查输入字词有无错误，或者尝试使用其他关键字再搜索。",
-
     "Action": "操作",
     "Active": "正常",
     "AD": "广告",
@@ -24,6 +21,7 @@
     "All Boards": "所有版块",
     "All Categories": "所有分类",
     "All Comments": "所有评论",
+    "All Links": "所有链接",
     "All Navigations": "所有导航",
     "All Pages": "所有页面",
     "All Replies": "所有回复",
@@ -85,10 +83,12 @@
     "Index": "目录",
     "Internal Server Error": "服务器内部错误",
 
+    "Keyword": "关键字",
     "Keywords": "关键字",
 
     "Last replied at": "最后回复于",
     "License": "使用许可",
+    "Links": "链接",
     "Loading": "正在加载",
 
     "Make a comment": "发表评论",
@@ -104,6 +104,7 @@
     "New Article": "新文章",
     "New Board": "新板块",
     "New Category": "新分类",
+    "New Link": "新链接",
     "New Navigation": "新导航",
     "New Single Page": "新页面",
     "New Topic": "新话题",
@@ -122,7 +123,7 @@
     "Pages": "页面",
     "Password": "口令",
     "Pending": "等待",
-    "Please sign in": "Please Sign In",
+    "Please sign in": "请登录",
     "Popular Articles": "热门推荐",
     "Post": "发布",
     "posted at": "发布于",
@@ -130,7 +131,7 @@
     "Previous Page": "上一页",
     "Price": "价格",
     "Profile": "个人资料",
-    "Publish At": "Publish at",
+    "Publish At": "发布于",
 
     "Read more": "继续阅读",
     "Reads": "阅读",
@@ -147,8 +148,10 @@
     "Save Orders": "保存顺序",
     "Search": "搜索",
     "Search result": "搜索结果",
+    "Search Status": "Search Status",
     "Setting": "设置",
     "Settings": "设置",
+    "Shorten URL": "短链接",
     "Sign In": "登录",
     "Sign in to make a comment": "登录后发表评论",
     "Sign in to make a reply": "登录后发表回复",
@@ -186,5 +189,8 @@
     "Width": "宽度",
     "Wiki": "维基",
     "Wiki Index": "维基目录",
-    "Wikis": "维基"
+    "Wikis": "维基",
+
+    "~search-not-found-error": "很抱歉，未找到相关结果。",
+    "~search-not-found-message": "请检查输入字词有无错误，或者尝试使用其他关键字再搜索。"
 }

@@ -170,6 +170,25 @@ public class ManageController extends AbstractController {
 	}
 
 	///////////////////////////////////////////////////////////////////////////////////////////////
+	// links
+	///////////////////////////////////////////////////////////////////////////////////////////////
+
+	@GetMapping("/link/")
+	public ModelAndView linkList() {
+		return prepareModelAndView("manage/link/link_list.html");
+	}
+
+	@GetMapping("/link/link_create")
+	public ModelAndView linkCreate() {
+		return prepareModelAndView("manage/link/link_form.html", Map.of("id", 0, "action", "/api/links"));
+	}
+
+	@GetMapping("/link/link_update")
+	public ModelAndView linkUpdate(@RequestParam("id") long id) {
+		return prepareModelAndView("manage/link/link_form.html", Map.of("id", id, "action", "/api/links/" + id));
+	}
+
+	///////////////////////////////////////////////////////////////////////////////////////////////
 	// navigations
 	///////////////////////////////////////////////////////////////////////////////////////////////
 

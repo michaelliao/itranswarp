@@ -36,7 +36,9 @@
 <head>
 	<meta charset="utf-8" />
 	<title>{% block title %} ??? {% endblock %} - {{ __website__.name }}</title>
+	{% if __scheme__ == 'https' %}
 	<meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
+	{% endif %}
 	<meta name="viewport" content="width=device-width" />
 	<meta name="keywords" content="{{ __website__.keywords }}" />
 	<meta name="description" content="{{ __website__.description }}" />

@@ -165,6 +165,16 @@ public class RedisService {
 		});
 	}
 
+	public void hsetAll(String key, Map<String, String> kv) {
+		executeSync(commands -> {
+			commands.del(key);
+			kv.forEach((k, v) -> {
+				commands.hset(key, k, v);
+			});
+			return null;
+		});
+	}
+
 	public Map<String, String> hgetAll(String key) {
 		return executeSync(commands -> {
 			return commands.hgetall(key);

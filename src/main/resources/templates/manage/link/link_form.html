@@ -1,0 +1,97 @@
+{% extends '../_manage.html' %}
+
+{% block title %} {{ form.name }} {% endblock %}
+
+{% block head %}
+
+<script>
+
+$(function() {
+	var id = parseInt('{{ id }}');
+	if (id > 0) {
+	    getJSON('/api/links/' + id, function (err, resp) {
+	        if (err) {
+	            return showError(err);
+		    }
+		    initVM({
+		        link: resp,
+		        title: 'Edit Link'
+	        });
+	    });
+	} else {
+		initVM({
+	        link: {},
+			title: 'New Link'
+		});
+	}
+});
+
+function initVM(data) {
+    window.vm = new Vue({
+        el: '#vm',
+        data: {
+        	title: data.title,
+            link: data.link
+        },
+        created: function () {
+            $('#loading').hide();
+            $('#vm').show();
+        },
+        methods: {
+            submit: function () {
+                var that = this;
+                that.$resource('{{ action }}').save(this.link).then(function (resp) {
+                    resp.json().then(function (result) {
+                        location.assign('/manage/link/');
+                    });
+                }, onJsonFormError);
+            }
+        }
+    });
+}
+</script>
+
+{% endblock %}
+
+{% block main %}
+
+    <div id="loading" class="uk-width-1-1">
+        <i class="uk-icon-spinner uk-icon-spin"></i> {{ _('Loading') }}...
+    </div>
+
+    <div id="vm" class="uk-width-1-1">
+        <ul class="uk-breadcrumb">
+            <li><a href="/manage/link/">{{ _('All Links') }}</a></li>
+            <li class="uk-active"><span v-text="title"></span></li>
+        </ul>
+
+        <form v-on:submit.prevent="submit" class="uk-form uk-form-stacked uk-margin">
+            <legend v-text="title"></legend>
+            <fieldset>
+                <div class="uk-alert uk-alert-danger uk-hidden"></div>
+
+                <div class="uk-form-row">
+                    <label class="uk-form-label">{{ _('Name') }}:</label>
+                    <div class="uk-form-controls">
+                        <input v-model="link.name" name="name" type="text" maxlength="100" class="uk-width-1-1" placeholder="name">
+                    </div>
+                </div>
+
+                <div class="uk-form-row">
+                    <label class="uk-form-label">{{ _('URL') }}:</label>
+                    <div class="uk-form-controls">
+                        <input v-model="link.url" name="url" type="text" maxlength="1000" class="uk-width-1-1" placeholder="https://">
+                    </div>
+                </div>
+
+                <div class="uk-form-row">
+                    <div class="uk-form-controls">
+                        <button type="submit" class="uk-button uk-button-primary"><i class="uk-icon-check"></i> Save</button>
+                        <button type="button" class="uk-button" onclick="location.assign('/manage/link/')"><i class="uk-icon-times"></i> Cancel</button>
+                    </div>
+                </div>
+            </fieldset>
+        </form>
+    </div>
+
+{% endblock %}

@@ -12,6 +12,7 @@ import com.itranswarp.service.ArticleService;
 import com.itranswarp.service.AttachmentService;
 import com.itranswarp.service.BoardService;
 import com.itranswarp.service.EncryptService;
+import com.itranswarp.service.LinkService;
 import com.itranswarp.service.NavigationService;
 import com.itranswarp.service.SettingService;
 import com.itranswarp.service.SinglePageService;
@@ -43,6 +44,9 @@ public abstract class AbstractController {
 
 	@Autowired
 	protected BoardService boardService;
+
+	@Autowired
+	protected LinkService linkService;
 
 	@Autowired
 	protected NavigationService navigationService;

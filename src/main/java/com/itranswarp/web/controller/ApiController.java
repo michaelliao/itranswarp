@@ -21,6 +21,7 @@ import com.itranswarp.bean.ArticleBean;
 import com.itranswarp.bean.AttachmentBean;
 import com.itranswarp.bean.BoardBean;
 import com.itranswarp.bean.CategoryBean;
+import com.itranswarp.bean.LinkBean;
 import com.itranswarp.bean.NavigationBean;
 import com.itranswarp.bean.ReplyBean;
 import com.itranswarp.bean.SinglePageBean;
@@ -44,6 +45,7 @@ import com.itranswarp.model.Article;
 import com.itranswarp.model.Attachment;
 import com.itranswarp.model.Board;
 import com.itranswarp.model.Category;
+import com.itranswarp.model.Link;
 import com.itranswarp.model.Navigation;
 import com.itranswarp.model.Reply;
 import com.itranswarp.model.SinglePage;
@@ -332,6 +334,46 @@ public class ApiController extends AbstractController {
 		this.articleService.deleteCategory(id);
 		this.articleService.deleteCategoryFromCache(id);
 		return API_RESULT_TRUE;
+	}
+
+	///////////////////////////////////////////////////////////////////////////////////////////////
+	// link
+	///////////////////////////////////////////////////////////////////////////////////////////////
+
+	@GetMapping("/links")
+	@RoleWith(Role.CONTRIBUTOR)
+	public Map<String, List<Link>> links() {
+		return Map.of(RESULTS, this.linkService.getLinks());
+	}
+
+	@GetMapping("/links/" + ID)
+	@RoleWith(Role.CONTRIBUTOR)
+	public Link linkGet(@PathVariable("id") long id) {
+		return this.linkService.getById(id);
+	}
+
+	@PostMapping("/links")
+	@RoleWith(Role.ADMIN)
+	public Link linkCreate(@RequestBody LinkBean bean) {
+		Link link = this.linkService.createLink(bean);
+		this.linkService.updateLinksCache();
+		return link;
+	}
+
+	@PostMapping("/links/" + ID + "/delete")
+	@RoleWith(Role.ADMIN)
+	public Map<String, Boolean> linkDelete(@PathVariable("id") long id) {
+		this.linkService.deleteLink(id);
+		this.linkService.updateLinksCache();
+		return API_RESULT_TRUE;
+	}
+
+	@PostMapping("/links/" + ID)
+	@RoleWith(Role.ADMIN)
+	public Link linkUpdate(@PathVariable("id") long id, @RequestBody LinkBean bean) {
+		Link link = this.linkService.updateLink(id, bean);
+		this.linkService.updateLinksCache();
+		return link;
 	}
 
 	///////////////////////////////////////////////////////////////////////////////////////////////

@@ -62,6 +62,18 @@ function execute_python(tid, btn) {
 	execute_remote(tid, btn, 'python');
 }
 
+function execute_scheme(tid, btn) {
+	execute_remote(tid, btn, 'scheme');
+}
+
+function execute_c(tid, btn) {
+	execute_remote(tid, btn, 'c');
+}
+
+function execute_lua(tid, btn) {
+	execute_remote(tid, btn, 'lua');
+}
+
 function execute_javascript(tid, btn) {
 	var code = _mdGetCode(tid);
 	(function () {

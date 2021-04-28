@@ -154,6 +154,7 @@ server {
 	ssl_certificate     /srv/itranswarp/ssl/static.{{ env.DOMAIN }}.crt;
 	ssl_certificate_key /srv/itranswarp/ssl/static.{{ env.DOMAIN }}.key;
 
+	root       /srv/itranswarp/www;
 	access_log /var/log/nginx/static_access.log access_format;
 	error_log  /var/log/nginx/static_error.log;
 
@@ -168,7 +169,8 @@ server {
 
 	location ~ /static/ {
 		if ($request_method ~* "(GET|POST)") {
-			add_header "Access-Control-Allow-Origin"  *;
+			add_header "Access-Control-Allow-Origin" "https://www.{{ env.DOMAIN }}";
+			expires 300d;
 		}
 
 		if ($request_method = OPTIONS ) {
@@ -178,25 +180,22 @@ server {
 			expires 300d;
 			return 200;
 		}
-
-		proxy_pass         https://source.{{ env.DOMAIN }};
-		proxy_read_timeout 5s;
 	}
 
 	location ~ /files/ {
-		if ($request_method ~* "(GET|POST)") {
-			add_header "Access-Control-Allow-Origin"  *;
-		}
+		add_header "Access-Control-Allow-Origin" "https://www.{{ env.DOMAIN }}";
 
-		if ($request_method = OPTIONS ) {
-			add_header "Access-Control-Allow-Origin"  "https://www.{{ env.DOMAIN }}";
-			add_header "Access-Control-Allow-Methods" "GET, POST, OPTIONS, HEAD";
-			add_header "Access-Control-Allow-Headers" "Authorization, Origin, X-Requested-With, Content-Type, Accept";
-			expires 300d;
-			return 200;
-		}
+		proxy_pass         http://itw_upstream;
+		proxy_set_header   Host $host;
+		proxy_set_header   X-Real-IP $remote_addr;
+		proxy_set_header   X-Forwarded-Proto $scheme;
+		proxy_set_header   X-Forwarded-For $proxy_add_x_forwarded_for;
+		proxy_read_timeout 3s;
 
-		proxy_pass         https://source.{{ env.DOMAIN }};
-		proxy_read_timeout 5s;
+		proxy_cache       itw_cache;
+		proxy_cache_key   $uri;
+		proxy_cache_valid 300d;
+
+		expires 300d;
 	}
 }

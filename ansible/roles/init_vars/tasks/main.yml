@@ -42,10 +42,10 @@
   set_fact:
     timestamp: "{{ var_timestamp.stdout }}"
 
-# calculate the maximum memory used by JVM: xmx = MAX(total * 0.75, total - 800MB)
+# calculate the maximum memory used by JVM: xmx = MAX(total * 0.7, total - 800MB)
 
 - name: init memory size
-  shell: grep MemTotal /proc/meminfo | awk '{x=int($2/1024*0.75);y=int($2/1024-800);print (x<y?y:x)}'
+  shell: grep MemTotal /proc/meminfo | awk '{x=int($2/1024*0.7);y=int($2/1024-800);print (x<y?y:x)}'
   register: var_xmx
 
 - name: set var "xmx"

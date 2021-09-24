@@ -33,10 +33,6 @@ public class SettingService extends AbstractService<Setting> {
 		this.redisService.hdel(KEY_SETTING, Follow.class.getSimpleName());
 	}
 
-	public void deleteSecurityFromCache() {
-		this.redisService.hdel(KEY_SETTING, Security.class.getSimpleName());
-	}
-
 	public Website getWebsiteFromCache() {
 		String group = Website.class.getSimpleName();
 		Website bean = this.redisService.hget(KEY_SETTING, group, Website.class);

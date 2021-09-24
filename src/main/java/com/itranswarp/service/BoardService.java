@@ -219,7 +219,7 @@ public class BoardService extends AbstractService<Board> {
 	@Transactional
 	public Topic createTopic(User user, Board board, TopicBean bean) {
 		bean.validate(true);
-		if (this.antiSpamService.isSpam(bean.name) || this.antiSpamService.isSpam(bean.content)) {
+		if (this.antiSpamService.isSpamText(bean.name) || this.antiSpamService.isSpamText(bean.content)) {
 			throw new ApiException(ApiError.SECURITY_ANTI_SPAM, "content", "Spam detected.");
 		}
 		Topic topic = new Topic();
@@ -265,7 +265,7 @@ public class BoardService extends AbstractService<Board> {
 	@Transactional
 	public Reply createReply(User user, Topic topic, ReplyBean bean) {
 		bean.validate(true);
-		if (this.antiSpamService.isSpam(bean.content)) {
+		if (this.antiSpamService.isSpamText(bean.content)) {
 			throw new ApiException(ApiError.SECURITY_ANTI_SPAM, "content", "Spam detected.");
 		}
 		Reply reply = new Reply();

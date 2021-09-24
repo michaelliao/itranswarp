@@ -27,6 +27,7 @@ import com.itranswarp.model.LocalAuth;
 import com.itranswarp.model.OAuth;
 import com.itranswarp.model.User;
 import com.itranswarp.oauth.OAuthProviders;
+import com.itranswarp.service.AntiSpamService;
 import com.itranswarp.service.EncryptService;
 import com.itranswarp.service.RedisRateLimiter;
 import com.itranswarp.service.UserService;
@@ -49,6 +50,9 @@ public class GlobalFilterRegistrationBean extends FilterRegistrationBean<Filter>
 
 	@Autowired
 	EncryptService encryptService;
+
+	@Autowired
+	AntiSpamService antiSpamService;
 
 	@Autowired
 	OAuthProviders oauthProviders;
@@ -87,6 +91,10 @@ public class GlobalFilterRegistrationBean extends FilterRegistrationBean<Filter>
 			request.setCharacterEncoding("UTF-8");
 			response.setHeader("X-Server-ID", serverId);
 			final String ip = HttpUtil.getIPAddress(request);
+			if (antiSpamService.isSpamIp(ip)) {
+				response.setStatus(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
+				return;
+			}
 			// check rate limit but except static file:
 			String path = request.getRequestURI();
 			if (!path.startsWith("/static/") && !path.startsWith("/files/")) {

@@ -555,8 +555,6 @@ public class ApiController extends AbstractController {
 	@PostMapping("/setting/security")
 	public Map<String, Boolean> settingSecurityUpdate(@RequestBody Security bean) {
 		this.settingService.setSecurity(bean);
-		this.settingService.deleteSecurityFromCache();
-		super.antiSpamService.setSpamKeywords(bean.getSpamKeywordsAsList());
 		return API_RESULT_TRUE;
 	}
 

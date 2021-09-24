@@ -1,7 +1,9 @@
 package com.itranswarp.bean.setting;
 
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import com.itranswarp.anno.SettingInput;
@@ -15,8 +17,8 @@ public class Security extends AbstractSettingBean {
 	@SettingInput(value = InputType.TEXTAREA, order = 2, description = "Spam keywords")
 	public String spamKeywords;
 
-	public List<String> getIpBlacklistAsList() {
-		return splitByLines(this.ipBlacklist, false);
+	public Set<String> getIpBlacklistAsSet() {
+		return new HashSet<>(splitByLines(this.ipBlacklist, false));
 	}
 
 	public List<String> getSpamKeywordsAsList() {

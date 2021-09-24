@@ -3,13 +3,17 @@ package com.itranswarp.service;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.annotation.PostConstruct;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+
+import com.itranswarp.bean.setting.Security;
 
 @Component
 public class AntiSpamService {
@@ -20,6 +24,7 @@ public class AntiSpamService {
 	SettingService settingService;
 
 	List<String> spamKeywords = List.of();
+	Set<String> spamIps = Set.of();
 
 	private final Map<Character, Character> charMap = createMapping();
 
@@ -57,10 +62,14 @@ public class AntiSpamService {
 
 	@PostConstruct
 	public void init() {
-		setSpamKeywords(settingService.getSecurity().getSpamKeywordsAsList());
+		scheduledReload();
 	}
 
-	public boolean isSpam(String text) {
+	public boolean isSpamIp(String ip) {
+		return this.spamIps.contains(ip);
+	}
+
+	public boolean isSpamText(String text) {
 		if (this.spamKeywords.isEmpty()) {
 			return false;
 		}
@@ -74,8 +83,11 @@ public class AntiSpamService {
 		return false;
 	}
 
-	public void setSpamKeywords(List<String> keywords) {
-		this.spamKeywords = keywords;
+	@Scheduled(cron = "0 0/10 * * * *")
+	public void scheduledReload() {
+		Security security = settingService.getSecurity();
+		this.spamKeywords = security.getSpamKeywordsAsList();
+		this.spamIps = security.getIpBlacklistAsSet();
 	}
 
 	String normalize(String text) {

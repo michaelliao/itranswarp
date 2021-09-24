@@ -18,11 +18,11 @@ public class AntiSpamServiceTest {
 
 	@Test
 	void testIsSpam() {
-		this.antiSpamService.setSpamKeywords(List.of("123456", "world"));
-		assertTrue(this.antiSpamService.isSpam("add QQ: ①②③④⑤⑥"));
-		assertTrue(this.antiSpamService.isSpam("Hello, spam world!"));
-		assertFalse(this.antiSpamService.isSpam("add QQ: ①②③④⑤"));
-		assertFalse(this.antiSpamService.isSpam("qq: 123 456"));
+		this.antiSpamService.spamKeywords = List.of("123456", "world");
+		assertTrue(this.antiSpamService.isSpamText("add QQ: ①②③④⑤⑥"));
+		assertTrue(this.antiSpamService.isSpamText("Hello, spam world!"));
+		assertFalse(this.antiSpamService.isSpamText("add QQ: ①②③④⑤"));
+		assertFalse(this.antiSpamService.isSpamText("qq: 123 456"));
 	}
 
 	@Test

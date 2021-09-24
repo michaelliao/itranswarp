@@ -10,9 +10,9 @@ MYSQL_DB=it
 # backup file name:
 BACKUP=it-`date +"%Y-%m-%d_%H_%M_%S"`.sql
 
-echo "mysqldump -h $MYSQL_HOST --opt --hex-blob --set-gtid-purged=OFF --user $MYSQL_USER -p $MYSQL_DB > $BACKUP"
+echo "mysqldump -h $MYSQL_HOST --default-character-set=utf8mb4 --opt --hex-blob --set-gtid-purged=OFF --user $MYSQL_USER -p $MYSQL_DB > $BACKUP"
 
-mysqldump -h $MYSQL_HOST --opt --hex-blob --set-gtid-purged=OFF --user $MYSQL_USER -p $MYSQL_DB > $BACKUP
+mysqldump -h $MYSQL_HOST --default-character-set=utf8mb4 --opt --hex-blob --set-gtid-purged=OFF --user $MYSQL_USER -p $MYSQL_DB > $BACKUP
 
 gzip $BACKUP
 

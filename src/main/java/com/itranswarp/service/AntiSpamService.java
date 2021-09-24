@@ -85,6 +85,7 @@ public class AntiSpamService {
 
 	@Scheduled(cron = "0 0/10 * * * *")
 	public void scheduledReload() {
+		logger.info("scheduled reload spam ips and keywords...");
 		Security security = settingService.getSecurity();
 		this.spamKeywords = security.getSpamKeywordsAsList();
 		this.spamIps = security.getIpBlacklistAsSet();

@@ -95,8 +95,8 @@ public class GlobalFilterRegistrationBean extends FilterRegistrationBean<Filter>
 				response.setStatus(HttpServletResponse.SC_SERVICE_UNAVAILABLE);
 				return;
 			}
+			final String path = request.getRequestURI();
 			// check rate limit but except static file:
-			String path = request.getRequestURI();
 			if (!path.startsWith("/static/") && !path.startsWith("/files/")) {
 				int remaining = rateLimiter.getRateLimit("www", ip, rateLimit, rateLimitBurst);
 				response.setIntHeader("X-RateLimit-Limit", rateLimit);

@@ -1,3 +1,7 @@
+# Hidden files:
+
+.*
+
 # Docker.gitignore #
 
 docker/app/log
@@ -35,13 +39,10 @@ pom.xml.next
 release.properties
 dependency-reduced-pom.xml
 buildNumber.properties
-.mvn/timing.properties
 
 # Eclipse.gitignore ###########################################################
 
 *.pydevproject
-.metadata
-.gradle
 bin/
 tmp/
 *.tmp
@@ -49,36 +50,9 @@ tmp/
 *.swp
 *~.nib
 local.properties
-.settings/
-.loadpath
-
-# Eclipse Core
-.project
-
-# External tool builders
-.externalToolBuilders/
-.recommenders/
 
 # Locally stored "Eclipse launch configurations"
 *.launch
-
-# CDT-specific
-.cproject
-
-# JDT-specific (Eclipse Java Development Tools)
-.classpath
-
-# Java annotation processor (APT)
-.factorypath
-
-# PDT-specific
-.buildpath
-
-# sbteclipse plugin
-.target
-
-# TeXlipse plugin
-.texlipse
 
 # NetBeans.gitignore ##########################################################
 
@@ -89,36 +63,12 @@ dist/
 nbdist/
 nbactions.xml
 nb-configuration.xml
-.nb-gradle/
 
 # JetBrains.gitignore #########################################################
 
 # Covers JetBrains IDEs: IntelliJ, RubyMine, PhpStorm, AppCode, PyCharm, CLion, Android Studio
 
 *.iml
-
-## Directory-based project format:
-.idea/
-# if you remove the above rule, at least ignore the following:
-
-# User-specific stuff:
-# .idea/workspace.xml
-# .idea/tasks.xml
-# .idea/dictionaries
-
-# Sensitive or high-churn files:
-# .idea/dataSources.ids
-# .idea/dataSources.xml
-# .idea/sqlDataSources.xml
-# .idea/dynamic.xml
-# .idea/uiDesigner.xml
-
-# Gradle:
-# .idea/gradle.xml
-# .idea/libraries
-
-# Mongo Explorer plugin:
-# .idea/mongoSettings.xml
 
 ## File-based project format:
 *.ipr
@@ -128,9 +78,6 @@ nb-configuration.xml
 
 # IntelliJ
 /out/
-
-# mpeltonen/sbt-idea plugin
-.idea_modules/
 
 # JIRA plugin
 atlassian-ide-plugin.xml
@@ -163,7 +110,6 @@ sftp-config.json
 [._]s[a-w][a-z]
 *.un~
 Session.vim
-.netrwhist
 *~
 
 # Emacs.gitignore #############################################################
@@ -179,7 +125,6 @@ tramp
 .\#*
 
 # Org-mode
-.org-id-locations
 *_archive
 
 # flymake-mode
@@ -197,9 +142,6 @@ tramp
 
 # AUCTeX auto folder
 /auto/
-
-# cask packages
-.cask/
 
 # Python ignore ###############################################################
 
@@ -219,7 +161,6 @@ bin
 var
 sdist
 develop-eggs
-.installed.cfg
 lib
 lib64
 __pycache__
@@ -228,36 +169,15 @@ __pycache__
 pip-log.txt
 
 # Unit test / coverage reports
-.coverage
-.tox
 nosetests.xml
-
-# OSX.gitignore ###############################################################
-
-.DS_Store
-.AppleDouble
-.LSOverride
 
 # Icon must end with two \r
 Icon
 
-# Thumbnails
-._*
-
-# Files that might appear in the root of a volume
-.DocumentRevisions-V100
-.fseventsd
-.Spotlight-V100
-.TemporaryItems
-.Trashes
-.VolumeIcon.icns
 
 # Directories potentially created on remote AFP share
-.AppleDB
-.AppleDesktop
 Network Trash Folder
 Temporary Items
-.apdisk
 
 # Windows.gitignore ###########################################################
 
@@ -284,8 +204,6 @@ $RECYCLE.BIN/
 
 *~
 
-# KDE directory preferences
-.directory
+# Unignore:
 
-# Linux trash folder which might appear on any partition or disk
-.Trash-*
+!.gitignore

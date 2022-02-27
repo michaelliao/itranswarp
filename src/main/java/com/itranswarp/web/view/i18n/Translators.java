@@ -13,18 +13,15 @@ import java.util.stream.Collectors;
 
 import javax.annotation.PostConstruct;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.core.io.Resource;
 import org.springframework.stereotype.Component;
 
+import com.itranswarp.common.AbstractService;
 import com.itranswarp.util.ClassPathUtil;
 import com.itranswarp.util.JsonUtil;
 
 @Component
-public class Translators {
-
-    final Logger logger = LoggerFactory.getLogger(getClass());
+public class Translators extends AbstractService {
 
     Translator defaultTranslator;
     Map<String, Translator> translators;

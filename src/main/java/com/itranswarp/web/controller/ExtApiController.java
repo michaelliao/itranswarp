@@ -16,8 +16,6 @@ import java.util.concurrent.TimeUnit;
 
 import javax.annotation.PostConstruct;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -27,6 +25,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.context.request.async.DeferredResult;
 
+import com.itranswarp.common.AbstractService;
 import com.itranswarp.common.ApiException;
 import com.itranswarp.enums.ApiError;
 import com.itranswarp.redis.RedisService;
@@ -35,9 +34,7 @@ import com.itranswarp.web.filter.HttpContext;
 
 @RestController
 @RequestMapping("/api/external")
-public class ExtApiController {
-
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+public class ExtApiController extends AbstractService {
 
     @Value("${spring.external.remote-code-runner.enabled:false}")
     boolean remoteCodeRunnerEnabled;

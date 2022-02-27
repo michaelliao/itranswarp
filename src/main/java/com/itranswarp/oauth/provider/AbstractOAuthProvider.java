@@ -3,14 +3,10 @@ package com.itranswarp.oauth.provider;
 import java.net.http.HttpClient;
 import java.time.Duration;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+import com.itranswarp.common.AbstractService;
 import com.itranswarp.oauth.OAuthAuthentication;
 
-public abstract class AbstractOAuthProvider {
-
-    protected final Logger logger = LoggerFactory.getLogger(getClass());
+public abstract class AbstractOAuthProvider extends AbstractService {
 
     protected static final Duration DEFAULT_TIMEOUT = Duration.ofSeconds(5);
 

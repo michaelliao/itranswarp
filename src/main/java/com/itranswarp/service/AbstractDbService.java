@@ -3,11 +3,10 @@ package com.itranswarp.service;
 import java.util.HashSet;
 import java.util.List;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.itranswarp.common.AbstractService;
 import com.itranswarp.common.ApiException;
 import com.itranswarp.enums.ApiError;
 import com.itranswarp.enums.Role;
@@ -19,9 +18,7 @@ import com.itranswarp.util.ClassUtil;
 import com.itranswarp.warpdb.WarpDb;
 
 @Transactional
-public class AbstractDbService<T extends AbstractEntity> {
-
-    protected final Logger logger = LoggerFactory.getLogger(getClass());
+public class AbstractDbService<T extends AbstractEntity> extends AbstractService {
 
     protected final int ITEMS_PER_PAGE = 10;
 

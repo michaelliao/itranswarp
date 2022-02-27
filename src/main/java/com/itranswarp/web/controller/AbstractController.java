@@ -1,9 +1,8 @@
 package com.itranswarp.web.controller;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import com.itranswarp.common.AbstractService;
 import com.itranswarp.redis.RedisService;
 import com.itranswarp.search.AbstractSearcher;
 import com.itranswarp.service.AdService;
@@ -20,9 +19,7 @@ import com.itranswarp.service.TextService;
 import com.itranswarp.service.UserService;
 import com.itranswarp.service.WikiService;
 
-public abstract class AbstractController {
-
-    protected final Logger logger = LoggerFactory.getLogger(getClass());
+public abstract class AbstractController extends AbstractService {
 
     protected static final String ID = "{id:[0-9]{1,17}}";
     protected static final String ID2 = "{id2:[0-9]{1,17}}";

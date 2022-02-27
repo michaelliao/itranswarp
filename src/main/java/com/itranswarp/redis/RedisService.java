@@ -11,12 +11,11 @@ import java.util.function.Consumer;
 
 import javax.annotation.PreDestroy;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.core.type.TypeReference;
+import com.itranswarp.common.AbstractService;
 import com.itranswarp.util.ClassPathUtil;
 import com.itranswarp.util.JsonUtil;
 
@@ -30,9 +29,7 @@ import io.lettuce.core.pubsub.RedisPubSubAdapter;
 import io.lettuce.core.pubsub.StatefulRedisPubSubConnection;
 
 @Component
-public class RedisService {
-
-    Logger logger = LoggerFactory.getLogger(getClass());
+public class RedisService extends AbstractService {
 
     final RedisClient redisClient;
 

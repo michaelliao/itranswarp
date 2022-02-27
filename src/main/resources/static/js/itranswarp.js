@@ -45,23 +45,23 @@ $(function () {
 
     // on resize:
     var autoResizeNavBar = function () {
-	    var
-	        $navbar = $('#navbar'),
-	        $brand = $('#brand'),
-	        $brand2 = $('#brand-small'),
-	        $ul = $('#ul-navbar'),
-	        $ulList = [],
-	        $more = $('#navbar-more'),
-	        $moreList = [],
-	        $user = $('#navbar-user-info'),
-	        minNavWidth = 0;
-	    $ul.find('>li.x-nav').each(function () {
-	        minNavWidth += $(this).outerWidth();
-	        $ulList.push($(this));
-	    });
-	    $('#ul-navbar-more').find('>li.x-nav').each(function () {
-	        $moreList.push($(this));
-	    });
+        var
+            $navbar = $('#navbar'),
+            $brand = $('#brand'),
+            $brand2 = $('#brand-small'),
+            $ul = $('#ul-navbar'),
+            $ulList = [],
+            $more = $('#navbar-more'),
+            $moreList = [],
+            $user = $('#navbar-user-info'),
+            minNavWidth = 0;
+        $ul.find('>li.x-nav').each(function () {
+            minNavWidth += $(this).outerWidth();
+            $ulList.push($(this));
+        });
+        $('#ul-navbar-more').find('>li.x-nav').each(function () {
+            $moreList.push($(this));
+        });
         var total = $navbar.width() - 6;
         if ($brand.is(':visible')) {
             total -= $brand.outerWidth();
@@ -106,56 +106,56 @@ $(function () {
 });
 
 function deleteTopic(topicId) {
-	UIkit.modal.confirm("Are you sure to delete this topic?", function(){
-		postJSON('/api/topics/' + topicId + '/delete', {}, function (err, resp) {
-			if (err) {
-				return showError(err);
-			}
-			refresh();
-		});
-	});
+    UIkit.modal.confirm("Are you sure to delete this topic?", function () {
+        postJSON('/api/topics/' + topicId + '/delete', {}, function (err, resp) {
+            if (err) {
+                return showError(err);
+            }
+            refresh();
+        });
+    });
 }
 
-function deleteTopicAndLockUser(topicId, userId){
-	UIkit.modal.confirm("Are you sure to delete this topic and lock user?", function(){
-		postJSON('/api/topics/' + topicId + '/delete', {}, function (err, resp) {
-			if (err) {
-				return showError(err);
-			}
-			_lockUser(userId);
-		});
-	});
+function deleteTopicAndLockUser(topicId, userId) {
+    UIkit.modal.confirm("Are you sure to delete this topic and lock user?", function () {
+        postJSON('/api/topics/' + topicId + '/delete', {}, function (err, resp) {
+            if (err) {
+                return showError(err);
+            }
+            _lockUser(userId);
+        });
+    });
 }
 
 function deleteReply(replyId) {
-	UIkit.modal.confirm("Are you sure to delete this reply?", function(){
-		postJSON('/api/replies/' + replyId + '/delete', {}, function (err, resp) {
-			if (err) {
-				return showError(err);
-			}
-			refresh();
-		});
-	});
+    UIkit.modal.confirm("Are you sure to delete this reply?", function () {
+        postJSON('/api/replies/' + replyId + '/delete', {}, function (err, resp) {
+            if (err) {
+                return showError(err);
+            }
+            refresh();
+        });
+    });
 }
 
-function deleteReplyAndLockUser(replyId, userId){
-	UIkit.modal.confirm("Are you sure to delete this reply and lock user?", function(){
-		postJSON('/api/replies/' + replyId + '/delete', {}, function (err, resp) {
-			if (err) {
-				return showError(err);
-			}
-			_lockUser(userId);
-		});
-	});
+function deleteReplyAndLockUser(replyId, userId) {
+    UIkit.modal.confirm("Are you sure to delete this reply and lock user?", function () {
+        postJSON('/api/replies/' + replyId + '/delete', {}, function (err, resp) {
+            if (err) {
+                return showError(err);
+            }
+            _lockUser(userId);
+        });
+    });
 }
 
 function _lockUser(userId) {
-	postJSON('/api/users/' + userId + '/lock/5000000000000', {}, function (err, resp) {
-		if (err) {
-			return showError(err);
-		}
-		refresh();
-	});
+    postJSON('/api/users/' + userId + '/lock/5000000000000', {}, function (err, resp) {
+        if (err) {
+            return showError(err);
+        }
+        refresh();
+    });
 }
 
 // comment ////////////////////////////////////////////////////////////////////
@@ -190,10 +190,10 @@ function initCommentArea(ref_type, ref_id, tag) {
         $commentForm.show();
         $commentForm.find('div.x-textarea').html('<textarea></textarea>');
         var editor = new Simditor({
-			textarea: $commentForm.find('textarea'),
-			toolbarFloatOffset: 50,
-			toolbar: ['title', '|', 'bold', 'italic', 'strikethrough', '|', 'blockquote', 'code', 'link', '|', 'ol', 'ul', '|', 'hr']
-		});
+            textarea: $commentForm.find('textarea'),
+            toolbarFloatOffset: 50,
+            toolbar: ['title', '|', 'bold', 'italic', 'strikethrough', '|', 'blockquote', 'code', 'link', '|', 'ol', 'ul']
+        });
         $makeComment.hide();
     });
     $cancelComment.click(function () {
@@ -255,16 +255,16 @@ function buildComments(topics) {
     if (topics.length === 0) {
         return '<p>No comment yet.</p>';
     }
-	L = [];
+    L = [];
     topics.map(function (topic) {
         L.push('<li>');
         L.push(tplComment.render(topic));
         L.push('<ul>')
-    	topic.replies.map(function (reply) {
+        topic.replies.map(function (reply) {
             L.push('<li>');
             L.push(tplCommentReply.render(reply));
             L.push('</li>');
-    	});
+        });
         L.push(tplCommentInfo.render(topic));
         L.push('</ul>');
         L.push('</li>');
@@ -313,112 +313,112 @@ $(function () {
 // markdown ///////////////////////////////////////////////////////////////////
 
 function html2md(input) {
-	// convert <p><code>...</code></p> to <pre><code>...</code></pre>:
-	var s = '';
-	while (true) {
-		n1 = input.indexOf('<p><code>');
-		n2 = input.indexOf('</code></p>');
-		n3 = input.indexOf('</code>');
-		if (n1 >= 0 && n2 > n1 && n2 == n3) {
-			s = s + input.substring(0, n1);
-			s = s + '<pre><code>';
-			s = s + input.substring(n1+9, n2).replace(/<p>/g, '').replace(/<\/p>/g, '\n').replace(/<br>/g, '\n');
-			s = s + '</code></pre>';
-			input = input.substring(n2+11);
-		} else {
-			s = s + input;
-			break;
-		}
-	}
-	return new TurndownService({
-		headingStyle: 'atx',
-		codeBlockStyle: 'fenced',
-		emDelimiter: '*',
-		hr: '----'
-	}).turndown(s);
+    // convert <p><code>...</code></p> to <pre><code>...</code></pre>:
+    var s = '';
+    while (true) {
+        n1 = input.indexOf('<p><code>');
+        n2 = input.indexOf('</code></p>');
+        n3 = input.indexOf('</code>');
+        if (n1 >= 0 && n2 > n1 && n2 == n3) {
+            s = s + input.substring(0, n1);
+            s = s + '<pre><code>';
+            s = s + input.substring(n1 + 9, n2).replace(/<p>/g, '').replace(/<\/p>/g, '\n').replace(/<br>/g, '\n');
+            s = s + '</code></pre>';
+            input = input.substring(n2 + 11);
+        } else {
+            s = s + input;
+            break;
+        }
+    }
+    return new TurndownService({
+        headingStyle: 'atx',
+        codeBlockStyle: 'fenced',
+        emDelimiter: '*',
+        hr: '----'
+    }).turndown(s);
 }
 
 // begin ad ///////////////////////////////////////////////////////////////////
 
 function _adFilterMaterials(metaTags, materials) {
-	if (materials.length === 0) {
-		return [];
-	}
-	var matched = materials.filter(function (material) {
-		var filteredTags = metaTags.filter(function (tag) {
-			return material.tags.indexOf(tag) >= 0;
-		});
-		return filteredTags.length > 0;
-	});
-	return matched.length > 0 ? matched : materials;
+    if (materials.length === 0) {
+        return [];
+    }
+    var matched = materials.filter(function (material) {
+        var filteredTags = metaTags.filter(function (tag) {
+            return material.tags.indexOf(tag) >= 0;
+        });
+        return filteredTags.length > 0;
+    });
+    return matched.length > 0 ? matched : materials;
 }
 
 var _adImagePlaceHolder = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='128' height='128' x='0px' y='0px' viewBox='0 0 469.333 469.333'%3E%3Cg%3E%3Cpath d='M426.667,0h-384C19.135,0,0,19.135,0,42.667v384c0,23.531,19.135,42.667,42.667,42.667h384 c23.531,0,42.667-19.135,42.667-42.667v-384C469.333,19.135,450.198,0,426.667,0z M448,426.667 c0,11.76-9.573,21.333-21.333,21.333h-384c-11.76,0-21.333-9.573-21.333-21.333v-320H448V426.667z M448,85.333H21.333V42.667 c0-11.76,9.573-21.333,21.333-21.333h384c11.76,0,21.333,9.573,21.333,21.333V85.333z'/%3E%3Ccircle cx='53.333' cy='53.333' r='10.667'/%3E%3Ccircle cx='96' cy='53.333' r='10.667'/%3E%3Ccircle cx='138.667' cy='53.333' r='10.667'/%3E%3Cpath d='M74.667,341.333H288c5.896,0,10.667-4.771,10.667-10.667V160c0-5.896-4.771-10.667-10.667-10.667H74.667 C68.771,149.333,64,154.104,64,160v170.667C64,336.563,68.771,341.333,74.667,341.333z M85.333,170.667h192V320h-192V170.667z'/%3E%3Cpath d='M138.667,192c-17.646,0-32,14.354-32,32v64c0,5.896,4.771,10.667,10.667,10.667c5.896,0,10.667-4.771,10.667-10.667 v-10.667h21.333V288c0,5.896,4.771,10.667,10.667,10.667c5.896,0,10.667-4.771,10.667-10.667v-64 C170.667,206.354,156.312,192,138.667,192z M149.333,256H128v-32c0-5.885,4.781-10.667,10.667-10.667s10.667,4.781,10.667,10.667 V256z'/%3E%3Cpath d='M224,192h-21.333c-5.896,0-10.667,4.771-10.667,10.667V288c0,5.896,4.771,10.667,10.667,10.667H224 c17.646,0,32-14.354,32-32V224C256,206.354,241.646,192,224,192z M234.667,266.667c0,5.885-4.781,10.667-10.667,10.667h-10.667 v-64H224c5.885,0,10.667,4.781,10.667,10.667V266.667z'/%3E%3Cpath d='M74.667,405.333h320c5.896,0,10.667-4.771,10.667-10.667c0-5.896-4.771-10.667-10.667-10.667h-320 C68.771,384,64,388.771,64,394.667C64,400.563,68.771,405.333,74.667,405.333z'/%3E%3Cpath d='M330.667,213.333h64c5.896,0,10.667-4.771,10.667-10.667S400.563,192,394.667,192h-64 c-5.896,0-10.667,4.771-10.667,10.667S324.771,213.333,330.667,213.333z'/%3E%3Cpath d='M330.667,277.333h64c5.896,0,10.667-4.771,10.667-10.667S400.563,256,394.667,256h-64 c-5.896,0-10.667,4.771-10.667,10.667S324.771,277.333,330.667,277.333z'/%3E%3Cpath d='M330.667,341.333h64c5.896,0,10.667-4.771,10.667-10.667c0-5.896-4.771-10.667-10.667-10.667h-64 c-5.896,0-10.667,4.771-10.667,10.667C320,336.563,324.771,341.333,330.667,341.333z'/%3E%3C/g%3E%3C/svg%3E";
 var _adTemplate = '<div style="float:left;overflow:hidden;box-sizing:border-box;margin:0 0 -1px -1px;border:solid 1px #ddd;width:${width}px;height:${height}px;"><a target="_blank" href="${url}"><img style="width:${width}px;height:${height}px;" src="/files/attachments/${imageId}/0"></a></div>';
-var _adDefault  = '<div style="float:left;overflow:hidden;box-sizing:border-box;margin:0 0 -1px -1px;border:solid 1px #ddd;width:${width}px;height:${height}px;"><a target="_blank" href="${url}"><img style="width:100px;height:100px" src="' + _adImagePlaceHolder + '"></a></div>';
+var _adDefault = '<div style="float:left;overflow:hidden;box-sizing:border-box;margin:0 0 -1px -1px;border:solid 1px #ddd;width:${width}px;height:${height}px;"><a target="_blank" href="${url}"><img style="width:100px;height:100px" src="' + _adImagePlaceHolder + '"></a></div>';
 var _adAutoFill = '<div style="float:left;overflow:hidden;box-sizing:border-box;margin:0 0 -1px -1px;border:solid 1px #ddd;width:${width}px;height:${height}px;">${content}</div>';
 
 function _adAddSponsor(slot, template, material) {
-	var s = template.replace(/\$\{width\}/g, '' + slot.width)
-			.replace(/\$\{height\}/g, '' + slot.height)
-			.replace(/\$\{imageId\}/g, '' + material.imageId)
-			.replace(/\$\{url\}/g, material.url)
-			.replace(/\$\{content\}/g, material.content);
-	$('#sponsor-' + slot.alias).append(s);
+    var s = template.replace(/\$\{width\}/g, '' + slot.width)
+        .replace(/\$\{height\}/g, '' + slot.height)
+        .replace(/\$\{imageId\}/g, '' + material.imageId)
+        .replace(/\$\{url\}/g, material.url)
+        .replace(/\$\{content\}/g, material.content);
+    $('#sponsor-' + slot.alias).append(s);
 }
 
 function _adRandomMaterial(materials) {
-	if (materials.length === 0) {
-		return null;
-	}
-	if (materials.length === 1) {
-		return materials[0];
-	}
-	var
-		weights = materials.map(function (m) { return m.weight; }),
-		total_weights = weights.reduce(function (ax, w) { return ax + w; }, 0),
-		rnd = Math.random(),
-		ws = 0,
-		i,
-		hit;
-	for (i=0; i < weights.length; i++) {
-		ws = ws + weights[i];
-		if (rnd < ws / total_weights) {
-			return materials[i];
-		}
-	}
-	return materials[0];
+    if (materials.length === 0) {
+        return null;
+    }
+    if (materials.length === 1) {
+        return materials[0];
+    }
+    var
+        weights = materials.map(function (m) { return m.weight; }),
+        total_weights = weights.reduce(function (ax, w) { return ax + w; }, 0),
+        rnd = Math.random(),
+        ws = 0,
+        i,
+        hit;
+    for (i = 0; i < weights.length; i++) {
+        ws = ws + weights[i];
+        if (rnd < ws / total_weights) {
+            return materials[i];
+        }
+    }
+    return materials[0];
 }
 
 function initSponsors(ads) {
-	// ad enabled?
-	var meta_ad = $('meta[property="og:ad"]').attr('content');
-	if (meta_ad !== 'true') {
-		return;
-	}
+    // ad enabled?
+    var meta_ad = $('meta[property="og:ad"]').attr('content');
+    if (meta_ad !== 'true') {
+        return;
+    }
 
-	// try get tags as string array like ['abc', 'xyz']:
-	var
-		meta_tag = $('meta[property="og:tag"]').attr('content') || '',
-		meta_tags = meta_tag.toLowerCase().split(',');
+    // try get tags as string array like ['abc', 'xyz']:
+    var
+        meta_tag = $('meta[property="og:tag"]').attr('content') || '',
+        meta_tags = meta_tag.toLowerCase().split(',');
 
-	// process each slot:
-	ads.slots.forEach(function (slot) {
-		$('#sponsor-' + slot.alias).addClass('x-sponsor');
-		slot.periods.forEach(function (period) {
-			var
-				materials = _adFilterMaterials(meta_tags, period.materials),
-				material = _adRandomMaterial(materials);
-			if (material) {
-				_adAddSponsor(slot, _adTemplate, material);
-			} else {
-				_adAddSponsor(slot, _adDefault, { imageId: 0, url: '/' });
-			}
-		});
-		for (var i=0; i < Math.min(slot.numAutoFill, slot.numSlots - slot.periods.length); i++) {
-			_adAddSponsor(slot, _adAutoFill, { content: slot.adAutoFill });
-		}
-	});
+    // process each slot:
+    ads.slots.forEach(function (slot) {
+        $('#sponsor-' + slot.alias).addClass('x-sponsor');
+        slot.periods.forEach(function (period) {
+            var
+                materials = _adFilterMaterials(meta_tags, period.materials),
+                material = _adRandomMaterial(materials);
+            if (material) {
+                _adAddSponsor(slot, _adTemplate, material);
+            } else {
+                _adAddSponsor(slot, _adDefault, { imageId: 0, url: '/' });
+            }
+        });
+        for (var i = 0; i < Math.min(slot.numAutoFill, slot.numSlots - slot.periods.length); i++) {
+            _adAddSponsor(slot, _adAutoFill, { content: slot.adAutoFill });
+        }
+    });
 }
 
 // end ad /////////////////////////////////////////////////////////////////////

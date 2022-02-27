@@ -15,19 +15,19 @@ function execute_remote(tid, btn, language) {
 	$i.addClass('uk-icon-spinner');
 	$i.addClass('uk-icon-spin');
 	var opt = {
-        type: 'post',
-        url: '/api/external/remoteCodeRun',
-        contentType: 'application/json',
-        dataType: 'json',
-        data: JSON.stringify({
-        	language: language,
-        	code: code
-        })
-    };
-    $.ajax(opt).done(function (r) {
-    	console.log('done:');
-    	console.log(r);
-        if (r.timeout) {
+		type: 'post',
+		url: '/api/external/remoteCodeRun',
+		contentType: 'application/json',
+		dataType: 'json',
+		data: JSON.stringify({
+			language: language,
+			code: code
+		})
+	};
+	$.ajax(opt).done(function (r) {
+		console.log('done:');
+		console.log(r);
+		if (r.timeout) {
 			_mdShowCodeError(btn, '代码执行超时，请修复后等待60秒再执行。', false);
 		} else if (r.error) {
 			_mdShowCodeError(btn, r.output || '代码执行失败', false);
@@ -37,21 +37,21 @@ function execute_remote(tid, btn, language) {
 			}
 			_mdShowCodeResult(btn, r.output, false);
 		}
-    }).fail(function (jqXHR, textStatus) {
-    	console.log('fail:');
-    	console.log(jqXHR);
-    	if (jqXHR.status === 429 || (jqXHR.responseJSON && jqXHR.responseJSON.error === 'RATE_LIMIT')) {
-    		_mdShowCodeError(btn, '超出执行限额：请等待20秒后再试。', false);
-    	} else if (jqXHR.responseJSON) {
+	}).fail(function (jqXHR, textStatus) {
+		console.log('fail:');
+		console.log(jqXHR);
+		if (jqXHR.status === 429 || (jqXHR.responseJSON && jqXHR.responseJSON.error === 'RATE_LIMIT')) {
+			_mdShowCodeError(btn, '超出执行限额：请等待20秒后再试。', false);
+		} else if (jqXHR.responseJSON) {
 			_mdShowCodeError(btn, jqXHR.responseJSON.output || jqXHR.responseJSON.message || jqXHR.responseJSON.error, false);
-    	} else {
+		} else {
 			_mdShowCodeError(btn, '远程代码执行服务暂时不可用，请稍后再试。', false);
-    	}
-    }).always(function () {
+		}
+	}).always(function () {
 		$i.removeClass('uk-icon-spinner');
 		$i.removeClass('uk-icon-spin');
 		$button.removeAttr('disabled');
-    });
+	});
 }
 
 function execute_java(tid, btn) {
@@ -253,7 +253,7 @@ function _mdAdjustTextareaHeight(t) {
 	$t.attr('rows', '' + (lines + 1));
 }
 
-var initRunCode = (function() {
+var initRunCode = (function () {
 	var tid = 0;
 	var trimCode = function (code) {
 		var ch;
@@ -380,12 +380,7 @@ function initMarkdownRun() {
 		if ($code.hasClass('language-ascii')) {
 			// set ascii style for markdown:
 			$code.css('font-family', '"Courier New",Consolas,monospace')
-				.parent('pre')
-				.css('font-size', '12px')
-				.css('line-height', '12px')
-				.css('border', 'none')
-				.css('white-space', 'pre')
-				.css('background-color', 'transparent');
+				.parent('pre').addClass('ascii');
 		} else if (x_run) {
 			var fn = 'execute_' + x_run.substring('language-x-'.length);
 			initRunCode($code.parent(), fn);
@@ -436,8 +431,8 @@ function initMarkdownMath() {
 			nextNode = this.nextSibling,
 			prevText = prevNode && prevNode.nodeValue,
 			nextText = nextNode && nextNode.nodeValue;
-		if (typeof(prevText)=== 'string' && typeof(nextText)==='string') {
-			if (prevText.substring(prevText.length-1, prevText.length) === '$' && nextText.substring(0, 1) === '$') {
+		if (typeof (prevText) === 'string' && typeof (nextText) === 'string') {
+			if (prevText.substring(prevText.length - 1, prevText.length) === '$' && nextText.substring(0, 1) === '$') {
 				math = fnRenderMath($code.text());
 				if (math.error) {
 					$code.text(math.error);

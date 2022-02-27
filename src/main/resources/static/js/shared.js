@@ -1,78 +1,78 @@
 
 // global object patch ////////////////////////////////////////////////////////////////////////////
 
-if (! window.console) {
+if (!window.console) {
     window.console = {
-        log: function(s) {
+        log: function (s) {
         }
     };
 }
 
-if (! String.prototype.trim) {
-    String.prototype.trim = function() {
+if (!String.prototype.trim) {
+    String.prototype.trim = function () {
         return this.replace(/^\s+|\s+$/g, '');
     };
 }
 
-if (! Number.prototype.toDateTime) {
+if (!Number.prototype.toDateTime) {
     var replaces = {
-        'yyyy': function(dt) {
+        'yyyy': function (dt) {
             return dt.getFullYear().toString();
         },
-        'yy': function(dt) {
+        'yy': function (dt) {
             return (dt.getFullYear() % 100).toString();
         },
-        'MM': function(dt) {
+        'MM': function (dt) {
             var m = dt.getMonth() + 1;
             return m < 10 ? '0' + m : m.toString();
         },
-        'M': function(dt) {
+        'M': function (dt) {
             var m = dt.getMonth() + 1;
             return m.toString();
         },
-        'dd': function(dt) {
+        'dd': function (dt) {
             var d = dt.getDate();
             return d < 10 ? '0' + d : d.toString();
         },
-        'd': function(dt) {
+        'd': function (dt) {
             var d = dt.getDate();
             return d.toString();
         },
-        'hh': function(dt) {
+        'hh': function (dt) {
             var h = dt.getHours();
             return h < 10 ? '0' + h : h.toString();
         },
-        'h': function(dt) {
+        'h': function (dt) {
             var h = dt.getHours();
             return h.toString();
         },
-        'mm': function(dt) {
+        'mm': function (dt) {
             var m = dt.getMinutes();
             return m < 10 ? '0' + m : m.toString();
         },
-        'm': function(dt) {
+        'm': function (dt) {
             var m = dt.getMinutes();
             return m.toString();
         },
-        'ss': function(dt) {
+        'ss': function (dt) {
             var s = dt.getSeconds();
             return s < 10 ? '0' + s : s.toString();
         },
-        's': function(dt) {
+        's': function (dt) {
             var s = dt.getSeconds();
             return s.toString();
         },
-        'a': function(dt) {
+        'a': function (dt) {
             var h = dt.getHours();
             return h < 12 ? 'AM' : 'PM';
         }
     };
     var token = /([a-zA-Z]+)/;
-    Number.prototype.toDateTime = function(format) {
+    Number.prototype.toDateTime = function (format) {
         var fmt = format || 'yyyy-MM-dd hh:mm:ss'
         var dt = new Date(this);
         var arr = fmt.split(token);
-        for (var i=0; i<arr.length; i++) {
+        for (var i = 0; i < arr.length; i++) {
             var s = arr[i];
             if (s && s in replaces) {
                 arr[i] = replaces[s](dt);
@@ -80,11 +80,11 @@ if (! Number.prototype.toDateTime) {
         }
         return arr.join('');
     };
-    Number.prototype.toDate = function(format) {
+    Number.prototype.toDate = function (format) {
         var fmt = format || 'yyyy-MM-dd'
         var dt = new Date(this);
         var arr = fmt.split(token);
-        for (var i=0; i<arr.length; i++) {
+        for (var i = 0; i < arr.length; i++) {
             var s = arr[i];
             if (s && s in replaces) {
                 arr[i] = replaces[s](dt);
@@ -92,11 +92,11 @@ if (! Number.prototype.toDateTime) {
         }
         return arr.join('');
     };
-    Number.prototype.toTime = function(format) {
+    Number.prototype.toTime = function (format) {
         var fmt = format || 'hh:mm'
         var dt = new Date(this);
         var arr = fmt.split(token);
-        for (var i=0; i<arr.length; i++) {
+        for (var i = 0; i < arr.length; i++) {
             var s = arr[i];
             if (s && s in replaces) {
                 arr[i] = replaces[s](dt);
@@ -106,20 +106,20 @@ if (! Number.prototype.toDateTime) {
     };
 }
 
-if (! Number.prototype.toSmartDate) {
-	Number.prototype.toSmartDate = function () {
-		var
-			ts = this,
-			m = moment(ts);
-		if (Date.now() - ts < 259200000) {
-			return m.fromNow();
-		}
-		return m.format('LLL');
-	};
+if (!Number.prototype.toSmartDate) {
+    Number.prototype.toSmartDate = function () {
+        var
+            ts = this,
+            m = moment(ts);
+        if (Date.now() - ts < 259200000) {
+            return m.fromNow();
+        }
+        return m.format('LLL');
+    };
 }
 
-if (! Number.prototype.toFileSize) {
-    Number.prototype.toFileSize = function() {
+if (!Number.prototype.toFileSize) {
+    Number.prototype.toFileSize = function () {
         var size = this;
         if (size < 1024)
             return size + ' bytes';
@@ -137,11 +137,11 @@ if (! Number.prototype.toFileSize) {
 // functions //////////////////////////////////////////////////////////////////////////////////////
 
 function nextId() {
-	if (!window.__nextId__) {
-		window.__nextId__ = 0;
-	}
-	window.__nextId__ ++;
-	return window.__nextId__;
+    if (!window.__nextId__) {
+        window.__nextId__ = 0;
+    }
+    window.__nextId__++;
+    return window.__nextId__;
 }
 
 // JS Template:
@@ -194,11 +194,11 @@ function deleteCookie(key) {
 
 function getObjectURL(file) {
     var url = '';
-    if (window.createObjectURL!=undefined) // basic
+    if (window.createObjectURL != undefined) // basic
         url = window.createObjectURL(file);
-    else if (window.URL!=undefined) // mozilla(firefox)
+    else if (window.URL != undefined) // mozilla(firefox)
         url = window.URL.createObjectURL(file);
-    else if (window.webkitURL!=undefined) // webkit or chrome
+    else if (window.webkitURL != undefined) // webkit or chrome
         url = window.webkitURL.createObjectURL(file);
     return url;
 }
@@ -230,50 +230,50 @@ function size2string(value) {
     return value.toFixed(2) + ' GB';
 }
 
-var parseDateTime = (function() {
+var parseDateTime = (function () {
     var replaces = {
         'yyyy': {
             re: '(19[0-9][0-9]|20[0-9][0-9])',
-            fn: function(dt, value) {
+            fn: function (dt, value) {
                 dt.setFullYear(value);
             }
         },
         'MM': {
             re: '(0[1-9]|1[0-2]|[0-9])',
-            fn: function(dt, value) {
+            fn: function (dt, value) {
                 dt.setMonth(value - 1);
             }
         },
         'dd': {
             re: '(0[1-9]|1[0-9]|2[0-9]|3[0-1]|[0-9])',
-            fn: function(dt, value) {
+            fn: function (dt, value) {
                 dt.setDate(value);
             }
         },
         'hh': {
             re: '(0[0-9]|1[0-9]|2[0-3]|[0-9])',
-            fn: function(dt, value) {
+            fn: function (dt, value) {
                 dt.setHours(value);
             }
         },
         'mm': {
             re: '(0[0-9]|1[0-9]|2[0-9]|3[0-9]|4[0-9]|5[0-9]|[0-9])',
-            fn: function(dt, value) {
+            fn: function (dt, value) {
                 dt.setMinutes(value);
             }
         },
         'ss': {
             re: '(0[0-9]|1[0-9]|2[0-9]|3[0-9]|4[0-9]|5[0-9]|[0-9])',
-            fn: function(dt, value) {
+            fn: function (dt, value) {
                 dt.setSeconds(value);
             }
         }
     };
     var token = /([a-zA-Z]+)/;
     var normalChars = /[a-zA-Z0-9]/;
-    var filter = function(arr, fn) {
+    var filter = function (arr, fn) {
         var r = [];
-        for (var i = 0; i < arr.length; i ++) {
+        for (var i = 0; i < arr.length; i++) {
             var x = arr[i];
             if (fn(x)) {
                 r.push(x);
@@ -281,20 +281,20 @@ var parseDateTime = (function() {
         }
         return r;
     };
-    return function(s, format) {
-        if (! s) {
+    return function (s, format) {
+        if (!s) {
             return NaN;
         }
         var fmt = format || 'yyyy-MM-dd hh:mm:ss';
-        var arr = filter(fmt.split(token), function(s) { return s!==''; });
+        var arr = filter(fmt.split(token), function (s) { return s !== ''; });
         var pp = '^';
-        for (var i = 0; i < arr.length; i ++) {
+        for (var i = 0; i < arr.length; i++) {
             var p = arr[i];
             if (p in replaces) {
                 pp = pp + replaces[p].re;
             }
             else {
-                for (var n = 0; n < p.length; n ++ ) {
+                for (var n = 0; n < p.length; n++) {
                     var ch = p.charAt(n);
                     pp = pp + '(' + (normalChars.test(ch) ? '' : '\\') + ch + ')';
                 }
@@ -305,7 +305,7 @@ var parseDateTime = (function() {
         if (m) {
             m.shift();
             var dt = new Date(0);
-            for (var i = 0; i < arr.length; i ++) {
+            for (var i = 0; i < arr.length; i++) {
                 var p = arr[i];
                 if (p in replaces) {
                     replaces[p].fn(dt, parseInt(m[i]));
@@ -324,15 +324,15 @@ function parseQueryString() {
         q = location.search,
         r = {},
         i, pos, s, qs;
-    if (q && q.charAt(0)==='?') {
+    if (q && q.charAt(0) === '?') {
         qs = q.substring(1).split('&');
-        for (i=0; i<qs.length; i++) {
+        for (i = 0; i < qs.length; i++) {
             s = qs[i];
             pos = s.indexOf('=');
             if (pos <= 0) {
                 continue;
             }
-            r[s.substring(0, pos)] = decodeURIComponent(s.substring(pos+1)).replace(/\+/g, ' ');
+            r[s.substring(0, pos)] = decodeURIComponent(s.substring(pos + 1)).replace(/\+/g, ' ');
         }
     }
     return r;
@@ -357,10 +357,10 @@ function _httpJSON(method, url, data, callback) {
         type: method,
         dataType: 'json'
     };
-    if (method==='GET') {
+    if (method === 'GET') {
         opt.url = url + (url.indexOf('?') >= 0 ? '&' : '?') + data;
     }
-    if (method==='POST') {
+    if (method === 'POST') {
         opt.url = url;
         opt.data = JSON.stringify(data || {});
         opt.contentType = 'application/json';
@@ -371,20 +371,20 @@ function _httpJSON(method, url, data, callback) {
         }
         return callback(null, r);
     }).fail(function (jqXHR, textStatus) {
-    	if (jqXHR.responseJSON && jqXHR.responseJSON.error) {
-    		return callback(jqXHR.responseJSON);
-    	}
-    	var err = {'error': 'http_bad_response', 'data': '' + jqXHR.status, 'message': '网络好像出问题了 (HTTP ' + jqXHR.status + ')'};
+        if (jqXHR.responseJSON && jqXHR.responseJSON.error) {
+            return callback(jqXHR.responseJSON);
+        }
+        var err = { 'error': 'http_bad_response', 'data': '' + jqXHR.status, 'message': '网络好像出问题了 (HTTP ' + jqXHR.status + ')' };
         return callback(err);
     });
 }
 
 function getJSON(url, data, callback) {
-    if (arguments.length===2) {
+    if (arguments.length === 2) {
         callback = data;
         data = {};
     }
-    if (typeof (data)==='object') {
+    if (typeof (data) === 'object') {
         var arr = [];
         $.each(data, function (k, v) {
             arr.push(k + '=' + encodeURIComponent(v));
@@ -395,7 +395,7 @@ function getJSON(url, data, callback) {
 }
 
 function postJSON(url, data, callback) {
-    if (arguments.length===2) {
+    if (arguments.length === 2) {
         callback = data;
         data = {};
     }
@@ -404,7 +404,7 @@ function postJSON(url, data, callback) {
 
 function showError(err) {
     UIkit.notify({
-        message: '<i class="uk-icon-exclamation-triangle"></i> '+ (err.message || err.error),
+        message: '<i class="uk-icon-exclamation-triangle"></i> ' + (err.message || err.error),
         status: 'danger',
         timeout: 0,
         pos: 'top-center'
@@ -413,39 +413,39 @@ function showError(err) {
 
 // jQuery document.onReady ////////////////////////////////////////////////////////////////////////
 
-$(function() {
-    $('.x-smart-datetime').each(function() {
-    	var
-    		t = parseInt($(this).attr('data') || '0'),
-    		dt = new Date(t),
-    		s = Math.floor(t / 1000),
-    		m = Math.floor(s / 60),
-    		h = Math.floor(m / 60),
-    		d = Math.floor(h / 24),
-    		s = 'a minute ago';
-		if (d >= 1) {
-			s = dt.toLocaleDateString() + ' ' + (dt.getHours() < 10 ? '0' : '') + dt.getHours() + ':' + (dt.getMinutes() < 10 ? '0' : '') + dt.getMinutes();
-		} else {
-			s = moment(t).fromNow();
-		}
+$(function () {
+    $('.x-smart-datetime').each(function () {
+        var
+            t = parseInt($(this).attr('data') || '0'),
+            dt = new Date(t),
+            s = Math.floor(t / 1000),
+            m = Math.floor(s / 60),
+            h = Math.floor(m / 60),
+            d = Math.floor(h / 24),
+            s = 'a minute ago';
+        if (d >= 1) {
+            s = dt.toLocaleDateString() + ' ' + (dt.getHours() < 10 ? '0' : '') + dt.getHours() + ':' + (dt.getMinutes() < 10 ? '0' : '') + dt.getMinutes();
+        } else {
+            s = moment(t).fromNow();
+        }
         $(this).removeClass('x-smart-datetime').text(s);
     });
-    $('.x-datetime').each(function() {
-    	var
-    		t = parseInt($(this).attr('data') || '0'),
-    		s = moment(t).format('L LTS');
+    $('.x-datetime').each(function () {
+        var
+            t = parseInt($(this).attr('data') || '0'),
+            s = moment(t).format('L LTS');
         $(this).removeClass('x-datetime').text(s);
     });
-    $('.x-date').each(function() {
-    	var
-    		t = parseInt($(this).attr('data') || '0'),
-    		s = moment(t).format('L');
+    $('.x-date').each(function () {
+        var
+            t = parseInt($(this).attr('data') || '0'),
+            s = moment(t).format('L');
         $(this).removeClass('x-date').text(s);
     });
-    $('.x-time').each(function() {
-    	var
-    		t = parseInt($(this).attr('data') || '0'),
-    		s = moment(t).format('LTS');
+    $('.x-time').each(function () {
+        var
+            t = parseInt($(this).attr('data') || '0'),
+            s = moment(t).format('LTS');
         $(this).removeClass('x-time').text(s);
     });
 });
@@ -460,7 +460,7 @@ $(function () {
                     $form = $(this),
                     $alert = $form && $form.find('.uk-alert-danger'),
                     fieldName = err && err.data;
-                if (! $form.is('form')) {
+                if (!$form.is('form')) {
                     console.error('Cannot call showFormError() on non-form object.');
                     return;
                 }
@@ -492,9 +492,9 @@ $(function () {
                     $form = $(this),
                     $submit = $form && $form.find('button[type=submit]'),
                     $buttons = $form && $form.find('button');
-                    $i = $submit && $submit.find('i'),
+                $i = $submit && $submit.find('i'),
                     iconClass = $i && $i.attr('class');
-                if (! $form.is('form')) {
+                if (!$form.is('form')) {
                     console.error('Cannot call showFormLoading() on non-form object.');
                     return;
                 }
@@ -513,7 +513,7 @@ $(function () {
             });
         },
         postJSON: function (url, data, callback) {
-            if (arguments.length===2) {
+            if (arguments.length === 2) {
                 callback = data;
                 data = {};
             }
@@ -539,8 +539,8 @@ $(function () {
 
 // register custom filters for Vue:
 
-if (typeof(Vue)!=='undefined') {
-	var createPageList = function (page) {
+if (typeof (Vue) !== 'undefined') {
+    var createPageList = function (page) {
         if (page.totalPages <= 1) {
             return [1];
         }
@@ -551,14 +551,14 @@ if (typeof(Vue)!=='undefined') {
             i,
             list = [1],
             start = Math.max(2, page.pageIndex - 4),
-            end = Math.min(page.totalPages-1, page.pageIndex + 4);
+            end = Math.min(page.totalPages - 1, page.pageIndex + 4);
         if (start > 2) {
             list.push('...');
         }
-        for (i=start; i<=end; i++) {
+        for (i = start; i <= end; i++) {
             list.push(i);
         }
-        if (end < (page.totalPages-1)) {
+        if (end < (page.totalPages - 1)) {
             list.push('...');
         }
         list.push(page.totalPages);
@@ -567,7 +567,7 @@ if (typeof(Vue)!=='undefined') {
     Vue.http.options.timeout = 5000;
     Vue.filter('datetime', function (value) {
         var d = value;
-        if (typeof(value)==='number') {
+        if (typeof (value) === 'number') {
             d = new Date(value);
         }
         return d.getFullYear() + '-' + (d.getMonth() + 1) + '-' + d.getDate() + ' ' + d.getHours() + ':' + d.getMinutes();
@@ -581,13 +581,13 @@ if (typeof(Vue)!=='undefined') {
             }
         },
         template: '<div>' +
-        		  '  <div v-if="page.total===0" class="x-empty-list"><p>No items found.</p></div>' +
-        		  '  <ul v-if="page.totalItems > 0" class="uk-pagination">' +
-                  '    <li v-for="i in this.list" v-bind:class="{\'uk-active\':i===page.pageIndex}">' +
-                  '      <a v-if="i!==\'...\' && i!==page.pageIndex" v-bind:href="\'javascript:gotoPage(\' + i + \')\'">{{ i }}</a>' +
-                  '      <span v-if="i===\'...\' || i===page.pageIndex">{{ i }}</span>' +
-                  '    </li>' +
-                  '  </ul>' +
-                  '</div>'
+            '  <div v-if="page.total===0" class="x-empty-list"><p>No items found.</p></div>' +
+            '  <ul v-if="page.totalItems > 0" class="uk-pagination">' +
+            '    <li v-for="i in this.list" v-bind:class="{\'uk-active\':i===page.pageIndex}">' +
+            '      <a v-if="i!==\'...\' && i!==page.pageIndex" v-bind:href="\'javascript:gotoPage(\' + i + \')\'">{{ i }}</a>' +
+            '      <span v-if="i===\'...\' || i===page.pageIndex">{{ i }}</span>' +
+            '    </li>' +
+            '  </ul>' +
+            '</div>'
     });
 }

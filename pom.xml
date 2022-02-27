@@ -1,9 +1,7 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
-	<groupId>com.itranswarp.learnjava</groupId>
+	<groupId>com.itranswarp.web</groupId>
 	<artifactId>itranswarp</artifactId>
 	<version>1.0</version>
 	<packaging>jar</packaging>
@@ -212,28 +210,6 @@
 						<arg>-Xlint:all</arg>
 					</compilerArgs>
 				</configuration>
-			</plugin>
-
-			<!-- generate css by less -->
-			<plugin>
-				<groupId>org.lesscss</groupId>
-				<artifactId>lesscss-maven-plugin</artifactId>
-				<version>${lesscss.version}</version>
-				<configuration>
-					<sourceDirectory>${project.basedir}/src/main/resources/less</sourceDirectory>
-					<outputDirectory>${project.basedir}/src/main/resources/static/css</outputDirectory>
-					<compress>false</compress>
-					<includes>
-						<include>main.less</include>
-					</includes>
-				</configuration>
-				<executions>
-					<execution>
-						<goals>
-							<goal>compile</goal>
-						</goals>
-					</execution>
-				</executions>
 			</plugin>
 		</plugins>
 	</build>

@@ -25,7 +25,7 @@ import com.itranswarp.warpdb.Page;
 import com.itranswarp.warpdb.PagedResults;
 
 @Component
-public class BoardService extends AbstractService<Board> {
+public class BoardService extends AbstractDbService<Board> {
 
     @Autowired
     Markdown markdown;

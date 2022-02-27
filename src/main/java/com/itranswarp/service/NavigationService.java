@@ -10,7 +10,7 @@ import com.itranswarp.bean.NavigationBean;
 import com.itranswarp.model.Navigation;
 
 @Component
-public class NavigationService extends AbstractService<Navigation> {
+public class NavigationService extends AbstractDbService<Navigation> {
 
 	static final String KEY_NAVIGATIONS = "__navigations__";
 

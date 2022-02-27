@@ -12,15 +12,14 @@ import com.mitchellbosecke.pebble.template.PebbleTemplate;
 @Component
 public class JsonFilter extends AbstractFilter {
 
-	@Override
-	public String getName() {
-		return "json";
-	}
+    @Override
+    public String getName() {
+        return "json";
+    }
 
-	@Override
-	public Object apply(Object input, Map<String, Object> args, PebbleTemplate self, EvaluationContext context,
-			int lineNumber) throws PebbleException {
-		return JsonUtil.writeJson(input);
-	}
+    @Override
+    public Object apply(Object input, Map<String, Object> args, PebbleTemplate self, EvaluationContext context, int lineNumber) throws PebbleException {
+        return JsonUtil.writeJson(input);
+    }
 
 }

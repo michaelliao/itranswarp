@@ -13,8 +13,8 @@ import com.itranswarp.enums.Role;
 @Target(ElementType.METHOD)
 public @interface RoleWith {
 
-	/**
-	 * Get expected role.
-	 */
-	Role value();
+    /**
+     * Get expected role.
+     */
+    Role value();
 }

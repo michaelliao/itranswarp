@@ -12,29 +12,29 @@ import com.itranswarp.oauth.OAuthAuthentication;
 @Component
 public class TwitterOAuthProvider extends AbstractOAuthProvider {
 
-	@Component
-	@ConfigurationProperties("spring.signin.oauth.twitter")
-	public static class OAuthConfiguration extends AbstractOAuthConfiguration {
+    @Component
+    @ConfigurationProperties("spring.signin.oauth.twitter")
+    public static class OAuthConfiguration extends AbstractOAuthConfiguration {
 
-	}
+    }
 
-	@Autowired
-	OAuthConfiguration configuration;
+    @Autowired
+    OAuthConfiguration configuration;
 
-	@Override
-	public AbstractOAuthConfiguration getOAuthConfiguration() {
-		return this.configuration;
-	}
+    @Override
+    public AbstractOAuthConfiguration getOAuthConfiguration() {
+        return this.configuration;
+    }
 
-	@Override
-	public String getAuthenticateUrl(String redirectUrl) {
-		return String.format("https://xxxxxxxxx/authorize?client_id=%s&response_type=%s&redirect_uri=%s",
-				this.configuration.getClientId(), "code", URLEncoder.encode(redirectUrl, StandardCharsets.UTF_8));
-	}
+    @Override
+    public String getAuthenticateUrl(String redirectUrl) {
+        return String.format("https://xxxxxxxxx/authorize?client_id=%s&response_type=%s&redirect_uri=%s", this.configuration.getClientId(), "code",
+                URLEncoder.encode(redirectUrl, StandardCharsets.UTF_8));
+    }
 
-	@Override
-	public OAuthAuthentication getAuthentication(String code, String state, String redirectUrl) throws Exception {
-		return null;
-	}
+    @Override
+    public OAuthAuthentication getAuthentication(String code, String state, String redirectUrl) throws Exception {
+        return null;
+    }
 
 }

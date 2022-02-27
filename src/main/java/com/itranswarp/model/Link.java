@@ -9,14 +9,14 @@ import javax.persistence.Transient;
 @Table(name = "links")
 public class Link extends AbstractEntity {
 
-	@Column(nullable = false, length = VAR_CHAR_NAME)
-	public String name;
+    @Column(nullable = false, length = VAR_CHAR_NAME)
+    public String name;
 
-	@Column(nullable = false, length = VAR_CHAR_URL)
-	public String url;
+    @Column(nullable = false, length = VAR_CHAR_URL)
+    public String url;
 
-	@Transient
-	public String getShortenUrl() {
-		return "/link/" + this.id;
-	}
+    @Transient
+    public String getShortenUrl() {
+        return "/link/" + this.id;
+    }
 }

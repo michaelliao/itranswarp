@@ -22,53 +22,53 @@ import com.itranswarp.service.WikiService;
 
 public abstract class AbstractController {
 
-	protected final Logger logger = LoggerFactory.getLogger(getClass());
+    protected final Logger logger = LoggerFactory.getLogger(getClass());
 
-	protected static final String ID = "{id:[0-9]{1,17}}";
-	protected static final String ID2 = "{id2:[0-9]{1,17}}";
+    protected static final String ID = "{id:[0-9]{1,17}}";
+    protected static final String ID2 = "{id2:[0-9]{1,17}}";
 
-	@Autowired
-	protected EncryptService encryptService;
+    @Autowired
+    protected EncryptService encryptService;
 
-	@Autowired
-	protected RedisService redisService;
+    @Autowired
+    protected RedisService redisService;
 
-	@Autowired
-	protected AdService adService;
+    @Autowired
+    protected AdService adService;
 
-	@Autowired
-	protected ArticleService articleService;
+    @Autowired
+    protected ArticleService articleService;
 
-	@Autowired
-	protected AttachmentService attachmentService;
+    @Autowired
+    protected AttachmentService attachmentService;
 
-	@Autowired
-	protected BoardService boardService;
+    @Autowired
+    protected BoardService boardService;
 
-	@Autowired
-	protected LinkService linkService;
+    @Autowired
+    protected LinkService linkService;
 
-	@Autowired
-	protected NavigationService navigationService;
+    @Autowired
+    protected NavigationService navigationService;
 
-	@Autowired
-	protected SettingService settingService;
+    @Autowired
+    protected SettingService settingService;
 
-	@Autowired
-	protected SinglePageService singlePageService;
+    @Autowired
+    protected SinglePageService singlePageService;
 
-	@Autowired
-	protected TextService textService;
+    @Autowired
+    protected TextService textService;
 
-	@Autowired
-	protected UserService userService;
+    @Autowired
+    protected UserService userService;
 
-	@Autowired
-	protected WikiService wikiService;
+    @Autowired
+    protected WikiService wikiService;
 
-	@Autowired
-	protected AntiSpamService antiSpamService;
+    @Autowired
+    protected AntiSpamService antiSpamService;
 
-	@Autowired(required = false)
-	protected AbstractSearcher searcher;
+    @Autowired(required = false)
+    protected AbstractSearcher searcher;
 }

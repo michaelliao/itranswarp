@@ -10,14 +10,14 @@ import org.commonmark.renderer.html.HtmlWriter;
  */
 public interface PatternLinkRenderer {
 
-	/**
-	 * Try render a link. Return false to skip.
-	 * 
-	 * @param html  HtmlWriter object.
-	 * @param url   Link url, not empty.
-	 * @param title Link title, maybe null.
-	 * @return True if rendered ok, or false to skip.
-	 */
-	boolean render(HtmlWriter html, String url, String title);
+    /**
+     * Try render a link. Return false to skip.
+     * 
+     * @param html  HtmlWriter object.
+     * @param url   Link url, not empty.
+     * @param title Link title, maybe null.
+     * @return True if rendered ok, or false to skip.
+     */
+    boolean render(HtmlWriter html, String url, String title);
 
 }

@@ -13,25 +13,25 @@ import javax.persistence.Table;
 @Table(name = "attachments")
 public class Attachment extends AbstractEntity {
 
-	@Column(nullable = false, updatable = false)
-	public long userId;
+    @Column(nullable = false, updatable = false)
+    public long userId;
 
-	@Column(nullable = false, updatable = false)
-	public long resourceId;
+    @Column(nullable = false, updatable = false)
+    public long resourceId;
 
-	@Column(nullable = false, updatable = false)
-	public long size;
+    @Column(nullable = false, updatable = false)
+    public long size;
 
-	@Column(nullable = false, updatable = false)
-	public int width;
+    @Column(nullable = false, updatable = false)
+    public int width;
 
-	@Column(nullable = false, updatable = false)
-	public int height;
+    @Column(nullable = false, updatable = false)
+    public int height;
 
-	@Column(nullable = false, updatable = false, length = VAR_CHAR_NAME)
-	public String name;
+    @Column(nullable = false, updatable = false, length = VAR_CHAR_NAME)
+    public String name;
 
-	@Column(nullable = false, updatable = false, length = VAR_CHAR_MIME)
-	public String mime;
+    @Column(nullable = false, updatable = false, length = VAR_CHAR_MIME)
+    public String mime;
 
 }

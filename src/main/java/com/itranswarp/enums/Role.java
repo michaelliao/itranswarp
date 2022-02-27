@@ -2,20 +2,20 @@ package com.itranswarp.enums;
 
 public enum Role {
 
-	ADMIN(0),
+    ADMIN(0),
 
-	EDITOR(10),
+    EDITOR(10),
 
-	CONTRIBUTOR(100),
+    CONTRIBUTOR(100),
 
-	SPONSOR(1_000),
+    SPONSOR(1_000),
 
-	SUBSCRIBER(10_000);
+    SUBSCRIBER(10_000);
 
-	public final int value;
+    public final int value;
 
-	Role(int value) {
-		this.value = value;
-	}
+    Role(int value) {
+        this.value = value;
+    }
 
 }

@@ -2,7 +2,7 @@ package com.itranswarp.enums;
 
 public enum InputType {
 
-	TEXT,
+    TEXT,
 
-	TEXTAREA;
+    TEXTAREA;
 }

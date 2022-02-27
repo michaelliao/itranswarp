@@ -2,12 +2,12 @@ package com.itranswarp.enums;
 
 public enum RefType {
 
-	ARTICLE,
+    ARTICLE,
 
-	WIKI,
+    WIKI,
 
-	WIKIPAGE,
+    WIKIPAGE,
 
-	NONE;
+    NONE;
 
 }

@@ -37,105 +37,103 @@ import com.itranswarp.web.filter.HttpContext;
 @RequestMapping("/api/external")
 public class ExtApiController {
 
-	private final Logger logger = LoggerFactory.getLogger(getClass());
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
-	@Value("${spring.external.remote-code-runner.enabled:false}")
-	boolean remoteCodeRunnerEnabled;
+    @Value("${spring.external.remote-code-runner.enabled:false}")
+    boolean remoteCodeRunnerEnabled;
 
-	@Value("${spring.external.remote-code-runner.url:}")
-	String remoteCodeRunnerUrl;
+    @Value("${spring.external.remote-code-runner.url:}")
+    String remoteCodeRunnerUrl;
 
-	@Value("${spring.external.remote-code-runner.languages:java,python}")
-	Set<String> remoteCodeRunnerLanguages;
+    @Value("${spring.external.remote-code-runner.languages:java,python}")
+    Set<String> remoteCodeRunnerLanguages;
 
-	@Value("${spring.external.remote-code-runner.wait:15}")
-	int remoteCodeRunnerWait;
+    @Value("${spring.external.remote-code-runner.wait:15}")
+    int remoteCodeRunnerWait;
 
-	@Value("${spring.external.remote-code-runner.timeout:10}")
-	int remoteCodeRunnerTimeout;
+    @Value("${spring.external.remote-code-runner.timeout:10}")
+    int remoteCodeRunnerTimeout;
 
-	@Value("${spring.external.remote-code-runner.max-concurrent:10}")
-	int remoteCodeRunnerMaxConcurrent;
+    @Value("${spring.external.remote-code-runner.max-concurrent:10}")
+    int remoteCodeRunnerMaxConcurrent;
 
-	@Autowired
-	RedisService redisService;
+    @Autowired
+    RedisService redisService;
 
-	private HttpClient httpClient;
+    private HttpClient httpClient;
 
-	private String REMOTE_CODE_RUNNER_TIMEOUT = "{\"timeout\":true,\"error\":false,\"truncated\":false,\"output\":\"\"}";
+    private String REMOTE_CODE_RUNNER_TIMEOUT = "{\"timeout\":true,\"error\":false,\"truncated\":false,\"output\":\"\"}";
 
-	@PostConstruct
-	public void init() {
-		Executor executor = new ThreadPoolExecutor(1, this.remoteCodeRunnerMaxConcurrent, 60L, TimeUnit.SECONDS,
-				new LinkedBlockingQueue<Runnable>());
-		this.httpClient = HttpClient.newBuilder() // builder
-				.connectTimeout(Duration.ofSeconds(2)) // connect timeout
-				.executor(executor).build();
-	}
+    @PostConstruct
+    public void init() {
+        Executor executor = new ThreadPoolExecutor(1, this.remoteCodeRunnerMaxConcurrent, 60L, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>());
+        this.httpClient = HttpClient.newBuilder() // builder
+                .connectTimeout(Duration.ofSeconds(2)) // connect timeout
+                .executor(executor).build();
+    }
 
-	// remote code running ////////////////////////////////////////////////////
+    // remote code running ////////////////////////////////////////////////////
 
-	@PostMapping("/remoteCodeRun")
-	@ResponseBody
-	public DeferredResult<String> remoteCodeRun(@RequestBody RemoteCodeRunInput input) {
-		if (!this.remoteCodeRunnerEnabled) {
-			throw new ApiException(ApiError.OPERATION_FAILED, null, "Remote code running service is not enabled.");
-		}
-		if (input.language == null || !this.remoteCodeRunnerLanguages.contains(input.language)) {
-			throw new ApiException(ApiError.PARAMETER_INVALID, "language", "Invalid language.");
-		}
-		if (input.code == null || input.code.isBlank() || input.code.length() > 4096) {
-			throw new ApiException(ApiError.PARAMETER_INVALID, "code", "Invalid code.");
-		}
-		@SuppressWarnings("resource")
-		String key = "_rcr_" + HttpContext.getContext().ip;
-		boolean canRun = redisService.executeSync(command -> {
-			if (command.get(key) == null) {
-				command.setex(key, this.remoteCodeRunnerWait, "ok");
-				return true;
-			} else {
-				return false;
-			}
-		});
-		if (!canRun) {
-			throw new ApiException(ApiError.RATE_LIMIT, null, "Rate limit.");
-		}
-		byte[] jsonData = JsonUtil.writeJsonAsBytes(input);
-		HttpRequest request = HttpRequest.newBuilder(URI.create(this.remoteCodeRunnerUrl)) // url
-				.timeout(Duration.ofSeconds(this.remoteCodeRunnerTimeout)) // timeout
-				.header("Content-Type", "application/json") // json
-				.POST(BodyPublishers.ofByteArray(jsonData)).version(Version.HTTP_1_1).build();
-		CompletableFuture<HttpResponse<String>> cf = this.httpClient.sendAsync(request,
-				HttpResponse.BodyHandlers.ofString());
-		DeferredResult<String> dr = new DeferredResult<>(Long.valueOf(this.remoteCodeRunnerTimeout * 1000L), () -> {
-			redisService.executeSync(command -> {
-				command.setex(key, this.remoteCodeRunnerTimeout * 6, "ok");
-				return "";
-			});
-			return REMOTE_CODE_RUNNER_TIMEOUT;
-		});
-		cf.thenAccept(resp -> {
-			dr.setResult(resp.body());
-		});
-		cf.exceptionally(e -> {
-			logger.error("call remote code runner error!", e);
-			dr.setErrorResult(new ApiException(ApiError.INTERNAL_SERVER_ERROR));
-			return null;
-		});
-		return dr;
-	}
+    @PostMapping("/remoteCodeRun")
+    @ResponseBody
+    public DeferredResult<String> remoteCodeRun(@RequestBody RemoteCodeRunInput input) {
+        if (!this.remoteCodeRunnerEnabled) {
+            throw new ApiException(ApiError.OPERATION_FAILED, null, "Remote code running service is not enabled.");
+        }
+        if (input.language == null || !this.remoteCodeRunnerLanguages.contains(input.language)) {
+            throw new ApiException(ApiError.PARAMETER_INVALID, "language", "Invalid language.");
+        }
+        if (input.code == null || input.code.isBlank() || input.code.length() > 4096) {
+            throw new ApiException(ApiError.PARAMETER_INVALID, "code", "Invalid code.");
+        }
+        @SuppressWarnings("resource")
+        String key = "_rcr_" + HttpContext.getContext().ip;
+        boolean canRun = redisService.executeSync(command -> {
+            if (command.get(key) == null) {
+                command.setex(key, this.remoteCodeRunnerWait, "ok");
+                return true;
+            } else {
+                return false;
+            }
+        });
+        if (!canRun) {
+            throw new ApiException(ApiError.RATE_LIMIT, null, "Rate limit.");
+        }
+        byte[] jsonData = JsonUtil.writeJsonAsBytes(input);
+        HttpRequest request = HttpRequest.newBuilder(URI.create(this.remoteCodeRunnerUrl)) // url
+                .timeout(Duration.ofSeconds(this.remoteCodeRunnerTimeout)) // timeout
+                .header("Content-Type", "application/json") // json
+                .POST(BodyPublishers.ofByteArray(jsonData)).version(Version.HTTP_1_1).build();
+        CompletableFuture<HttpResponse<String>> cf = this.httpClient.sendAsync(request, HttpResponse.BodyHandlers.ofString());
+        DeferredResult<String> dr = new DeferredResult<>(Long.valueOf(this.remoteCodeRunnerTimeout * 1000L), () -> {
+            redisService.executeSync(command -> {
+                command.setex(key, this.remoteCodeRunnerTimeout * 6, "ok");
+                return "";
+            });
+            return REMOTE_CODE_RUNNER_TIMEOUT;
+        });
+        cf.thenAccept(resp -> {
+            dr.setResult(resp.body());
+        });
+        cf.exceptionally(e -> {
+            logger.error("call remote code runner error!", e);
+            dr.setErrorResult(new ApiException(ApiError.INTERNAL_SERVER_ERROR));
+            return null;
+        });
+        return dr;
+    }
 
-	// static bean class //////////////////////////////////////////////////////
+    // static bean class //////////////////////////////////////////////////////
 
-	public static class RemoteCodeRunInput {
-		public String language;
-		public String code;
-	}
+    public static class RemoteCodeRunInput {
+        public String language;
+        public String code;
+    }
 
-	public static class RemoteCodeRunResult {
-		public boolean timeout;
-		public boolean error;
-		public boolean truncated;
-		public String output;
-	}
+    public static class RemoteCodeRunResult {
+        public boolean timeout;
+        public boolean error;
+        public boolean truncated;
+        public String output;
+    }
 }

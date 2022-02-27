@@ -13,19 +13,18 @@ import com.mitchellbosecke.pebble.template.PebbleTemplate;
 @Component
 public class UrlFilter extends AbstractFilter {
 
-	@Override
-	public String getName() {
-		return "url";
-	}
+    @Override
+    public String getName() {
+        return "url";
+    }
 
-	@Override
-	public Object apply(Object input, Map<String, Object> args, PebbleTemplate self, EvaluationContext context,
-			int lineNumber) throws PebbleException {
-		if (input == null) {
-			return "";
-		}
-		String s = input.toString();
-		return URLEncoder.encode(s, StandardCharsets.UTF_8).replace("+", "%20");
-	}
+    @Override
+    public Object apply(Object input, Map<String, Object> args, PebbleTemplate self, EvaluationContext context, int lineNumber) throws PebbleException {
+        if (input == null) {
+            return "";
+        }
+        String s = input.toString();
+        return URLEncoder.encode(s, StandardCharsets.UTF_8).replace("+", "%20");
+    }
 
 }

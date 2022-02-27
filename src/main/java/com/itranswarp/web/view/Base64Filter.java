@@ -13,19 +13,18 @@ import com.mitchellbosecke.pebble.template.PebbleTemplate;
 @Component
 public class Base64Filter extends AbstractFilter {
 
-	@Override
-	public String getName() {
-		return "base64";
-	}
+    @Override
+    public String getName() {
+        return "base64";
+    }
 
-	@Override
-	public Object apply(Object input, Map<String, Object> args, PebbleTemplate self, EvaluationContext context,
-			int lineNumber) throws PebbleException {
-		if (input == null) {
-			return "";
-		}
-		String s = input.toString();
-		return Base64.getEncoder().encodeToString(s.getBytes(StandardCharsets.UTF_8));
-	}
+    @Override
+    public Object apply(Object input, Map<String, Object> args, PebbleTemplate self, EvaluationContext context, int lineNumber) throws PebbleException {
+        if (input == null) {
+            return "";
+        }
+        String s = input.toString();
+        return Base64.getEncoder().encodeToString(s.getBytes(StandardCharsets.UTF_8));
+    }
 
 }

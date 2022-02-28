@@ -3,6 +3,7 @@
 # tomcat configuration:
 server:
   port: ${SERVER_PORT:2019}
+  forward-headers-strategy: native
 
 spring:
   profiles:

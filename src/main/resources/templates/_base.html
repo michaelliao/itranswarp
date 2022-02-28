@@ -33,13 +33,14 @@
 	{% endif %}
 {% endmacro %}
 -->
+
 <head>
 	<meta charset="utf-8" />
 	<title>{% block title %} ??? {% endblock %} - {{ __website__.name }}</title>
 	{% if __scheme__ == 'https' %}
 	<meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests">
 	{% endif %}
-	<meta name="viewport" content="width=device-width" />
+	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<meta name="keywords" content="{{ __website__.keywords }}" />
 	<meta name="description" content="{{ __website__.description }}" />
 	<meta property="x-nav" content="{% block nav %}/{% endblock %}" />
@@ -51,37 +52,43 @@
 	{% block layout %}
 	{% endblock %}
 
-	{% block meta %}<!-- meta here -->{% endblock %}
+	{% block meta %}
+	<!-- meta here -->
+	{% endblock %}
 
 	<!-- BEGIN CSS -->
-	<link rel="stylesheet" href="/static/css/codemirror.css" />
-	<link rel="stylesheet" href="/static/css/highlight.css" />
-	<link rel="stylesheet" href="/static/css/katex.css" />
-	<link rel="stylesheet" href="/static/css/simditor.css" />
-	<link rel="stylesheet" href="/static/css/main.css?v={{ __version__ }}" />
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/uikit@2.27.4/vendor/codemirror/codemirror.css">
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/uikit@2.27.4/vendor/highlight/highlight.css">
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.15.1/dist/katex.min.css">
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/simditor@2.3.22/styles/simditor.css">
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/uikit@2.27.4/dist/css/uikit.min.css">
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/uikit@2.27.4/dist/css/uikit.almost-flat.css">
 	<!-- END CSS -->
+
+	<link rel="stylesheet" href="/static/css/itranswarp.css?v={{ __version__ }}">
+
 	<!-- BEGIN JAVASCRIPT -->
-	<script src="/static/js/3rdparty/jquery.js"></script>
-	<script src="/static/js/3rdparty/underscore.js"></script>
-	<script src="/static/js/3rdparty/moment-with-locales.min.js"></script>
-	<script src="/static/js/3rdparty/marked.js"></script>
-	<script src="/static/js/3rdparty/codemirror.js"></script>
-	<script src="/static/js/3rdparty/highlight.js"></script>
-	<script src="/static/js/3rdparty/katex.js"></script>
-	<script src="/static/js/3rdparty/module.js"></script>
-	<script src="/static/js/3rdparty/hotkeys.js"></script>
-	<script src="/static/js/3rdparty/uploader.js"></script>
-	<script src="/static/js/3rdparty/simditor.js"></script>
-	<script src="/static/js/3rdparty/turndown.js"></script>
-	<script src="/static/js/uikit/uikit.js"></script>
-	<script src="/static/js/uikit/components/tooltip.js"></script>
-	<script src="/static/js/uikit/components/slideshow.js"></script>
-	<script src="/static/js/uikit/components/datepicker.js"></script>
-	<script src="/static/js/uikit/components/autocomplete.js"></script>
-	<script src="/static/js/uikit/components/notify.js"></script>
-	<script src="/static/js/uikit/components/lightbox.js"></script>
-	<script src="/static/js/uikit/components/htmleditor.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/jquery@2.1.4/dist/jquery.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/underscore@1.12.1/underscore-min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/moment@2.29.1/min/moment-with-locales.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/uikit@2.27.4/vendor/codemirror/codemirror.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/uikit@2.27.4/vendor/highlight/highlight.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/uikit@2.27.4/vendor/commonmark.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/katex@0.15.1/dist/katex.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/simple-module@2.0.6/lib/module.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/simple-hotkeys@1.0.3/lib/hotkeys.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/simditor@2.3.22/lib/simditor.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/turndown@7.1.1/dist/turndown.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/uikit@2.27.4/dist/js/uikit.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/uikit@2.27.4/dist/js/components/tooltip.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/uikit@2.27.4/dist/js/components/slideshow.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/uikit@2.27.4/dist/js/components/datepicker.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/uikit@2.27.4/dist/js/components/autocomplete.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/uikit@2.27.4/dist/js/components/notify.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/uikit@2.27.4/dist/js/components/lightbox.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/uikit@2.27.4/dist/js/components/htmleditor.min.js"></script>
 	<!-- END JAVASCRIPT -->
+
 	<script src="/static/js/shared.js?v={{ __version__ }}"></script>
 	<script src="/static/js/itranswarp.js?v={{ __version__ }}"></script>
 	<script src="/static/js/extension.js?v={{ __version__ }}"></script>
@@ -89,74 +96,79 @@
 	{% include("_inc_comment.html") %}
 
 	<style id="x-doc-style">
-		.x-display-none { display: none; }
-{% if __user__ != null %}
-		.x-display-if-not-signin { display: none; }
-{% else %}
-		.x-display-if-signin { display: none; }
-{% endif %}
-		.x-can-delete {
-{% if __user__ != null and __user__.role.value() <= 10 %}
-			display: inline;
-{% else %}
+		.x-display-none {
 			display: none;
-{% endif %}
+		}
+
+		/* {% if __user__ !=null %} */
+
+		.x-display-if-not-signin {
+			display: none;
+		}
+
+		/* {% else %} */
+
+		.x-display-if-signin {
+			display: none;
+		}
+
+		/* {% endif %} */
+
+		.x-can-delete {
+
+			/* {% if __user__ !=null and __user__.role.value() <=10 %} */
+
+			display: inline;
+
+			/* {% else %} */
+
+			display: none;
+
+			/* {% endif %} */
 		}
 	</style>
 
 	<script>
-		// global variables:
+		/* global variables */
 		var g_time = parseFloat('{{ __timestamp__ }}');
-{% if __user__ != null %}
+
+		/* {% if __user__ != null %} */
 		var g_user = {
 			id: '{{ __user__.id }}',
 			name: JSON.parse(decodeURIComponent('{{ __user__.name|json|url|raw }}')),
 			image_url: '{{ __user__.image_url }}'
 		};
-{% else %}
+		/* {% else %} */
 		var g_user = null;
-{% endif %}
+		/* {% endif %} */
 
-	// init svg icons:
-	var g_icons = {
-{% for nav in __navigations__ %}
-	'{{ nav.id }}':{{ nav.icon|json|raw }},
-{% endfor %}
-	'END':''
-	};
-	$(function () {
-		$('span.x-icon').each(function () {
-			var
-				$span = $(this),
-				iconId = $span.attr('data-id');
-			if (iconId) {
-				$span.html(g_icons[iconId]);
-			}
+		$(function () {
+			$(window).trigger('resize');
 		});
-		$(window).trigger('resize');
-	});
 
-	// init ads:
-	var g_ads = JSON.parse(decodeURIComponent('{{ __ads__|json|url|raw }}'));
-	$(function () {
-		initSponsors(g_ads);
-		console.log('init ad ok.');
-	});
+		// init ads:
+		var g_ads = JSON.parse(decodeURIComponent('{{ __ads__|json|url|raw }}'));
+		$(function () {
+			initSponsors(g_ads);
+			console.log('init ad ok.');
+		});
 	</script>
 
-{% block head %}<!-- head  -->{% endblock %}
+	{% block head %}
+	<!-- head  -->
+	{% endblock %}
 
-<script>
-	console.log('init itranswarp ok.');
-</script>
+	<script>
+		console.log('init itranswarp ok.');
+	</script>
 
-<!-- BEGIN custom_header -->
-{{ __website__.customHeader|raw }}
-<!-- END custom_header -->
+	<!-- BEGIN custom_header -->
+	{{ __website__.customHeader|raw }}
+	<!-- END custom_header -->
 
-<script>
-	console.log('init js ok.');
-</script>
+	<script>
+		console.log('init js ok.');
+	</script>
 
 </head>
 
@@ -166,9 +178,9 @@
 		<div class="x-stick"></div>
 	</div>
 
-	<div id="header" class="uk-navbar uk-navbar-attached">
+	<div id="header" class="x-navbar uk-navbar uk-navbar-attached">
 		<div class="uk-container x-container">
-			<div id="navbar" class="uk-navbar uk-navbar-attached">
+			<div id="navbar">
 				{% if __offcanvas_left__ %}
 				<ul class="uk-navbar-nav uk-visible-small">
 					<li><a href="#0" onclick="UIkit.offcanvas.show('#x-offcanvas-left')">{{ _('Index') }}</a></li>
@@ -179,14 +191,24 @@
 				<a class="uk-hidden" href="/blog/{{ __time__ }}">Blog</a>
 				<ul id="ul-navbar" class="uk-navbar-nav uk-hidden-small">
 					{% for nav in __navigations__ %}
-					<li class="x-nav"><a href="{{ nav.url }}" {% if nav.blank %}target="_blank"{% endif %}>{% if nav.icon %}<span class="x-icon" data-id="{{ nav.id }}"></span> {% endif %}{{ nav.name }}</a></li>
+					<li class="x-nav">
+						<a href="{{ nav.url }}" {% if nav.blank %} target="_blank" {% endif %}>
+							{% if nav.icon != '' %}<i class="uk-icon-{{ nav.icon }}"></i>{% endif %}
+							{{ nav.name }}
+						</a>
+					</li>
 					{% endfor %}
 					<li id="navbar-more" class="uk-parent" data-uk-dropdown style="display:none">
 						<a href="#0"><i class="uk-icon-chevron-down"></i> {{ _('More') }}</a>
 						<div class="uk-dropdown uk-dropdown-navbar">
 							<ul id="ul-navbar-more" class="uk-nav uk-nav-navbar">
 								{% for nav in __navigations__ %}
-								<li class="x-nav"><a href="{{ nav.url }}" {% if nav.blank %}target="_blank"{% endif %}>{% if nav.icon %}<span class="x-icon" data-id="{{ nav.id }}"></span> {% endif %}{{ nav.name }}</a></li>
+								<li class="x-nav">
+									<a href="{{ nav.url }}" {% if nav.blank %} target="_blank" {% endif %}>
+										{% if nav.icon != '' %}<i class="uk-icon-{{ nav.icon }}"></i>{% endif %}
+										{{ nav.name }}
+									</a>
+								</li>
 								{% endfor %}
 							</ul>
 						</div>
@@ -198,65 +220,90 @@
 						<div class="uk-dropdown uk-dropdown-navbar">
 							<ul class="uk-nav uk-nav-navbar">
 								{% for nav in __navigations__ %}
-								<li><a href="{{ nav.url }}" {% if nav.blank %}target="_blank"{% endif %}>{{ nav.name }}</a></li>
+								<li>
+									<a href="{{ nav.url }}" {% if nav.blank %} target="_blank" {% endif %}>
+										{% if nav.icon != '' %}<i class="uk-icon-{{ nav.icon }}"></i>{% endif %}
+										{{ nav.name }}
+									</a>
+								</li>
 								{% endfor %}
 							</ul>
 						</div>
 					</li>
 				</ul>
 
-<!--
-				<div class="uk-navbar-content x-hidden-tiny">
-					<form id="form-search" class="uk-form uk-margin-remove uk-display-inline-block">
-						<div class="uk-form-icon">
-							<i class="uk-icon-search"></i>
-							<input type="text" placeholder="Search">
-						</div>
-					</form>
-				</div>
--->
-
 				<div id="navbar-user-info" class="uk-navbar-flip">
 					<ul class="uk-navbar-nav">
+
+						<!--
+						<li>
+							<form action="/search" class="uk-form uk-display-inline-block uk-visible-small" style="margin: 8px 8px">
+								<div class="uk-form-icon">
+									<i class="uk-icon-search"></i>
+									<input type="text" name="q" placeholder="Search" class="uk-form-width-small">
+								</div>
+							</form>
+						</li>
+						<li>
+							<form action="/search" class="uk-form uk-display-inline-block uk-hidden-small" style="margin: 8px 8px">
+								<div class="uk-form-icon">
+									<i class="uk-icon-search"></i>
+									<input type="text" name="q" placeholder="Search" class="uk-form-width-medium">
+								</div>
+							</form>
+						</li>
+-->
+
 						<li class="uk-parent x-display-if-signin" data-uk-dropdown>
-							<a href="#0"><i class="uk-icon-user"></i><span class="x-hidden-tiny">&nbsp;</span><span class="x-user-name x-hidden-tiny">{% if __user__ != null %}{{ __user__.name }}{% endif %}</span></a>
+							<a href="#0"><i class="uk-icon-user"></i><span class="x-hidden-tiny">&nbsp;</span><span
+									class="x-user-name x-hidden-tiny">{% if __user__ != null %}{{ __user__.name }}{%
+									endif %}</span></a>
 							<div class="uk-dropdown uk-dropdown-navbar">
 								<ul class="uk-nav uk-nav-navbar">
-									<li><a target="_blank" href="/profile"><i class="uk-icon-cog"></i> {{ _('Profile') }}</a></li>
+									<li><a target="_blank" href="/profile"><i class="uk-icon-cog"></i> {{ _('Profile')
+											}}</a></li>
 									<li class="uk-nav-divider"></li>
-								{% if __user__ != null and __user__.role.value <= 100 %}
-									<li><a target="_blank" href="/manage/"><i class="uk-icon-cogs"></i> {{ _('Manage') }}</a></li>
-									<li class="uk-nav-divider"></li>
-								{% endif %}
-								{% if __user__ != null and __user__.role.value == 1000 %}
-									<li><a target="_blank" href="/sponsor/adperiod"><i class="uk-icon-photo"></i> {{ _('Sponsor') }}</a></li>
-									<li class="uk-nav-divider"></li>
-								{% endif %}
-									<li><a href="/auth/signout"><i class="uk-icon-power-off"></i> {{ _('Sign Out') }}</a></li>
-								</ul>
-							</div>
+									{% if __user__ != null and __user__.role.value <= 100 %} <li><a target="_blank"
+											href="/manage/"><i class="uk-icon-cogs"></i> {{ _('Manage') }}</a>
 						</li>
-						<li class="x-display-if-not-signin uk-hidden-small"><a href="/auth/signin"><i class="uk-icon-sign-in"></i> {{ _('Sign In') }}</a></li>
-						<li class="x-display-if-not-signin uk-visible-small"><a href="/auth/signin"><i class="uk-icon-sign-in"></i></a></li>
-						<li class="uk-parent" data-uk-dropdown>
-							<a href="#0"><i class="uk-icon-globe"></i></a>
-							<div class="uk-dropdown uk-dropdown-navbar">
-								<ul class="uk-nav uk-nav-navbar">
-									{% for l in __languages__ %}
-									<li><a href="/locale/{{ l.locale }}">{{ l.name }}</a></li>
-									{% endfor %}
-								</ul>
-							</div>
-						</li>
+						<li class="uk-nav-divider"></li>
+						{% endif %}
+						{% if __user__ != null and __user__.role.value == 1000 %}
+						<li><a target="_blank" href="/sponsor/adperiod"><i class="uk-icon-photo"></i> {{ _('Sponsor')
+								}}</a></li>
+						<li class="uk-nav-divider"></li>
+						{% endif %}
+						<li><a href="/auth/signout"><i class="uk-icon-power-off"></i> {{ _('Sign Out') }}</a></li>
 					</ul>
 				</div>
+				</li>
+				<li class="x-display-if-not-signin uk-hidden-small"><a href="/auth/signin"><i
+							class="uk-icon-sign-in"></i> {{ _('Sign In') }}</a></li>
+				<li class="x-display-if-not-signin uk-visible-small"><a href="/auth/signin"><i
+							class="uk-icon-sign-in"></i></a></li>
+				<li class="uk-parent" data-uk-dropdown>
+					<a href="#0"><i class="uk-icon-globe"></i></a>
+					<div class="uk-dropdown uk-dropdown-navbar">
+						<ul class="uk-nav uk-nav-navbar">
+							{% for l in __languages__ %}
+							<li><a href="/locale/{{ l.locale }}">{{ l.name }}</a></li>
+							{% endfor %}
+						</ul>
+					</div>
+				</li>
+				</ul>
 			</div>
 		</div>
+	</div>
 	</div><!-- // header -->
 
 	<div id="main">
-		<div class="x-placeholder-50"><!-- placeholder --></div>
-		<div class="x-placeholder"><!-- placeholder --></div>
+		<div class="x-placeholder-v">
+			<!-- placeholder -->
+		</div>
+		<div class="x-placeholder">
+			<!-- placeholder -->
+		</div>
 		<div class="uk-container x-container">
 			<div class="uk-grid">
 				<div id="x-body-top" class="uk-width-1-1">
@@ -275,7 +322,8 @@
 									<!-- // __snippet__.sidebarLeftTop -->
 								</div>
 								<div id="x-sidebar-left-content" class="x-sidebar-left-content">
-									{% block sidebar_left_content %}<p>override block "sidebar_left_content"</p>{% endblock %}
+									{% block sidebar_left_content %}<p>override block "sidebar_left_content"</p>{%
+									endblock %}
 								</div>
 								<div id="x-sidebar-left-bottom">
 									<!-- __snippet__.sidebarLeftBottom -->
@@ -285,7 +333,8 @@
 							</div>
 						</div>
 						{% endif %}
-						<div class="uk-flex-item-1" style="{% if __sidebar_left__ %}padding-left:15px;{% endif %} {% if __sidebar_right__ %}padding-right:15px;{% endif %}">
+						<div class="uk-flex-item-1"
+							style="{% if __sidebar_left__ %}padding-left:15px;{% endif %} {% if __sidebar_right__ %}padding-right:15px;{% endif %}">
 							<div id="x-content-top">
 								<!-- __snippet__.contentTop -->
 								{{ __snippet__.contentTop|raw }}
@@ -299,7 +348,7 @@
 								{{ __snippet__.contentBottom|raw }}
 								<!-- // __snippet__.contentBottom -->
 							</div>
-							<div id="x-content-comment">
+							<div id="x-content-comment" class="uk-margin-top">
 								{% block content_comment %}{% endblock %}
 							</div>
 						</div>
@@ -312,7 +361,8 @@
 									<!-- // __snippet__.sidebarRightTop -->
 								</div>
 								<div id="x-sidebar-right-content" class="x-sidebar-right-content">
-									{% block sidebar_right_content %}<p>override block "sidebar_right_content"</p>{% endblock %}
+									{% block sidebar_right_content %}<p>override block "sidebar_right_content"</p>{%
+									endblock %}
 								</div>
 								<div id="x-sidebar-right-bottom">
 									<!-- __snippet__.sidebarRightBottom -->
@@ -334,7 +384,7 @@
 		</div>
 	</div>
 
-{% if __offcanvas_left__ %}
+	{% if __offcanvas_left__ %}
 	<div id="x-offcanvas-left" class="uk-offcanvas">
 		<div class="uk-offcanvas-bar">
 			<div class="uk-panel">
@@ -342,7 +392,7 @@
 			</div>
 		</div>
 	</div>
-{% endif %}
+	{% endif %}
 
 	<div id="footer">
 		<div class="x-footer uk-container x-container">
@@ -350,25 +400,29 @@
 			<div class="uk-grid">
 				<div class="x-footer-copyright uk-width-small-1-2 uk-width-medium-1-3">
 					<p>
-						<a href="/" title="version={{ __version__ }}">{{ __website__.name }}</a> {{ __website__.copyright|raw }}
+						<a href="/" title="version={{ __version__ }}">{{ __website__.name }}</a>
+						{{ __website__.copyright|raw }}
 						<br>
 						Powered by <a href="https://github.com/michaelliao/itranswarp" target="_blank">iTranswarp</a>
 					</p>
 				</div>
 				<div class="uk-width-small-1-2 uk-width-medium-1-3 x-hidden-tiny">
-				{% for f in __follows__ %}
+					{% for f in __follows__ %}
 					<a href="{{ f[1] }}" target="_blank" class="uk-icon-button uk-icon-{{ f[0] }}"></a>
-				{% endfor %}
+					{% endfor %}
 				</div>
 				<div class="uk-width-medium-1-3 uk-hidden-small">
 					<p>
-						<a href="https://github.com/michaelliao/itranswarp/issues" target="_blank">{{ _('Feedback') }}</a>
+						<a href="https://github.com/michaelliao/itranswarp/issues" target="_blank">{{ _('Feedback')
+							}}</a>
 						<br>
-						<a href="https://github.com/michaelliao/itranswarp/blob/master/LICENSE" target="_blank">{{ _('License') }}</a>
+						<a href="https://github.com/michaelliao/itranswarp/blob/master/LICENSE" target="_blank">{{
+							_('License') }}</a>
 					</p>
 				</div>
 			</div>
 		</div>
 	</div>
 </body>
+
 </html>

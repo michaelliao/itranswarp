@@ -1,7 +1,7 @@
 {% extends '_base.html' %}
 
 {% block layout %}
-	{% set __sidebar_right__ = true %}
+{% set __sidebar_right__ = true %}
 {% endblock %}
 
 {% block nav %} /discuss {% endblock %}
@@ -9,61 +9,60 @@
 {% block title %}{{ _('Discuss') }}{% endblock %}
 
 {% block meta %}
-    <meta property="og:ad" content="true" />
-    <meta property="og:type" content="webpage" />
-    <meta property="og:url" content="{{ __url__ }}" />
-    <meta property="og:title" content="{{ _('Discuss') }}" />
+<meta property="og:ad" content="true" />
+<meta property="og:type" content="webpage" />
+<meta property="og:url" content="{{ __url__ }}" />
+<meta property="og:title" content="{{ _('Discuss') }}" />
 {% endblock %}
 
 {% block head %}
 
 <style>
-.x-discuss-visible {
-    display: block;
-}
+    .x-discuss-visible {
+        display: block;
+    }
 </style>
 
 {% endblock %}
 
 {% block content %}
-    <div class="x-discuss-content">
-        <div class="uk-alert">
-            {{ _('Discuss') }}
-        </div>
-
-        <table class="uk-table uk-table-hover">
-            <thead>
-                <tr>
-                    <th>{{ _('Discuss') }}</th>
-                </tr>
-            </thead>
-            <tbody>
+<div class="x-discuss-content">
+    <table class="uk-table uk-table-hover">
+        <thead>
+            <tr>
+                <th>{{ _('Discuss') }}</th>
+            </tr>
+        </thead>
+        <tbody>
             {% for b in boards %}
-                <tr>
-                    <td>
-                        <div class="uk-margin" style="font-size:16px;"><a href="/discuss/{{ b.id }}">{{ b.name}}</a></div>
-                        <div>{{ b.description }}</div>
-                    </td>
-                </tr>
+            <tr>
+                <td>
+                    <div class="uk-margin">
+                        <h3><a href="/discuss/{{ b.id }}">{{ b.name}}</a></h3>
+                    </div>
+                    <div>{{ b.description }}</div>
+                </td>
+            </tr>
             {% endfor %}
-            </tbody>
-        </table>
-    </div>
+        </tbody>
+    </table>
+</div>
 
 {% endblock %}
 
 {% block sidebar_right_content %}
 
-    <h3>{{ _('Recent Topics') }}</h3>
-    <div class="x-index-recent-topics">
-        {% for t in recentTopics %}
-        	<div class="uk-margin uk-clearfix">
-        		<a href="/user/{{ t.userId }}" target="_blank"><img class="uk-comment-avatar uk-border-circle x-avatar" src="{{ t.userImageUrl }}" style="width:30px"></a>
-                <div style="margin-left:40px;">
-                    <div class="uk-x"><a href="/discuss/{{ t.boardId }}/{{ t.id }}">{{ t.name }}</a></div>
-                </div>
-            </div>
-        {% endfor %}
+<h3>{{ _('Recent Topics') }}</h3>
+<div class="x-recent-topics">
+    {% for t in recentTopics %}
+    <div class="uk-margin uk-clearfix">
+        <a href="/user/{{ t.userId }}" target="_blank">
+            <img class="uk-comment-avatar uk-border-circle x-avatar" src="{{ t.userImageUrl }}"></a>
+        <div class="x-title" style="margin-left:45px;">
+            <a href="/discuss/{{ t.boardId }}/{{ t.id }}">{{ t.name }}</a>
+        </div>
     </div>
+    {% endfor %}
+</div>
 
 {% endblock %}

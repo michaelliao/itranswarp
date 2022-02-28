@@ -6,11 +6,11 @@
 {% block title %}{{ _('Home') }}{% endblock %}
 
 {% block meta %}
-    <meta property="og:ad" content="true" />
-    <meta property="og:type" content="webpage" />
-    <meta property="og:url" content="{{ __url__ }}" />
-    <meta property="og:title" content="{{ __website__.name }}" />
-    <meta property="og:tag" content="index" />
+<meta property="og:ad" content="true" />
+<meta property="og:type" content="webpage" />
+<meta property="og:url" content="{{ __url__ }}" />
+<meta property="og:title" content="{{ __website__.name }}" />
+<meta property="og:tag" content="index" />
 {% endblock %}
 
 {% block head %}
@@ -18,56 +18,41 @@
 {% set __sidebar_right__ = true %}
 
 <style>
-.x-index-visible {
-    display: block;
-}
+    .x-index-visible {
+        display: block;
+    }
 </style>
 
 {% endblock %}
 
 {% block content %}
 
-    <div class="uk-grid">
-        <div class="x-index-top uk-width-1-1">
-            {{ __snippet__.indexTop|raw }}
-        </div>
+<div class="uk-grid">
+    <div class="x-index-top uk-width-1-1">
+        {{ __snippet__.indexTop|raw }}
     </div>
+</div>
 
-    <h3>{{ _('Hot Articles') }}</h3>
-    <div style="max-width:640px;" class="uk-slidenav-position" data-uk-slideshow="{autoplay:true,pauseOnHover:false,kenburns:true}">
-        <ul class="uk-slideshow uk-overlay-active">
-            {% for a in recentArticles %}
-            <li>
-                <img src="/files/attachments/{{ a.imageId }}/l" width="640" height="360">
-                <div onclick="window.open('/article/{{ a.id }}')" style="cursor:pointer" class="uk-overlay-panel uk-overlay-background uk-overlay-bottom uk-overlay-slide-bottom">
-                    <h3>{{ a.name }}</h3>
-                    <p>{{ a.description }}</p>
-                </div>
-            </li>
-            {% endfor %}
-        </ul>
-        <a href="#0" class="uk-slidenav uk-slidenav-contrast uk-slidenav-previous" data-uk-slideshow-item="previous" style="color: rgba(255,255,255,0.4)"></a>
-        <a href="#0" class="uk-slidenav uk-slidenav-contrast uk-slidenav-next" data-uk-slideshow-item="next" style="color: rgba(255,255,255,0.4)"></a>
-    </div>
-
-    <h3>{{ _('Recent Articles') }}</h3>
-    {% for a in recentArticles %}
-    <div class="uk-margin uk-clearfix">
+<h3>{{ _('Recent Articles') }}</h3>
+{% for a in recentArticles %}
+<div class="uk-margin uk-clearfix">
+    <div class="uk-margin">
         <div style="float:left">
             <a href="/article/{{ a.id }}" target="_blank"><img src="/files/attachments/{{ a.imageId }}/s" /></a>
         </div>
-        <div class="uk-margin" style="margin-left:180px;">
+        <div style="margin-left:170px;">
             <h3><a href="/article/{{ a.id }}" target="_blank">{{ a.name }}</a></h3>
             <p>{{ a.description }}</p>
         </div>
     </div>
-    {% endfor %}
+</div>
+{% endfor %}
 
-    <div class="uk-grid">
-        <div class="x-index-bottom uk-width-1-1">
-           {{ __snippet__.indexBottom|raw }}
-        </div>
+<div class="uk-grid">
+    <div class="x-index-bottom uk-width-1-1">
+        {{ __snippet__.indexBottom|raw }}
     </div>
+</div>
 
 {% endblock %}
 
@@ -75,14 +60,16 @@
 
 <div class="uk-margin">
     <h3>{{ _('Recent Topics') }}</h3>
-    <div class="x-index-recent-topics">
+    <div class="x-recent-topics">
         {% for t in recentTopics %}
-        	<div class="uk-margin uk-clearfix">
-        		<a href="/user/{{ t.userId }}" target="_blank"><img class="uk-comment-avatar uk-border-circle x-avatar" src="{{ t.userImageUrl }}" style="width:30px"></a>
-                <div style="margin-left:40px;">
-                    <div class="uk-x"><a href="/discuss/{{ t.boardId }}/{{ t.id }}">{{ t.name }}</a></div>
-                </div>
+        <div class="uk-margin uk-clearfix">
+            <a href="/user/{{ t.userId }}" target="_blank">
+                <img class="uk-comment-avatar uk-border-circle x-avatar" src="{{ t.userImageUrl }}">
+            </a>
+            <div class="x-title">
+                <a href="/discuss/{{ t.boardId }}/{{ t.id }}">{{ t.name }}</a>
             </div>
+        </div>
         {% endfor %}
     </div>
 </div>

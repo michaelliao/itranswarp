@@ -4,126 +4,134 @@
 
 {% block head %}
 <script>
-$(function() {
-    getJSON('/api/navigations', function (err, resp) {
-        if (err) {
-            return showError(err);
-        }
-        initVM(resp.results);
+    $(function () {
+        getJSON('/api/navigations', function (err, resp) {
+            if (err) {
+                return showError(err);
+            }
+            initVM(resp.results);
+        });
     });
-});
 
-function initVM(navigations) {
-    var vm = new Vue({
-        el: '#vm',
-        data: {
-            navigations: navigations
-        },
-        methods: {
-            find: function (id) {
-            	return this.navigations.findIndex(n => n.id === id);
+    function initVM(navigations) {
+        var vm = new Vue({
+            el: '#vm',
+            data: {
+                navigations: navigations
             },
-            swap: function (index1, index2) {
-                var obj = this.navigations[index2];
-                this.navigations.splice(index2, 1);
-                this.navigations.splice(index1, 0, obj);
-                $('#sort').show();
-            },
-            moveUp: function (id) {
-                var index = this.find(id);
-                if (index===(-1) || index===0) {
-                    return;
-                }
-                this.swap(index - 1, index);
-            },
-            moveDown: function (id) {
-                var index = this.find(id);
-                if (index===(-1) || index===(this.navigations.length-1)) {
-                    return;
-                }
-                this.swap(index, index + 1);
-            },
-            sort: function () {
-                var ids = this.navigations.map(n => n.id);
-                var that = this;
-                that.$resource('/api/navigations/sort').save({ ids: ids }).then(function (resp) {
-                    resp.json().then(function (result) {
-                        refresh();
-                    });
-                }, onJsonError);
-            },
-            editNavigation: function (n) {
-                location.assign('/manage/navigation/navigation_update?id=' + n.id);
-            },
-            deleteNavigation: function (n) {
-                var that = this;
-                UIkit.modal.confirm('Navigation \"' + n.name + '\" will be deleted. Continue?', function() {
-                    that.$resource('/api/navigations/' + n.id + '/delete').save({}).then(function (resp) {
+            methods: {
+                find: function (id) {
+                    return this.navigations.findIndex(n => n.id === id);
+                },
+                swap: function (index1, index2) {
+                    var obj = this.navigations[index2];
+                    this.navigations.splice(index2, 1);
+                    this.navigations.splice(index1, 0, obj);
+                    $('#sort').show();
+                },
+                moveUp: function (id) {
+                    var index = this.find(id);
+                    if (index === (-1) || index === 0) {
+                        return;
+                    }
+                    this.swap(index - 1, index);
+                },
+                moveDown: function (id) {
+                    var index = this.find(id);
+                    if (index === (-1) || index === (this.navigations.length - 1)) {
+                        return;
+                    }
+                    this.swap(index, index + 1);
+                },
+                sort: function () {
+                    var ids = this.navigations.map(n => n.id);
+                    var that = this;
+                    that.$resource('/api/navigations/sort').save({ ids: ids }).then(function (resp) {
                         resp.json().then(function (result) {
                             refresh();
                         });
                     }, onJsonError);
-                });
+                },
+                editNavigation: function (n) {
+                    location.assign('/manage/navigation/navigation_update?id=' + n.id);
+                },
+                deleteNavigation: function (n) {
+                    var that = this;
+                    UIkit.modal.confirm('Navigation \"' + n.name + '\" will be deleted. Continue?', function () {
+                        that.$resource('/api/navigations/' + n.id + '/delete').save({}).then(function (resp) {
+                            resp.json().then(function (result) {
+                                refresh();
+                            });
+                        }, onJsonError);
+                    });
+                }
             }
-        }
-    });
-    $('#loading').hide();
-    $('#vm').show();
-}
+        });
+        $('#loading').hide();
+        $('#vm').show();
+    }
 </script>
 {% endblock %}
 
 {% block main %}
 
-    <div id="error" class="uk-width-1-1">
+<div id="error" class="uk-width-1-1">
+</div>
+
+<div id="loading" class="uk-width-1-1">
+    <i class="uk-icon-spinner uk-icon-spin"></i> {{ _('Loading') }}...
+</div>
+
+<div id="vm" class="uk-width-1-1">
+    <div class="uk-margin">
+        <a href="javascript:refresh()" class="uk-button"><i class="uk-icon-refresh"></i> {{ _('Refresh') }}</a>
+        <a href="navigation_create" class="uk-button uk-button-primary uk-float-right"><i class="uk-icon-plus"></i> {{
+            _('New Navigation') }}</a>
     </div>
 
-    <div id="loading" class="uk-width-1-1">
-        <i class="uk-icon-spinner uk-icon-spin"></i> {{ _('Loading') }}...
+    <table class="uk-table uk-table-hover">
+        <thead>
+            <tr>
+                <th width="15%">{{ _('Name') }}</th>
+                <th width="55%">{{ _('URL') }}</th>
+                <th width="5%">{{ _('Blank') }}</th>
+                <th width="15%">{{ _('Created At') }}</th>
+                <th width="10%">{{ _('Action') }}</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr v-for="n in navigations">
+                <td><a v-bind:href="n.url" target="_blank">
+                        {% if n.icon != '' %}<i v-bind:class="'uk-icon-'+n.icon"></i>{% endif %}
+                        <span v-text="n.name"></span></a></td>
+                <td><a v-text="n.url" v-bind:href="n.url" target="_blank"></a></td>
+                <td>
+                    <i v-if="n.blank" class="uk-icon-check"></i>
+                    <i v-if="!n.blank" class="uk-icon-times"></i>
+                </td>
+                <td><span v-text="n.createdAt.toDateTime()"></span></td>
+                <td>
+                    <a v-on:click="moveUp(n.id)" title="Move this navigation up" href="#0" class="x-btn"><i
+                            class="uk-icon-arrow-up"></i></a>
+                    <a v-on:click="moveDown(n.id)" title="Move this navigation down" href="#0" class="x-btn"><i
+                            class="uk-icon-arrow-down"></i></a>
+                    <a v-on:click="editNavigation(n)" title="Edit this navigation" href="#0" class="x-btn"><i
+                            class="uk-icon-edit"></i></a>
+                    <a v-on:click="deleteNavigation(n)" title="Delete this navigation" href="#0" class="x-btn"><i
+                            class="uk-icon-trash"></i></a>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div v-if="navigations.length===0" class="x-empty-list">
+        <p>No navigation found.</p>
     </div>
 
-    <div id="vm" class="uk-width-1-1">
-        <div class="uk-margin">
-            <a href="javascript:refresh()" class="uk-button"><i class="uk-icon-refresh"></i> {{ _('Refresh') }}</a>
-            <a href="navigation_create" class="uk-button uk-button-primary uk-float-right"><i class="uk-icon-plus"></i> {{ _('New Navigation') }}</a>
-        </div>
-
-        <table class="uk-table uk-table-hover">
-            <thead>
-                <tr>
-                    <th width="15%">{{ _('Name') }}</th>
-                    <th width="55%">{{ _('URL') }}</th>
-                    <th width="5%">{{ _('Blank') }}</th>
-                    <th width="15%">{{ _('Created At') }}</th>
-                    <th width="10%">{{ _('Action') }}</th>
-                </tr>
-            </thead>
-            <tbody>
-                <tr v-for="n in navigations">
-                    <td><a v-bind:href="n.url" target="_blank"><span class="x-icon" v-html="n.icon"></span> <span v-text="n.name"></span></a></td>
-                    <td><a v-text="n.url" v-bind:href="n.url" target="_blank"></a></td>
-                    <td>
-                    	<i v-if="n.blank" class="uk-icon-check"></i>
-                    	<i v-if="!n.blank" class="uk-icon-times"></i>
-                    </td>
-                    <td><span v-text="n.createdAt.toDateTime()"></span></td>
-                    <td>
-                        <a v-on:click="moveUp(n.id)" title="Move this navigation up" href="#0" class="x-btn"><i class="uk-icon-arrow-up"></i></a>
-                        <a v-on:click="moveDown(n.id)" title="Move this navigation down" href="#0" class="x-btn"><i class="uk-icon-arrow-down"></i></a>
-                        <a v-on:click="editNavigation(n)" title="Edit this navigation" href="#0" class="x-btn"><i class="uk-icon-edit"></i></a>
-                        <a v-on:click="deleteNavigation(n)" title="Delete this navigation" href="#0" class="x-btn"><i class="uk-icon-trash"></i></a>
-                    </td>
-                </tr>
-            </tbody>
-        </table>
-
-        <div v-if="navigations.length===0" class="x-empty-list">
-            <p>No navigation found.</p>
-        </div>
-
-        <div id="sort" class="uk-margin" style="text-align:right; display:none">
-            <button v-on:click="sort" type="button" class="uk-button uk-button-success"><i class="uk-icon-list"></i> {{ _('Save Orders') }}</button>
-        </div>
+    <div id="sort" class="uk-margin" style="text-align:right; display:none">
+        <button v-on:click="sort" type="button" class="uk-button uk-button-success"><i class="uk-icon-list"></i> {{
+            _('Save Orders') }}</button>
     </div>
+</div>
 
 {% endblock %}

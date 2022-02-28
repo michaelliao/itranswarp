@@ -6,155 +6,156 @@
 
 <script>
 
-$(function() {
-	getJSON('/api/navigations/urls', function (err, resp) {
-		if (err) {
-		    return showError(err);
-		}
-		var urls = resp.results;
-		var id = parseInt('{{ id }}');
-		if (id > 0) {
-		    getJSON('/api/navigations/' + id, function (err, resp) {
-		        if (err) {
-		            return showError(err);
-		        }
-		        initVM({
-		        	urls: urls,
-		        	title: 'Edit Navigation',
-		        	navigation: resp
-		        });
-		    });
-		} else {
-			initVM({
-		        urls: urls,
-				title: 'New Navigation',
-				navigation: {
-					icon: ''
-				}
-			});
-		}
-	});
-});
-
-DEFAULT_ICON = '<svg width="16" height="16" viewBox="0 0 20 20">\n    <polygon fill="none" stroke="#000" stroke-width="1.01" points="10 2 12.63 7.27 18.5 8.12 14.25 12.22 15.25 18 10 15.27 4.75 18 5.75 12.22 1.5 8.12 7.37 7.27"></polygon>\n</svg>';
-
-function initVM(data) {
-    window.vm = new Vue({
-        el: '#vm',
-        data: {
-        	title: data.title,
-            navigation: data.navigation,
-            urls: data.urls,
-            selectedUrl: ''
-        },
-        created: function () {
-            $('#loading').hide();
-            $('#vm').show();
-            if (!this.navigation.icon) {
-            	this.navigation.icon = DEFAULT_ICON;
-        	}
-        	$('#icon-preview').html(this.navigation.icon);
-        },
-        watch: {
-        	navigation: {
-        		handler: function (newValue, oldValue) {
-        			if (window.lastIconText != newValue.icon) {
-        				window.lastIconText = newValue.icon;
-        				$('#icon-preview').html(window.lastIconText);
-        			}
-        		},
-        		deep: true
-        	}
-        },
-        methods: {
-            selectMenu: function () {
-                var index = this.urls.findIndex(u => u.url === this.selectedUrl);
-                var u = this.urls[index];
-                this.navigation.name = u.name;
-                this.navigation.url = u.url;
-            },
-            selectIcon: function () {
-                $('#icon').html('<i class="uk-icon-' + this.navigation.icon + '"></i>');
-            },
-            submit: function () {
-                var that = this;
-                that.$resource('{{ action }}').save(this.navigation).then(function (resp) {
-                    resp.json().then(function (result) {
-                        location.assign('/manage/navigation/');
-                    });
-                }, onJsonFormError);
+    $(function () {
+        getJSON('/api/navigations/urls', function (err, resp) {
+            if (err) {
+                return showError(err);
             }
-        }
+            var urls = resp.results;
+            var id = parseInt('{{ id }}');
+            if (id > 0) {
+                getJSON('/api/navigations/' + id, function (err, resp) {
+                    if (err) {
+                        return showError(err);
+                    }
+                    initVM({
+                        urls: urls,
+                        title: 'Edit Navigation',
+                        navigation: resp
+                    });
+                });
+            } else {
+                initVM({
+                    urls: urls,
+                    title: 'New Navigation',
+                    navigation: {
+                        icon: ''
+                    }
+                });
+            }
+        });
     });
-}
+
+    function initVM(data) {
+        window.vm = new Vue({
+            el: '#vm',
+            data: {
+                title: data.title,
+                navigation: data.navigation,
+                urls: data.urls,
+                selectedUrl: ''
+            },
+            created: function () {
+                $('#loading').hide();
+                $('#vm').show();
+                $('#icon-preview').html('<i class="uk-icon-' + this.navigation.icon + '"></i>');
+            },
+            watch: {
+                navigation: {
+                    handler: function (newValue, oldValue) {
+                        if (window.lastIconText != newValue.icon) {
+                            window.lastIconText = newValue.icon;
+                            $('#icon-preview').html('<i class="uk-icon-' + window.lastIconText + '"></i>');
+                        }
+                    },
+                    deep: true
+                }
+            },
+            methods: {
+                selectMenu: function () {
+                    var index = this.urls.findIndex(u => u.url === this.selectedUrl);
+                    var u = this.urls[index];
+                    this.navigation.name = u.name;
+                    this.navigation.url = u.url;
+                },
+                selectIcon: function () {
+                    $('#icon').html('<i class="uk-icon-' + this.navigation.icon + '"></i>');
+                },
+                submit: function () {
+                    var that = this;
+                    that.$resource('{{ action }}').save(this.navigation).then(function (resp) {
+                        resp.json().then(function (result) {
+                            location.assign('/manage/navigation/');
+                        });
+                    }, onJsonFormError);
+                }
+            }
+        });
+    }
 </script>
 
 {% endblock %}
 
 {% block main %}
 
-    <div id="loading" class="uk-width-1-1">
-        <i class="uk-icon-spinner uk-icon-spin"></i> {{ _('Loading') }}...
-    </div>
+<div id="loading" class="uk-width-1-1">
+    <i class="uk-icon-spinner uk-icon-spin"></i> {{ _('Loading') }}...
+</div>
 
-    <div id="vm" class="uk-width-1-1">
-        <ul class="uk-breadcrumb">
-            <li><a href="/manage/navigation/">{{ _('All Navigations') }}</a></li>
-            <li class="uk-active"><span v-text="title"></span></li>
-        </ul>
+<div id="vm" class="uk-width-1-1">
+    <ul class="uk-breadcrumb">
+        <li><a href="/manage/navigation/">{{ _('All Navigations') }}</a></li>
+        <li class="uk-active"><span v-text="title"></span></li>
+    </ul>
 
-        <form v-on:submit.prevent="submit" class="uk-form uk-form-stacked uk-margin">
-            <legend v-text="title"></legend>
-            <fieldset>
-                <div class="uk-alert uk-alert-danger uk-hidden"></div>
+    <form v-on:submit.prevent="submit" class="uk-form uk-form-stacked uk-margin">
+        <legend v-text="title"></legend>
+        <fieldset>
+            <div class="uk-alert uk-alert-danger uk-hidden"></div>
 
-                <div class="uk-form-row">
-                    <label class="uk-form-label">{{ _('Type') }}:</label>
-                    <div class="uk-form-controls">
-                        <select v-model="selectedUrl" v-on:change="selectMenu">
-                            <option value="">- select navigation -</option>
-                            <option v-for="m in urls" v-bind:value="m.url" v-text="m.name"></option>
-                        </select>
-                    </div>
+            <div class="uk-form-row">
+                <label class="uk-form-label">{{ _('Type') }}:</label>
+                <div class="uk-form-controls">
+                    <select v-model="selectedUrl" v-on:change="selectMenu">
+                        <option value="">- select navigation -</option>
+                        <option v-for="m in urls" v-bind:value="m.url" v-text="m.name"></option>
+                    </select>
                 </div>
+            </div>
 
-                <div class="uk-form-row">
-                    <label class="uk-form-label">{{ _('Name') }}:</label>
-                    <div class="uk-form-controls">
-                        <input v-model="navigation.name" name="name" type="text" maxlength="100" class="uk-width-1-1" placeholder="name">
-                    </div>
+            <div class="uk-form-row">
+                <label class="uk-form-label">{{ _('Name') }}:</label>
+                <div class="uk-form-controls">
+                    <input v-model="navigation.name" name="name" type="text" maxlength="100" class="uk-width-1-1"
+                        placeholder="name">
                 </div>
+            </div>
 
-                <div class="uk-form-row">
-                    <label class="uk-form-label">{{ _('URL') }}:</label>
-                    <div class="uk-form-controls">
-                        <input v-model="navigation.url" name="url" type="text" maxlength="100" class="uk-width-1-1" placeholder="http://">
-                    </div>
+            <div class="uk-form-row">
+                <label class="uk-form-label">{{ _('URL') }}:</label>
+                <div class="uk-form-controls">
+                    <input v-model="navigation.url" name="url" type="text" maxlength="100" class="uk-width-1-1"
+                        placeholder="http://">
                 </div>
+            </div>
 
-                <div class="uk-form-row">
-                    <label class="uk-form-label">Open in New Window:</label>
-                    <div class="uk-form-controls">
-                        <label><input v-model="navigation.blank" name="blank" type="checkbox" value="true"> Open in new window</label>
-                    </div>
+            <div class="uk-form-row">
+                <label class="uk-form-label">Open in New Window:</label>
+                <div class="uk-form-controls">
+                    <label><input v-model="navigation.blank" name="blank" type="checkbox" value="true"> Open in new
+                        window</label>
                 </div>
+            </div>
 
-                <div class="uk-form-row">
-                    <label class="uk-form-label">{{ _('Icon') }}: (14x14 SVG)</label>
-                    <div class="uk-form-controls">preview: <span id="icon-preview" class="x-icon"></span></div>
-                    <div class="uk-form-controls">
-                        <textarea id="icon-editor" v-model="navigation.icon" rows="10" style="width:100%; resize:none;"></textarea>
-                    </div>
+            <div class="uk-form-row">
+                <label class="uk-form-label">{{ _('Icon') }}: <span id="icon-preview" class="x-icon"></span></label>
+                <div class="uk-form-controls">
+                    <input v-model="navigation.icon" maxlength="32" class="uk-width-1-1" placeholder="Icon name">
                 </div>
+                <p class="uk-form-help-block">Icon name can be found <a href="https://getuikit.com/v2/docs/icon.html"
+                        target="_blank">here</a></p>
+            </div>
 
-                <div class="uk-form-row">
-                    <div class="uk-form-controls">
-                        <button type="submit" class="uk-button uk-button-primary"><i class="uk-icon-check"></i> Save</button>
-                        <button type="button" class="uk-button" onclick="location.assign('/manage/navigation/')"><i class="uk-icon-times"></i> Cancel</button>
-                    </div>
+            <div class="uk-form-row">
+                <div class="uk-form-controls">
+                    <button type="submit" class="uk-button uk-button-primary"><i class="uk-icon-check"></i>
+                        Save</button>
+                    <button type="button" class="uk-button" onclick="location.assign('/manage/navigation/')"><i
+                            class="uk-icon-times"></i> Cancel</button>
                 </div>
-            </fieldset>
-        </form>
-    </div>
+            </div>
+        </fieldset>
+    </form>
+</div>
 
 {% endblock %}

@@ -24,6 +24,14 @@
 .x-article-visible {
     display: block;
 }
+
+.x-can-edit {
+    {% if __user__ != null and __user__.role.value() <= 10 %}
+    display: inline;
+    {% else %}
+    display: none;
+    {% endif %}
+}
 </style>
 
 <script>
@@ -52,7 +60,10 @@ $(function () {
 
     <h3>{{ article.name }}</h3>
     <p><img src="/files/attachments/{{ article.imageId }}/l" class="uk-responsive-width"></p>
-    <p><a href="/user/{{ author.id }}">{{ author.name }}</a> / <a href="/category/{{ category.id }}">{{ category.name }}</a> / <span class="x-smart-datetime" data="{{ article.publishAt }}">...</span> / {{ _('Reads') }}: {{ article.views }}</p>
+    <p>
+    	<a href="/user/{{ author.id }}">{{ author.name }}</a> / <a href="/category/{{ category.id }}">{{ category.name }}</a> / <span class="x-smart-datetime" data="{{ article.publishAt }}">...</span> / {{ _('Reads') }}: {{ article.views }}
+		<a href="/manage/article/article_update?id={{ article.id }}" target="_blank" class="x-can-edit uk-text-danger">{{ _('Edit') }}</a>
+    </p>
     <div class="x-article-content x-main-content">
         {{ content|raw }}
     </div>

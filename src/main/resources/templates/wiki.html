@@ -1,270 +1,278 @@
 {% extends '_base.html' %}
 
 {% block layout %}
-	{% set __sidebar_left__ = true %}
-	{% set __offcanvas_left__ = true %}
+{% set __sidebar_left__ = true %}
+{% set __offcanvas_left__ = true %}
 {% endblock %}
 
 {% block nav %} /wiki/{{ wiki.id }} {% endblock %}
 
 {% block meta %}
-    <meta property="og:ad" content="true" />
-    <meta property="og:type" content="article" />
-    <meta property="og:url" content="{{ __url__ }}" />
-    <meta property="og:title" content="{{ current.name }}" />
-    <meta property="og:description" content="{{ wiki.description }}" />
-    <meta property="og:image" content="{{ __scheme__ }}://{{ __host__ }}/files/attachments/{{ wiki.imageId }}/l" />
-    <meta property="og:tag" content="{{ wiki.tag }}" />
+<meta property="og:ad" content="true" />
+<meta property="og:type" content="article" />
+<meta property="og:url" content="{{ __url__ }}" />
+<meta property="og:title" content="{{ current.name }}" />
+<meta property="og:description" content="{{ wiki.description }}" />
+<meta property="og:image" content="{{ __scheme__ }}://{{ __host__ }}/files/attachments/{{ wiki.imageId }}/l" />
+<meta property="og:tag" content="{{ wiki.tag }}" />
 {% endblock %}
 
 {% block title %}{{ current.name }}{% endblock %}
 
 {% block head %}
-    {% set __sidebar_left__ = true %}
-    {% set __offcanvas_left__ = true %}
+{% set __sidebar_left__ = true %}
+{% set __offcanvas_left__ = true %}
 <style>
-.x-wiki-visible {
-    display: block;
-}
-.x-can-edit {
-    {% if __user__ != null and __user__.role.value() <= 10 %}
-    display: inline;
-    {% else %}
-    display: none;
-    {% endif %}
-}
+    .x-wiki-visible {
+        display: block;
+    }
+
+    .x-can-edit {
+        /* {% if __user__ !=null and __user__.role.value() <=10 %} */
+        display: inline;
+        /* {% else %} */
+        display: none;
+        /* {% endif %} */
+    }
 </style>
 
 <script>
 
-loadComments('{{ current.id }}');
+    loadComments('{{ current.id }}');
 
-var
-    comment_type = '{{ current.id }}' === '{{ wiki.id }}' ? 'wiki' : 'wikipage',
-    comment_ref_id = '{{ current.id }}',
-    comment_tag = '{{ wiki.tag }}';
+    var
+        comment_type = '{{ current.id }}' === '{{ wiki.id }}' ? 'wiki' : 'wikipage',
+        comment_ref_id = '{{ current.id }}',
+        comment_tag = '{{ wiki.tag }}';
 
-function onAuthSuccess() {
-    initCommentArea(comment_type, comment_ref_id, comment_tag);
-}
-
-$(function () {
-    if (g_user !== null) {
+    function onAuthSuccess() {
         initCommentArea(comment_type, comment_ref_id, comment_tag);
     }
-});
 
-
-
-$(function () {
-    $('#{{ current.id }}').addClass('uk-active');
-    $('#off-{{ current.id }}').addClass('uk-active');
-    // expand current:
-    expandActiveNode();
-    // add prev, next:
-    $('div.x-wiki-prev-next').css('padding-left', '15px').css('padding-right', '15px');
-    var prev = getPrevNode();
-    var next = getNextNode();
-    if (prev) {
-        $('div.x-wiki-prev-next').append("<a href=\"" + prev.find("a").attr("href") + "\"><i class=\"uk-icon-chevron-left\"></i> {{ _('Previous Page') }}</a>");
-    }
-    if (next) {
-        $('div.x-wiki-prev-next').append("<a href=\"" + next.find("a").attr("href") + "\" class=\"uk-float-right\">{{ _('Next Page') }} <i class=\"uk-icon-chevron-right\"></i></a>");
-    }
-    $('div.x-wiki-prev-next').after('<hr>');
-});
-
-function getPrevNode() {
-    var activeNode = $('#{{ current.id }}');
-    var prev = activeNode.prev('div');
-    var lastChild;
-    if (prev.get(0)) {
-        lastChild = prev.find('div:last');
-        if (lastChild.get(0)) {
-            return lastChild;
+    $(function () {
+        if (g_user !== null) {
+            initCommentArea(comment_type, comment_ref_id, comment_tag);
         }
-        return prev;
-    }
-    prev = activeNode.parent('div');
-    if (prev.get(0)) {
-        return prev;
-    }
-    return null;
-}
+    });
 
-function getNextNode() {
-    var activeNode = $('#{{ current.id }}');
-    var next = activeNode.find('div:first');
-    var node;
-    if (next.get(0)) {
-        return next;
-    }
-    next = activeNode.next('div');
-    if (next.get(0)) {
-        return next;
-    }
-    node = activeNode;
-    for (;;) {
-        node = node.parent('div');
-        if (node.get(0)) {
-            next = node.next('div');
-            if (next.get(0)) {
-                return next;
+
+
+    $(function () {
+        $('#{{ current.id }}').addClass('uk-active');
+        $('#off-{{ current.id }}').addClass('uk-active');
+        // expand current:
+        expandActiveNode();
+        // add prev, next:
+        var prev = getPrevNode();
+        var next = getNextNode();
+        if (prev) {
+            $('div.x-wiki-prev-next').append("<a href=\"" + prev.find("a").attr("href") + "\" class=\"uk-button uk-button-primary\"><i class=\"uk-icon-chevron-left\"></i> {{ _('Previous Page') }}</a>");
+        }
+        if (next) {
+            $('div.x-wiki-prev-next').append("<a href=\"" + next.find("a").attr("href") + "\" class=\"uk-button uk-button-primary uk-float-right\">{{ _('Next Page') }} <i class=\"uk-icon-chevron-right\"></i></a>");
+        }
+        $('div.x-wiki-prev-next').after('<hr>');
+    });
+
+    function getPrevNode() {
+        var activeNode = $('#{{ current.id }}');
+        var prev = activeNode.prev('div');
+        var lastChild;
+        if (prev.get(0)) {
+            lastChild = prev.find('div:last');
+            if (lastChild.get(0)) {
+                return lastChild;
             }
+            return prev;
+        }
+        prev = activeNode.parent('div');
+        if (prev.get(0)) {
+            return prev;
+        }
+        return null;
+    }
+
+    function getNextNode() {
+        var activeNode = $('#{{ current.id }}');
+        var next = activeNode.find('div:first');
+        var node;
+        if (next.get(0)) {
+            return next;
+        }
+        next = activeNode.next('div');
+        if (next.get(0)) {
+            return next;
+        }
+        node = activeNode;
+        for (; ;) {
+            node = node.parent('div');
+            if (node.get(0)) {
+                next = node.next('div');
+                if (next.get(0)) {
+                    return next;
+                }
+            } else {
+                break;
+            }
+        }
+        return null;
+    }
+
+    function expandActiveNode() {
+        var activeNode = $('#{{ current.id }}');
+        for (; ;) {
+            i = activeNode.find('i').get(0);
+            if (i) {
+                expandWikiNode(i);
+            }
+            activeNode = activeNode.parent();
+            if (!activeNode.is('div')) {
+                break;
+            }
+        }
+    }
+
+    function toggleWikiNode(icon) {
+        var
+            $i = $(icon),
+            $div = $i.parent(),
+            expand = $div.attr('expand');
+        if (expand === 'true') {
+            collapseWikiNode(icon);
         } else {
-            break;
+            expandWikiNode(icon);
         }
     }
-    return null;
-}
 
-function expandActiveNode() {
-    var activeNode = $('#{{ current.id }}');
-    for (;;) {
-        i = activeNode.find('i').get(0);
-        if (i) {
-            expandWikiNode(i);
+    function collapseWikiNode(icon, rec) {
+        var
+            $i = $(icon),
+            $div = $i.parent();
+        $div.attr('expand', 'false');
+        $i.removeClass('uk-icon-minus-square-o');
+        $i.addClass('uk-icon-plus-square-o');
+        $div.find('>div').hide();
+        if (rec) {
+            $div.find('>div>i').each(function () {
+                collapseWikiNode(this, rec);
+            });
         }
-        activeNode = activeNode.parent();
-        if (! activeNode.is('div')) {
-            break;
+    }
+
+    function expandWikiNode(icon, rec) {
+        var
+            $i = $(icon),
+            $div = $i.parent();
+        $div.attr('expand', 'true');
+        $i.removeClass('uk-icon-plus-square-o');
+        $i.addClass('uk-icon-minus-square-o');
+        $div.find('>div').show();
+        if (rec) {
+            $div.find('>div>i').each(function () {
+                expandWikiNode(this, rec);
+            });
         }
     }
-}
-
-function toggleWikiNode(icon) {
-    var
-        $i = $(icon),
-        $div = $i.parent(),
-        expand = $div.attr('expand');
-    if (expand === 'true') {
-        collapseWikiNode(icon);
-    } else {
-        expandWikiNode(icon);
-    }
-}
-
-function collapseWikiNode(icon, rec) {
-    var
-        $i = $(icon),
-        $div = $i.parent();
-    $div.attr('expand', 'false');
-    $i.removeClass('uk-icon-minus-square-o');
-    $i.addClass('uk-icon-plus-square-o');
-    $div.find('>div').hide();
-    if (rec) {
-        $div.find('>div>i').each(function () {
-            collapseWikiNode(this, rec);
-        });
-    }
-}
-
-function expandWikiNode(icon, rec) {
-    var
-        $i = $(icon),
-        $div = $i.parent();
-    $div.attr('expand', 'true');
-    $i.removeClass('uk-icon-plus-square-o');
-    $i.addClass('uk-icon-minus-square-o');
-    $div.find('>div').show();
-    if (rec) {
-        $div.find('>div>i').each(function () {
-            expandWikiNode(this, rec);
-        });
-    }
-}
 
 </script>
 {% endblock %}
 
 {% macro createNodes(wiki, node, depth, ts) %}
-    {% for n in node.children %}
-    	{% if ts > n.publishAt %}
-        <div id="{{ n.id }}" depth="{{ depth }}" style="display:none;position:relative;margin-left:15px;">
-            {% if not n.children.isEmpty() %}
-              <i onclick="toggleWikiNode(this)" class="uk-icon-plus-square-o" style="position:absolute;margin-left:-1em;padding-top:8px;"></i>
-              <a href="/wiki/{{ wiki.id }}/{{ n.id }}" class="x-wiki-index-item">{{ n.name }}</a>
-              {{ createNodes(wiki, n, depth + 1, ts) }}
-            {% else %}
-              <a href="/wiki/{{ wiki.id }}/{{ n.id }}" class="x-wiki-index-item">{{ n.name }}</a>
-            {% endif %}
-        </div>
-        {% endif %}
-    {% endfor %}
+{% for n in node.children %}
+{% if ts > n.publishAt %}
+<div id="{{ n.id }}" depth="{{ depth }}" style="display:none;position:relative;margin-left:15px;">
+    {% if not n.children.isEmpty() %}
+    <i onclick="toggleWikiNode(this)" class="uk-icon-plus-square-o"
+        style="position:absolute;margin-left:-1em;padding-top:10px;"></i>
+    <a href="/wiki/{{ wiki.id }}/{{ n.id }}" class="x-wiki-index-item">{{ n.name }}</a>
+    {{ createNodes(wiki, n, depth + 1, ts) }}
+    {% else %}
+    <a href="/wiki/{{ wiki.id }}/{{ n.id }}" class="x-wiki-index-item">{{ n.name }}</a>
+    {% endif %}
+</div>
+{% endif %}
+{% endfor %}
 {% endmacro %}
 
 {% block sidebar_left_content %}
-    <div class="uk-float-right" style="padding-top:5px">
-        <a href="#0" onclick="expandWikiNode($('#x-wiki-index>div>i').get(0), true)" style="margin-left:5px"><i class="uk-icon-expand"></i></a>
-        <a href="#0" onclick="collapseWikiNode($('#x-wiki-index>div>i').get(0), true);expandActiveNode()" style="margin-left:5px"><i class="uk-icon-dot-circle-o"></i></a>
-        <a href="#0" onclick="collapseWikiNode($('#x-wiki-index>div>i').get(0), true)" style="margin-left:5px"><i class="uk-icon-compress"></i></a>
+<div class="uk-float-right" style="padding-top:5px">
+    <a href="#0" onclick="expandWikiNode($('#x-wiki-index>div>i').get(0), true)" style="margin-left:5px"><i
+            class="uk-icon-expand"></i></a>
+    <a href="#0" onclick="collapseWikiNode($('#x-wiki-index>div>i').get(0), true);expandActiveNode()"
+        style="margin-left:5px"><i class="uk-icon-dot-circle-o"></i></a>
+    <a href="#0" onclick="collapseWikiNode($('#x-wiki-index>div>i').get(0), true)" style="margin-left:5px"><i
+            class="uk-icon-compress"></i></a>
+</div>
+<ul class="uk-nav uk-nav-side">
+    <li class="uk-nav-header">{{ _('Index') }}</li>
+</ul>
+<ul id="x-wiki-index" class="uk-nav uk-nav-side" style="margin-right:-15px;">
+    <div id="{{ wiki.id }}" depth="0" style="position:relative;margin-left:15px;">
+        <i onclick="toggleWikiNode(this)" class="uk-icon-plus-square-o"
+            style="position:absolute;margin-left:-1em;padding-top:10px;"></i>
+        <a href="/wiki/{{ wiki.id }}" class="x-wiki-index-item">{{ wiki.name }}</a>
+        {{ createNodes(wiki, wiki, 1, __timestamp__) }}
     </div>
-    <ul class="uk-nav uk-nav-side">
-        <li class="uk-nav-header">{{ _('Index') }}</li>
-    </ul>
-    <ul id="x-wiki-index" class="uk-nav uk-nav-side" style="margin-right:-15px;">
-        <div id="{{ wiki.id }}" depth="0" style="position:relative;margin-left:15px;">
-            <i onclick="toggleWikiNode(this)" class="uk-icon-plus-square-o" style="position:absolute;margin-left:-1em;padding-top:8px;"></i>
-            <a href="/wiki/{{ wiki.id }}" class="x-wiki-index-item">{{ wiki.name }}</a>
-            {{ createNodes(wiki, wiki, 1, __timestamp__) }}
-        </div>
-    </ul>
-    <div class="x-placeholder"></div>
+</ul>
+<div class="x-placeholder"></div>
 {% endblock %}
 
 {% macro createOffcanvasNodes(wiki, node, depth, ts) %}
-    {% for n in node.children %}
-    {% if ts > n.publishAt %}
-	    <li id="off-{{ n.id }}" style="margin-left:{{ depth }}em;">
-	        <a href="/wiki/{{ wiki.id }}/{{ n.id }}">{{ n.name }}</a>
-	    </li>
-	    {% if not n.children.isEmpty() %}
-	        {{ createOffcanvasNodes(wiki, n, depth + 1, ts) }}
-	    {% endif %}
-    {% endif %}
-    {% endfor %}
+{% for n in node.children %}
+{% if ts > n.publishAt %}
+<li id="off-{{ n.id }}" style="margin-left:{{ depth }}em;">
+    <a href="/wiki/{{ wiki.id }}/{{ n.id }}">{{ n.name }}</a>
+</li>
+{% if not n.children.isEmpty() %}
+{{ createOffcanvasNodes(wiki, n, depth + 1, ts) }}
+{% endif %}
+{% endif %}
+{% endfor %}
 {% endmacro %}
 
 {% block offcanvas_left %}
-    <ul class="uk-nav uk-nav-side">
-        <li class="uk-nav-header">{{ _('Index') }}</li>
-    </ul>
-    <ul class="uk-nav uk-nav-side">
-        <li id="off-{{ wiki.id }}"><a href="/wiki/{{ wiki.id }}">{{ wiki.name }}</a></li>
-        {{ createOffcanvasNodes(wiki, wiki, 1, __timestamp__) }}
-    </ul>
-    <div class="x-placeholder"></div>
+<ul class="uk-nav uk-nav-side">
+    <li class="uk-nav-header">{{ _('Index') }}</li>
+</ul>
+<ul class="uk-nav uk-nav-side">
+    <li id="off-{{ wiki.id }}"><a href="/wiki/{{ wiki.id }}">{{ wiki.name }}</a></li>
+    {{ createOffcanvasNodes(wiki, wiki, 1, __timestamp__) }}
+</ul>
+<div class="x-placeholder"></div>
 {% endblock %}
 
 {% block content %}
-    <h4>{{ current.name }}</h4>
-    <div class="x-wiki-info">
-    	<span>{{ _('Reads') }}: {{ current.views }}</span>
-    	<a href="/manage/wiki/{% if current.id == wiki.id %}wiki_update{% else %}wikipage_update{% endif %}?id={{ current.id }}" target="_blank" class="x-can-edit uk-text-danger">{{ _('Edit') }}</a></div>
+<h4>{{ current.name }}</h4>
+<div class="x-wiki-info">
+    <span>{{ _('Reads') }}: {{ current.views }}</span>
+    <a href="/manage/wiki/{% if current.id == wiki.id %}wiki_update{% else %}wikipage_update{% endif %}?id={{ current.id }}"
+        target="_blank" class="x-can-edit uk-text-danger">{{ _('Edit') }}</a>
+</div>
 
-    <hr>
+<hr>
 
-    <div class="x-wiki-content x-main-content">{{ content|raw }}</div>
+<div class="x-wiki-content x-main-content">{{ content|raw }}</div>
 
-    <hr>
+<hr>
 
-    <div class="x-wiki-prev-next uk-clearfix"></div>
+<div class="x-wiki-prev-next uk-clearfix"></div>
 
-    <div class="x-anchor x-comment-anchor"><a name="comments"></a></div>
+<div class="x-anchor x-comment-anchor"><a name="comments"></a></div>
 {% endblock %}
 
 {% block content_comment %}
-    <h3>{{ _('Comments') }}</h3>
+<h3>{{ _('Comments') }}</h3>
 
-    <ul id="x-comment-list" class="uk-comment-list">
-    </ul>
+<ul id="x-comment-list" class="uk-comment-list">
+</ul>
 
-    <h3>{{ _('Make a comment') }}</h3>
+<h3>{{ _('Make a comment') }}</h3>
 
-    <div class="x-display-if-not-signin">
-        <p><button type="button" class="uk-button" onclick="showSignin()"><i class="uk-icon-signin"></i> {{ _('Sign in to make a comment') }}</button></p>
-    </div>
+<div class="x-display-if-not-signin">
+    <p><button type="button" class="uk-button" onclick="showSignin()"><i class="uk-icon-signin"></i> {{ _('Sign in to
+            make a comment') }}</button></p>
+</div>
 
-    <div id="x-comment-area"></div>
+<div id="x-comment-area"></div>
 
 {% endblock %}

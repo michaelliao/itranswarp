@@ -54,8 +54,8 @@ public class ManageController extends AbstractController {
     AbstractSearcher searcher;
 
     @GetMapping("/")
-    public ModelAndView index() {
-        return prepareModelAndView("redirect:/manage/board/");
+    public String index() {
+        return "redirect:/manage/board/";
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////////

@@ -46,7 +46,6 @@ public class FileController extends AbstractController {
         response.setContentType(bean.mime);
         response.setContentLength(bean.data.length);
         response.setHeader("Cache-Control", maxAge);
-        @SuppressWarnings("resource")
         ServletOutputStream output = response.getOutputStream();
         output.write(bean.data);
         output.flush();

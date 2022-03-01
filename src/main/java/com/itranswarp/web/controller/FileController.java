@@ -1,7 +1,10 @@
 package com.itranswarp.web.controller;
 
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 
+import javax.annotation.PostConstruct;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 
@@ -15,6 +18,25 @@ import com.itranswarp.bean.DownloadBean;
 public class FileController extends AbstractController {
 
     String maxAge = "max-age=" + 3600 * 24 * 365;
+
+    byte[] faviconData = null;
+
+    @PostConstruct
+    public void init() throws IOException {
+        try (InputStream input = getClass().getResourceAsStream("/favicon.ico")) {
+            this.faviconData = input.readAllBytes();
+        }
+    }
+
+    @GetMapping("/favicon.ico")
+    public void favicon(HttpServletResponse response) throws IOException {
+        response.setContentType("image/x-icon");
+        response.setContentLength(faviconData.length);
+        response.setHeader("Cache-Control", maxAge);
+        OutputStream output = response.getOutputStream();
+        output.write(faviconData);
+        output.flush();
+    }
 
     @GetMapping("/files/attachments/" + ID)
     public void process(@PathVariable("id") long id, HttpServletResponse response) throws IOException {

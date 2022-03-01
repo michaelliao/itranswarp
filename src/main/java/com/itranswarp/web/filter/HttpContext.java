@@ -39,7 +39,7 @@ public class HttpContext implements AutoCloseable {
         String query = request.getQueryString();
         this.url = this.scheme + "://" + this.host + this.path + (query == null ? "" : "?" + query);
         this.ip = ip;
-        logger.info("process new http context: {} {}...", request.getMethod(), this.url);
+        logger.info("process new http request from {}: {} {}...", ip, request.getMethod(), this.url);
         CONTEXT_THREAD_LOCAL.set(this);
     }
 

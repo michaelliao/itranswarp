@@ -52,6 +52,7 @@ import com.itranswarp.service.ViewService;
 import com.itranswarp.util.CookieUtil;
 import com.itranswarp.util.HashUtil;
 import com.itranswarp.util.HttpUtil;
+import com.itranswarp.util.JsonUtil;
 import com.itranswarp.warpdb.PagedResults;
 import com.itranswarp.web.filter.HttpContext;
 import com.itranswarp.web.view.i18n.Translators;
@@ -423,6 +424,7 @@ public class MvcController extends AbstractController {
             logger.error("OAuth failed.", e);
             throw new ApiException(ApiError.AUTH_SIGNIN_FAILED, null, "Signin from OAuth failed.");
         }
+        logger.info("oauth ok from {}: {}", authProviderId, authentication.getAuthenticationId());
         OAuth auth = this.userService.getOAuth(authProviderId, authentication);
         User user = this.userService.getEnabledUserById(auth.userId);
         if (user == null) {

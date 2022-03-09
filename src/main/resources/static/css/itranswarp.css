@@ -244,9 +244,9 @@ div.uk-active>a.x-wiki-index-item {
 }
 
 .uk-button {
-    padding: 0 14px;
-    line-height: 32px;
     min-height: 34px;
+    padding: 0 15px;
+    line-height: 32px;
 }
 
 .uk-button-small {
@@ -254,6 +254,13 @@ div.uk-active>a.x-wiki-index-item {
     padding: 0 10px;
     line-height: 30px;
     font-size: 14px;
+}
+
+.uk-button-large {
+    min-height: 46px;
+    padding: 0 20px;
+    line-height: 44px;
+    font-size: 18px;
 }
 
 /* layout */

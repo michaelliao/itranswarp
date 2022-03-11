@@ -2,6 +2,13 @@
 
 .*
 
+# compressed files:
+*.tar
+*.gz
+*.zip
+*.rar
+*.7z
+
 # Docker.gitignore #
 
 docker/app/log

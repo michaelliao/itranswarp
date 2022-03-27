@@ -382,6 +382,16 @@ pre>code {
     word-break: break-all;
 }
 
+:not(pre) > code, :not(pre) > kbd, :not(pre) > samp {
+    font-size: 14px;
+    color: #333;
+    padding: 0 4px;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    margin-left: 4px;
+    margin-right: 4px;
+}
+
 a, .uk-link, .uk-tab>li>a {
     color: #0593d3;
     text-decoration: none;

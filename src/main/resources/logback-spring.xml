@@ -17,9 +17,11 @@
 		<file>/var/log/itranswarp/app.log</file>
 		<rollingPolicy class="ch.qos.logback.core.rolling.FixedWindowRollingPolicy">
 			<fileNamePattern>/var/log/itranswarp/app.log.%i</fileNamePattern>
+			<minIndex>1</minIndex>
+			<maxIndex>5</maxIndex>
 		</rollingPolicy>
 		<triggeringPolicy class="ch.qos.logback.core.rolling.SizeBasedTriggeringPolicy">
-			<MaxFileSize>100MB</MaxFileSize>
+			<MaxFileSize>50MB</MaxFileSize>
 		</triggeringPolicy>
 	</appender>
 
@@ -34,14 +36,8 @@
 	<logger name="org.hibernate.validator.internal.util.Version" level="WARN" />
 	<logger name="org.springframework.boot.actuate.autoconfigure.CrshAutoConfiguration" level="WARN" />
 
-	<springProfile name="native">
-		<root level="INFO">
-			<appender-ref ref="CONSOLE" />
-		</root>
-	</springProfile>
-	<springProfile name="!native">
-		<root level="INFO">
-			<appender-ref ref="APP_LOG" />
-		</root>
-	</springProfile>
+	<root level="INFO">
+		<appender-ref ref="CONSOLE" />
+		<appender-ref ref="APP_LOG" />
+	</root>
 </configuration>

@@ -4,6 +4,8 @@ Full-featured CMS including blog, wiki, discussion, etc. Cloud native applicatio
 
 ![Github Workflow](https://github.com/michaelliao/warpdb/actions/workflows/maven.yml/badge.svg)
 
+[![Docker Pulls](https://img.shields.io/docker/pulls/michaelliao/itranswarp?color=%2334D058&style=plastic)](https://hub.docker.com/repository/docker/michaelliao/itranswarp)
+
 * Based on SpringBoot 2.x
 * OAuth2 integration (weibo, QQ, facebook, etc.)
 * SEO support

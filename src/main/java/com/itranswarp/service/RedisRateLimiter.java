@@ -21,7 +21,6 @@ public class RedisRateLimiter extends AbstractService {
     @PostConstruct
     public void init() {
         this.shaScript = this.redisService.loadScriptFromClassPath("/redis/request_rate_limiter.lua");
-        logger.info("load rate-limit-script: {}", this.shaScript);
     }
 
     /**

@@ -12,10 +12,10 @@ import com.itranswarp.enums.InputType;
 @Target(FIELD)
 public @interface SettingInput {
 
-	InputType value();
+    InputType value();
 
-	int order();
+    int order();
 
-	String description() default "";
+    String description() default "";
 
 }

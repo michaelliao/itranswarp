@@ -23,7 +23,6 @@ import com.itranswarp.enums.ApiError;
 import com.itranswarp.enums.Role;
 import com.itranswarp.markdown.Markdown;
 import com.itranswarp.model.User;
-import com.itranswarp.redis.RedisService;
 import com.itranswarp.search.AbstractSearcher;
 import com.itranswarp.web.filter.HttpContext;
 import com.itranswarp.web.view.i18n.Translators;
@@ -46,9 +45,6 @@ public class ManageController extends AbstractController {
 
     @Autowired
     Markdown markdown;
-
-    @Autowired
-    RedisService redisService;
 
     @Autowired(required = false)
     AbstractSearcher searcher;

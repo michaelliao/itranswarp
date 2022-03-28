@@ -10,17 +10,17 @@ import com.itranswarp.util.HashUtil;
 @Component
 public class EncryptService {
 
-	@Value("${spring.security.encrypt.key:ChangeTheKeyWhenDeployProduction}")
-	String encryptKey = "ChangeTheKeyWhenDeployProduction";
+    @Value("${spring.security.encrypt.key:ChangeTheKeyWhenDeployProduction}")
+    String encryptKey = "ChangeTheKeyWhenDeployProduction";
 
-	String sessionHmacKey;
+    String sessionHmacKey;
 
-	@PostConstruct
-	public void init() {
-		this.sessionHmacKey = HashUtil.hmacSha256(this.encryptKey, "SessionHmacKey");
-	}
+    @PostConstruct
+    public void init() {
+        this.sessionHmacKey = HashUtil.hmacSha256(this.encryptKey, "SessionHmacKey");
+    }
 
-	public String getSessionHmacKey() {
-		return this.sessionHmacKey;
-	}
+    public String getSessionHmacKey() {
+        return this.sessionHmacKey;
+    }
 }

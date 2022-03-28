@@ -1,21 +1,20 @@
 # iTranswarp
 
-Full-featured CMS including blog, wiki, discussion, etc. powered by SpringBoot.
+Full-featured CMS including blog, wiki, discussion, etc. Cloud native application that powered by SpringBoot.
 
-[![Build Status](https://travis-ci.org/michaelliao/itranswarp.svg?branch=master)](https://travis-ci.org/michaelliao/itranswarp)
+![Github Workflow](https://github.com/michaelliao/warpdb/actions/workflows/maven.yml/badge.svg)
 
-* based on SpringBoot 2.x
+* Based on SpringBoot 2.x
 * OAuth2 integration (weibo, QQ, facebook, etc.)
 * SEO support
 * REST API
-* customized CSS with UIkit2
+* Customized CSS with UIkit2
 
 ### Environment
 
 - JDK 11
 - MySQL 5.7
-- Redis 4/5
-- Nginx
+- Redis 5/6
 
 ### Build
 

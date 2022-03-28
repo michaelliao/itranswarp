@@ -3,7 +3,7 @@
 
 	<groupId>com.itranswarp.web</groupId>
 	<artifactId>itranswarp</artifactId>
-	<version>1.0</version>
+	<version>1.0.1</version>
 	<packaging>jar</packaging>
 
 	<parent>
@@ -209,6 +209,20 @@
 						<arg>-parameters</arg>
 						<arg>-Xlint:all</arg>
 					</compilerArgs>
+				</configuration>
+			</plugin>
+
+			<!-- docker build -->
+			<plugin>
+				<groupId>com.spotify</groupId>
+				<artifactId>dockerfile-maven-plugin</artifactId>
+				<version>1.4.13</version>
+				<configuration>
+					<repository>michaelliao/itranswarp</repository>
+					<tag>${project.version}</tag>
+					<buildArgs>
+						<JAR_FILE>${project.build.finalName}.jar</JAR_FILE>
+					</buildArgs>
 				</configuration>
 			</plugin>
 		</plugins>

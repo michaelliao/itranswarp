@@ -65,36 +65,19 @@ Please check [application.yml](src/main/resources/application.yml) for environme
 
 ### Deploy
 
-iTranswarp is deployed by Ansible. Scripts is ready for Ubuntu Server 18.04 or CentOS 7/8.
-
-Deploy script:
+iTranswarp is deployed by Docker. Images can be pulled from [DockerHub](https://hub.docker.com/repository/docker/michaelliao/itranswarp).
 
 ```
-$ ansible/deploy.py --profile <env>
+                        ┌─────────────────────────────────────────┐
+                        │                   VPC                   │
+                        │         ┌───────────┐                   │
+                        │         │  Docker   │     ┌────────────┐│
+        https        ┌──┴──┐      │┌─────────┐│     │  AWS:RDS   ││
+◀───────────────────▶│     │ http ││ AWS:ECS ││◀───▶│   MySQL    ││
+ https ┌─────┐ https │ ELB │◀────▶│└─────────┘│     └────────────┘│
+◀─────▶│ CDN │◀─────▶│     │      │┌─────────┐│     ┌────────────┐│
+       └─────┘       └──┬──┘      ││ AWS:ECS ││◀───▶│ElasticCache││
+                        │         │└─────────┘│     │   Redis    ││
+                        │         └───────────┘     └────────────┘│
+                        └─────────────────────────────────────────┘
 ```
-
-The deploy script will do following:
-
-- install open jdk 11 headless;
-- install nginx;
-- install supervisor;
-- deploy jar;
-- deploy static resources;
-- generate nginx configuration;
-- generate supervisor configuration;
-- update symbol link;
-- reload supervisor;
-- reload nginx.
-
-### Docker
-
-Support [.env.example](docker/.env.example) use local ip for test. 
-```
-$ cd docker
-$ cp .env.example .env
-$ vim .env
-$ docker-compose up -d
-```
-test:
-https://www.local.itranswarp.com/
-

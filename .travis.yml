@@ -1,6 +1,0 @@
-language: java
-
-jdk: openjdk11
-
-script: mvn -DskipTests=true clean package
-

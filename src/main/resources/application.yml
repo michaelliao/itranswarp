@@ -27,7 +27,8 @@ spring:
       auto-commit: false
       connection-timeout: ${DB_TIMEOUT:3000}
       validation-timeout: ${DB_TIMEOUT:3000}
-      max-lifetime: ${DB_MAX_LIFETIME:600000}
+      idle-timeout: ${DB_IDLE_TIMEOUT:600000}
+      max-lifetime: ${DB_MAX_LIFETIME:1800000}
       maximum-pool-size: ${DB_POOL_SIZE:100}
       minimum-idle: ${DB_MIN_IDLE:1}
 
@@ -164,5 +165,9 @@ spring:
       timeout: ${REMOTE_CODE_RUNNER_TIMEOUT:10}
       max-concurrent: ${REMOTE_CODE_RUNNER_MAX_CONCURRENT:10}
 
+# default logging level:
+logging:
+  level:
+    root: ${LOGGING_ROOT:INFO}
+
 # END
-    

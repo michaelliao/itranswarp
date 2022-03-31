@@ -74,11 +74,15 @@ public final class IdUtil {
 
     @Scheduled(initialDelay = 360_000, fixedDelay = 360_000)
     public void scheduledRenew() {
-        int ret = redisService.executeScriptReturnInt(this.luaRenewHash, new String[] { String.valueOf(shardingId), this.clientId, "600" }).intValue();
-        if (ret < 0) {
-            throw new IllegalStateException("Unable to renew sharding id from redis.");
+        try {
+            int ret = redisService.executeScriptReturnInt(this.luaRenewHash, new String[] { String.valueOf(shardingId), this.clientId, "600" }).intValue();
+            if (ret < 0) {
+                throw new IllegalStateException("Unable to renew sharding id from redis.");
+            }
+            logger.info("renewed sharding id: {}", shardingId);
+        } catch (Exception e) {
+            logger.error("unable renew sharding id for client " + clientId, e);
         }
-        logger.info("renewed sharding id: {}", shardingId);
     }
 
     public static long nextId() {

@@ -35,7 +35,7 @@
 		<lesscss.version>1.7.0.1.1</lesscss.version>
 		<lucene.version>8.5.0</lucene.version>
 		<pebble.version>3.1.2</pebble.version>
-		<warpdb.version>5.0.2</warpdb.version>
+		<warpdb.version>5.0.3</warpdb.version>
 	</properties>
 
 	<dependencies>

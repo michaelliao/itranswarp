@@ -62,7 +62,7 @@ $(function () {
         $('#ul-navbar-more').find('>li.x-nav').each(function () {
             $moreList.push($(this));
         });
-        var total = $navbar.width() - 6;
+        var total = $navbar.width() - 20;
         if ($brand.is(':visible')) {
             total -= $brand.outerWidth();
         }

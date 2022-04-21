@@ -6,11 +6,12 @@ import org.springframework.beans.factory.FactoryBean;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import io.lettuce.core.RedisClient;
+import com.redis.lettucemod.RedisModulesClient;
+
 import io.lettuce.core.RedisURI;
 
 @Component
-public class RedisClientFactory implements FactoryBean<RedisClient> {
+public class RedisClientFactory implements FactoryBean<RedisModulesClient> {
 
     @Value("${spring.redis.standalone.host:localhost}")
     String host = "localhost";
@@ -31,15 +32,14 @@ public class RedisClientFactory implements FactoryBean<RedisClient> {
     int database = 0;
 
     @Override
-    public RedisClient getObject() throws Exception {
-        RedisURI uri = RedisURI.Builder.redis(this.host, this.port).withPassword(this.password).withDatabase(this.database)
+    public RedisModulesClient getObject() throws Exception {
+        RedisURI uri = RedisURI.Builder.redis(this.host, this.port).withPassword(this.password.toCharArray()).withDatabase(this.database)
                 .withTimeout(Duration.ofSeconds(this.timeout)).build();
-        return RedisClient.create(uri);
+        return RedisModulesClient.create(uri);
     }
 
     @Override
     public Class<?> getObjectType() {
-        return RedisClient.class;
+        return RedisModulesClient.class;
     }
-
 }

@@ -33,11 +33,12 @@ $(function () {
 
     <div class="uk-width-1-1">
 
-        <h3>Search</h3>
+        <h3>Search Engine</h3>
 
-        <p>Search Engine: {{ searchEngineName }}</p>
+        <p>Provider: {{ searchEngineName }}</p>
+        <p>Ready: {{ searchReady }}</p>
 
-    {% if searchEnabled %}
+    {% if searchReady %}
 
         <form method="get" target="_blank" action="/search" class="uk-form uk-form-stacked uk-margin">
             <legend>Search</legend>
@@ -59,15 +60,16 @@ $(function () {
             </fieldset>
         </form>
 
+		<h3 class="uk-text-danger">DANGER ZONE</h3>
+
 		<div class="uk-alert uk-alert-danger">
-			<h3>DANGER ZONE</h3>
-			<p>You can reindex all documents. Please clean the search index before reindex.</p>
+			<p>You can reindex all documents. It may take several minutes.</p>
 	    	<p><button id="btnReindex" class="uk-button uk-button-danger">Reindex All Documents</button></p>
 	    </div>
 
     {% else %}
 
-    	<p>Search engine must be configured in <code>application.yml</code>.</p>
+    	<p>Search engine is auto-enabled if RediSearch is available in Redis. <a target="_blank" href="https://redis.io/docs/stack/search/">Learn how to integrate RediSearch.</a></p>
 
     {% endif %}
 

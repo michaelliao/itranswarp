@@ -80,14 +80,8 @@ spring:
 
   # search configurations:
   search:
-    lucene:
-      enabled: ${LUCENE_ENABLED:false}
-      index-dir: ${LUCENE_INDEX_DIR:/var/search-index}
-    elastic:
-      enabled: ${ELASTIC_SEARCH_ENABLED:false}
-      url: ${ELASTIC_SEARCH_URL:http://localhost:9200}
-      user: ${ELASTIC_SEARCH_USER:}
-      password: ${ELASTIC_SEARCH_PASSWORD:}
+    redisearch:
+      default-language: ${REDISEARCH_DEFAULT_LANGUAGE:CHINESE}
 
   # 3rd-party signin configurations:
   signin:

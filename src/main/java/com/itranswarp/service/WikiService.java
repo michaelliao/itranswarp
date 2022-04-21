@@ -61,7 +61,7 @@ public class WikiService extends AbstractDbService<Wiki> {
         return wiki;
     }
 
-    private List<WikiPage> getWikiPages(Long wikiId) {
+    public List<WikiPage> getWikiPages(Long wikiId) {
         return this.db.from(WikiPage.class).where("wikiId = ?", wikiId).orderBy("parentId").orderBy("displayOrder").orderBy("id").list();
     }
 

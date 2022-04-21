@@ -143,6 +143,10 @@ public class ArticleService extends AbstractDbService<Article> {
         return this.db.from(Article.class).orderBy("publishAt").desc().orderBy("id").desc().list(pageIndex, ITEMS_PER_PAGE);
     }
 
+    public PagedResults<Article> getArticles(int pageIndex, int pageSize) {
+        return this.db.from(Article.class).orderBy("publishAt").desc().orderBy("id").desc().list(pageIndex, pageSize);
+    }
+
     public PagedResults<Article> getArticles(Category category, int pageIndex) {
         return this.db.from(Article.class).where("categoryId = ?", category.id).orderBy("publishAt").desc().orderBy("id").desc().list(pageIndex,
                 ITEMS_PER_PAGE);

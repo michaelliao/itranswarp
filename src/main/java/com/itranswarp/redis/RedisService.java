@@ -7,7 +7,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
-import java.util.function.Consumer;
 
 import javax.annotation.PreDestroy;
 
@@ -18,22 +17,20 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.itranswarp.common.AbstractService;
 import com.itranswarp.util.ClassPathUtil;
 import com.itranswarp.util.JsonUtil;
+import com.redis.lettucemod.RedisModulesClient;
+import com.redis.lettucemod.api.StatefulRedisModulesConnection;
+import com.redis.lettucemod.api.async.RedisModulesAsyncCommands;
+import com.redis.lettucemod.api.sync.RedisModulesCommands;
 
 import io.lettuce.core.KeyValue;
-import io.lettuce.core.RedisClient;
 import io.lettuce.core.ScriptOutputType;
-import io.lettuce.core.api.StatefulRedisConnection;
-import io.lettuce.core.api.async.RedisAsyncCommands;
-import io.lettuce.core.api.sync.RedisCommands;
-import io.lettuce.core.pubsub.RedisPubSubAdapter;
-import io.lettuce.core.pubsub.StatefulRedisPubSubConnection;
 
 @Component
 public class RedisService extends AbstractService {
 
-    final RedisClient redisClient;
+    final RedisModulesClient redisClient;
 
-    public RedisService(@Autowired RedisClient redisClient) {
+    public RedisService(@Autowired RedisModulesClient redisClient) {
         this.redisClient = redisClient;
     }
 
@@ -46,17 +43,6 @@ public class RedisService extends AbstractService {
         return executeAsync(commands -> {
             return commands.publish(channel, message).toCompletableFuture();
         });
-    }
-
-    public void subscribe(String channel, Consumer<String> listener) {
-        StatefulRedisPubSubConnection<String, String> conn = this.redisClient.connectPubSub();
-        conn.addListener(new RedisPubSubAdapter<String, String>() {
-            @Override
-            public void message(String channel, String message) {
-                listener.accept(message);
-            }
-        });
-        conn.sync().subscribe(channel);
     }
 
     public String get(String key) {
@@ -237,17 +223,17 @@ public class RedisService extends AbstractService {
     }
 
     public <T> T executeSync(SyncCommandCallback<T> callback) {
-        try (StatefulRedisConnection<String, String> connection = redisClient.connect()) {
+        try (StatefulRedisModulesConnection<String, String> connection = redisClient.connect()) {
             connection.setAutoFlushCommands(true);
-            RedisCommands<String, String> commands = connection.sync();
+            RedisModulesCommands<String, String> commands = connection.sync();
             return callback.doInConnection(commands);
         }
     }
 
     public <T> CompletableFuture<T> executeBatchAsync(BatchAsyncCommandCallback<T> callback) {
-        try (StatefulRedisConnection<String, String> connection = redisClient.connect()) {
+        try (StatefulRedisModulesConnection<String, String> connection = redisClient.connect()) {
             connection.setAutoFlushCommands(false);
-            RedisAsyncCommands<String, String> commands = connection.async();
+            RedisModulesAsyncCommands<String, String> commands = connection.async();
             CompletableFuture<T> future = callback.doInConnection(commands);
             commands.flushCommands();
             return future;
@@ -255,9 +241,9 @@ public class RedisService extends AbstractService {
     }
 
     public <T> CompletableFuture<T> executeAsync(AsyncCommandCallback<T> callback) {
-        try (StatefulRedisConnection<String, String> connection = redisClient.connect()) {
+        try (StatefulRedisModulesConnection<String, String> connection = redisClient.connect()) {
             connection.setAutoFlushCommands(true);
-            RedisAsyncCommands<String, String> commands = connection.async();
+            RedisModulesAsyncCommands<String, String> commands = connection.async();
             return callback.doInConnection(commands);
         }
     }

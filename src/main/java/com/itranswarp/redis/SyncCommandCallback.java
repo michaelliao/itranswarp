@@ -1,9 +1,9 @@
 package com.itranswarp.redis;
 
-import io.lettuce.core.api.sync.RedisCommands;
+import com.redis.lettucemod.api.sync.RedisModulesCommands;
 
 @FunctionalInterface
 public interface SyncCommandCallback<T> {
 
-    T doInConnection(RedisCommands<String, String> commands);
+    T doInConnection(RedisModulesCommands<String, String> commands);
 }

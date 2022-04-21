@@ -2,44 +2,86 @@
 
 {% block nav %} /search {% endblock %}
 
-{% block meta %}
-    <meta property="og:ad" content="true" />
-    <meta property="og:type" content="webpage" />
-    <meta property="og:url" content="{{ __url__ }}" />
-{% endblock %}
-
 {% block title %}
 	{{ _('Search') }}
 	{% if q %} {{ q }} {% endif %}
 {% endblock %}
 
+{% block head %}
+
+<style>
+div.x-search-result {
+	margin-bottom: 40px;
+}
+
+.x-search-result-content > b {
+	font-weight: bold;
+	color: #e28327;
+	background-color: #fefceb;
+}
+</style>
+
+<script>
+
+	$(function () {
+		let re = /({{ qs|join('|') }})/ig;
+
+		let highlight = function() {
+			let
+				p = $(this),
+				text = p.text().replaceAll('<', '&lt;'),
+				s = text.replaceAll(re, '<b>$1</b>');
+			if (s === text) {
+				if (s.length > 200) {
+					s = s.substring(0, 200) + '...';
+				}
+			}
+			p.html(s);
+		};
+	
+		$('.x-search-result-content').each(highlight);
+	});
+</script>
+
+{% endblock %}
+
 {% block content %}
+
     <h4>{{ _('Search result') }}</h4>
     <div class="x-search-form">
         <form action="/search" method="get" class="uk-form uk-form-stacked uk-margin-bottom" style="width:100%">
-            <div class="uk-form-controls">
-				<div class="uk-form-icon" style="width:100%">
-					<i class="uk-icon-search"></i>
-					<input name="q" value="{{ q }}" type="text" maxlength="50" placeholder="keyword" style="width:100%">
+        	<div class="uk-grid">
+        		<div class="uk-width-3-4">
+		            <div class="uk-form-controls">
+						<div class="uk-form-icon" style="width:100%">
+							<i class="uk-icon-search"></i>
+							<input name="q" value="{{ q }}" type="text" maxlength="50" placeholder="keyword" style="width:100%">
+						</div>
+					</div>
+				</div>
+				<div class="uk-width-1-4">
+					<button type="submit" class="uk-button uk-button-primary">Search</button>
 				</div>
             </div>
         </form>
     </div>
 
     <div class="x-search-results">
-        {% if results == null or results.size() == 0 %}
+        {% if hits == null or hits.total == 0 %}
             <div class="uk-alert uk-alert-warning x-search-no-result">
-                <h4>{{ _('~search-not-found-error') }}</h4>
+                <h4>{{ _('~search-not-found-error') }} ({{ time }} seconds)</h4>
                 <p>{{ _('~search-not-found-message') }}</p>
             </div>
         {% else %}
-            {% for r in results %}
+            {% for d in hits.documents %}
                 <div class="x-search-result">
-                    <h4><a href="{{ r.url }}" target="_blank">{{ r.name|raw }}</a></h4>
-                    <p class="x-search-result-content">{{ r.content|raw }}</p>
+                    <h4><a href="{{ d.url }}" target="_blank" class="x-search-result-content">{{ d.name|raw }}</a></h4>
+                    <p class="x-search-result-content">{{ d.content }}</p>
                 </div>
             {% endfor %}
-            {{ pagination("?q=" + q|url + "&page=", page) }}
+            <div class="uk-alert uk-alert-info x-search-result">
+                <h4>{{ hits.total }} results found, display {{ hits.documents.size() }} results. ({{ time }} seconds)</h4>
+            </div>
         {% endif %}
     </div>
 

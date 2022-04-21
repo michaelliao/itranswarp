@@ -28,7 +28,6 @@ import com.itranswarp.common.ApiException;
 import com.itranswarp.enums.ApiError;
 import com.itranswarp.enums.RefType;
 import com.itranswarp.enums.Role;
-import com.itranswarp.markdown.Markdown;
 import com.itranswarp.model.AdMaterial;
 import com.itranswarp.model.AdPeriod;
 import com.itranswarp.model.AdSlot;
@@ -46,15 +45,13 @@ import com.itranswarp.model.WikiPage;
 import com.itranswarp.oauth.OAuthAuthentication;
 import com.itranswarp.oauth.OAuthProviders;
 import com.itranswarp.oauth.provider.AbstractOAuthProvider;
-import com.itranswarp.search.AbstractSearcher;
-import com.itranswarp.search.SearchableDocument;
+import com.itranswarp.search.Hits;
 import com.itranswarp.service.ViewService;
 import com.itranswarp.util.CookieUtil;
 import com.itranswarp.util.HashUtil;
 import com.itranswarp.util.HttpUtil;
 import com.itranswarp.warpdb.PagedResults;
 import com.itranswarp.web.filter.HttpContext;
-import com.itranswarp.web.view.i18n.Translators;
 
 /**
  * Mvc controller for all page views.
@@ -80,22 +77,13 @@ public class MvcController extends AbstractController {
     boolean passauthEnabled;
 
     @Autowired
-    Translators translators;
-
-    @Autowired
     LocaleResolver localeResolver;
-
-    @Autowired
-    Markdown markdown;
 
     @Autowired
     OAuthProviders oauthProviders;
 
     @Autowired
     ViewService viewService;
-
-    @Autowired(required = false)
-    AbstractSearcher searcher;
 
     ///////////////////////////////////////////////////////////////////////////////////////////////
     // index
@@ -122,18 +110,26 @@ public class MvcController extends AbstractController {
     }
 
     @GetMapping("/search")
-    public ModelAndView search(@RequestParam(value = "q", defaultValue = "") String q, @RequestParam(value = "page", defaultValue = "1") int page,
-            HttpServletResponse response) throws Exception {
-        if (this.searcher == null) {
-            response.sendError(HttpServletResponse.SC_NOT_FOUND);
-            return null;
+    public ModelAndView search(@RequestParam(value = "q", defaultValue = "") String q, HttpServletResponse response) throws Exception {
+        if (!this.searcher.ready()) {
+            throw new ApiException(ApiError.INTERNAL_SERVER_ERROR, null, "Search is not enabled.");
         }
         q = q.strip();
-        PagedResults<SearchableDocument> pr = this.searcher.search(q, page);
-        if (pr == null) {
-            return prepareModelAndView("search.html");
+        if (q.isEmpty()) {
+            return prepareModelAndView("search.html", Map.of("q", q, "qs", List.of(), "hits", Hits.empty(), "time", "0"));
         }
-        return prepareModelAndView("search.html", Map.of("q", q, "page", pr.page, "results", pr.results));
+        long startTime = System.currentTimeMillis();
+        Hits hits = Hits.empty();
+        List<String> qs = this.searcher.parseQuery(q);
+        if (qs == null) {
+            qs = List.of();
+        }
+        if (!qs.isEmpty()) {
+            logger.info("search keywords: {} -> {}", q, String.join(", ", qs));
+            hits = this.searcher.search(qs, 25);
+        }
+        return prepareModelAndView("search.html",
+                Map.of("q", q, "qs", qs, "hits", hits, "time", String.format("%.3f", (System.currentTimeMillis() - startTime) / 1000.0)));
     }
 
     @GetMapping("/ref/{refType}/" + ID)
@@ -509,6 +505,8 @@ public class MvcController extends AbstractController {
         mv.addObject("__follows__", settingService.getFollowFromCache().getFollows());
         // navigation menus:
         mv.addObject("__navigations__", navigationService.getNavigationsFromCache());
+        // can search?
+        mv.addObject("__searchable__", this.searcher.ready());
         // ads:
         mv.addObject("__ads__", adService.getAdInfoFromCache());
         // supported languages:

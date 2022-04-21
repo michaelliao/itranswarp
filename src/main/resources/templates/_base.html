@@ -273,25 +273,16 @@
 
 				<div id="navbar-user-info" class="uk-navbar-flip">
 					<ul class="uk-navbar-nav">
-
-						<!--
+						{% if __searchable__ %}
 						<li>
-							<form action="/search" class="uk-form uk-display-inline-block uk-visible-small" style="margin: 8px 8px">
-								<div class="uk-form-icon">
-									<i class="uk-icon-search"></i>
-									<input type="text" name="q" placeholder="Search" class="uk-form-width-small">
-								</div>
-							</form>
-						</li>
-						<li>
-							<form action="/search" class="uk-form uk-display-inline-block uk-hidden-small" style="margin: 8px 8px">
+							<form action="/search" class="uk-form uk-display-inline-block" style="margin: 8px 8px">
 								<div class="uk-form-icon">
 									<i class="uk-icon-search"></i>
 									<input type="text" name="q" placeholder="Search" class="uk-form-width-medium">
 								</div>
 							</form>
 						</li>
--->
+						{% endif %}
 
 						<li class="uk-parent x-display-if-signin" data-uk-dropdown>
 							<a href="#0"><i class="uk-icon-user"></i><span class="x-hidden-tiny">&nbsp;</span><span

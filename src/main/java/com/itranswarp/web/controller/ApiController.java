@@ -193,6 +193,7 @@ public class ApiController extends AbstractController {
     public Article articleCreate(@RequestBody ArticleBean bean) {
         Article article = this.articleService.createArticle(HttpContext.getRequiredCurrentUser(), bean);
         this.articleService.deleteArticlesFromCache(article.categoryId);
+        asyncIndex(article);
         return article;
     }
 
@@ -201,6 +202,7 @@ public class ApiController extends AbstractController {
     public Article articleUpdate(@PathVariable("id") long id, @RequestBody ArticleBean bean) {
         Article article = this.articleService.updateArticle(HttpContext.getRequiredCurrentUser(), id, bean);
         this.articleService.deleteArticlesFromCache(article.categoryId);
+        asyncIndex(article);
         return article;
     }
 
@@ -209,6 +211,7 @@ public class ApiController extends AbstractController {
     public Map<String, Boolean> articleDelete(@PathVariable("id") long id) {
         Article article = this.articleService.deleteArticle(HttpContext.getRequiredCurrentUser(), id);
         this.articleService.deleteArticlesFromCache(article.categoryId);
+        asyncUnindex(id);
         return API_RESULT_TRUE;
     }
 
@@ -446,49 +449,12 @@ public class ApiController extends AbstractController {
     // search
     ///////////////////////////////////////////////////////////////////////////////////////////////
 
-    private String KEY_REINDEX_STATUS = "__reindex_status__";
-    private String KEY_REINDEX_PROGRESS = "__reindex_progress__";
-
     @PostMapping("/search/reindex")
     @RoleWith(Role.ADMIN)
     public Map<String, Boolean> searchReindex() throws Exception {
-        if (this.redisService.get(KEY_REINDEX_STATUS) != null) {
-            throw new ApiException(ApiError.OPERATION_FAILED, "reindex", "Reindex is in progress...");
-        }
-        searchReindexAsync();
+        searcher.removeIndex();
+        searcher.createIndex();
         return API_RESULT_TRUE;
-    }
-
-    private void searchReindexAsync() throws Exception {
-        logger.warn("START reindex all documents...");
-        int indexedDocuments = 0;
-        this.redisService.set(KEY_REINDEX_PROGRESS, indexedDocuments);
-        this.redisService.set(KEY_REINDEX_STATUS, "indexing");
-        try {
-            logger.warn("reindex all articles...");
-            for (int i = 1; i < 100000; i++) {
-                PagedResults<Article> pr = this.articleService.getArticles(i);
-                if (pr.results.isEmpty()) {
-                    break;
-                }
-                this.searcher.indexArticles(pr.results.stream().toArray(Article[]::new));
-                indexedDocuments += pr.results.size();
-                this.redisService.set(KEY_REINDEX_PROGRESS, indexedDocuments);
-            }
-            logger.warn("END reindex all documents.");
-        } finally {
-            this.redisService.del(KEY_REINDEX_STATUS);
-        }
-    }
-
-    @GetMapping("/search/reindex")
-    @RoleWith(Role.ADMIN)
-    public Map<String, Object> searchReindexStatus() {
-        if (this.redisService.get(KEY_REINDEX_STATUS) == null) {
-            return Map.of("process", Boolean.FALSE);
-        }
-        var n = this.redisService.get(KEY_REINDEX_PROGRESS, Integer.class);
-        return Map.of("process", Boolean.TRUE, "progress", n);
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -775,6 +741,7 @@ public class ApiController extends AbstractController {
     public Wiki wikiCreate(@RequestBody WikiBean bean) {
         Wiki wiki = this.wikiService.createWiki(HttpContext.getRequiredCurrentUser(), bean);
         this.wikiService.removeWikiFromCache(wiki.id);
+        asyncIndex(wiki);
         return wiki;
     }
 
@@ -783,6 +750,7 @@ public class ApiController extends AbstractController {
     public Wiki wikiUpdate(@PathVariable("id") long id, @RequestBody WikiBean bean) {
         Wiki wiki = this.wikiService.updateWiki(HttpContext.getRequiredCurrentUser(), id, bean);
         this.wikiService.removeWikiFromCache(id);
+        asyncIndex(wiki);
         return wiki;
     }
 
@@ -791,6 +759,7 @@ public class ApiController extends AbstractController {
     public Map<String, Boolean> wikiDelete(@PathVariable("id") long id) {
         this.wikiService.deleteWiki(HttpContext.getRequiredCurrentUser(), id);
         this.wikiService.removeWikiFromCache(id);
+        asyncUnindex(id);
         return API_RESULT_TRUE;
     }
 
@@ -800,6 +769,7 @@ public class ApiController extends AbstractController {
         Wiki wiki = this.wikiService.getById(id);
         WikiPage wikiPage = this.wikiService.createWikiPage(HttpContext.getRequiredCurrentUser(), wiki, bean);
         this.wikiService.removeWikiFromCache(id);
+        asyncIndex(wiki, wikiPage);
         return wikiPage;
     }
 
@@ -816,6 +786,8 @@ public class ApiController extends AbstractController {
     public WikiPage wikiPageUpdate(@PathVariable("id") long id, @RequestBody WikiPageBean bean) {
         WikiPage wikiPage = this.wikiService.updateWikiPage(HttpContext.getRequiredCurrentUser(), id, bean);
         this.wikiService.removeWikiFromCache(wikiPage.wikiId);
+        Wiki wiki = this.wikiService.getById(wikiPage.wikiId);
+        asyncIndex(wiki, wikiPage);
         return wikiPage;
     }
 
@@ -825,6 +797,8 @@ public class ApiController extends AbstractController {
         bean.validate(true);
         WikiPage wikiPage = this.wikiService.moveWikiPage(HttpContext.getRequiredCurrentUser(), wikiPageId, bean.parentId, bean.displayIndex);
         this.wikiService.removeWikiFromCache(wikiPage.wikiId);
+        Wiki wiki = this.wikiService.getById(wikiPage.wikiId);
+        asyncIndex(wiki, wikiPage);
         return wikiPage;
     }
 
@@ -833,7 +807,52 @@ public class ApiController extends AbstractController {
     public Map<String, Boolean> wikiPageDelete(@PathVariable("id") long id) {
         WikiPage wikiPage = this.wikiService.deleteWikiPage(HttpContext.getRequiredCurrentUser(), id);
         this.wikiService.removeWikiFromCache(wikiPage.wikiId);
+        asyncUnindex(id);
         return API_RESULT_TRUE;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////
+    // async index
+    ///////////////////////////////////////////////////////////////////////////////////////////////
+
+    private void asyncIndex(Article article) {
+        new Thread(() -> {
+            try {
+                searcher.indexArticles(article);
+            } catch (Exception e) {
+                logger.error("index article failed.", e);
+            }
+        }).start();
+    }
+
+    private void asyncUnindex(long id) {
+        new Thread(() -> {
+            try {
+                searcher.unindexSearchableDocument(id);
+            } catch (Exception e) {
+                logger.error("unindex failed.", e);
+            }
+        }).start();
+    }
+
+    private void asyncIndex(Wiki wiki) {
+        new Thread(() -> {
+            try {
+                searcher.indexWiki(wiki);
+            } catch (Exception e) {
+                logger.error("index wiki failed.", e);
+            }
+        }).start();
+    }
+
+    private void asyncIndex(Wiki wiki, WikiPage wikiPage) {
+        new Thread(() -> {
+            try {
+                searcher.indexWikiPages(wiki, List.of(wikiPage));
+            } catch (Exception e) {
+                logger.error("index wiki page failed.", e);
+            }
+        }).start();
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////////

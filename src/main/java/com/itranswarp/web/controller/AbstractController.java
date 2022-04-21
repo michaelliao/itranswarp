@@ -3,6 +3,7 @@ package com.itranswarp.web.controller;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.itranswarp.common.AbstractService;
+import com.itranswarp.markdown.Markdown;
 import com.itranswarp.redis.RedisService;
 import com.itranswarp.search.AbstractSearcher;
 import com.itranswarp.service.AdService;
@@ -18,6 +19,7 @@ import com.itranswarp.service.SinglePageService;
 import com.itranswarp.service.TextService;
 import com.itranswarp.service.UserService;
 import com.itranswarp.service.WikiService;
+import com.itranswarp.web.view.i18n.Translators;
 
 public abstract class AbstractController extends AbstractService {
 
@@ -66,6 +68,13 @@ public abstract class AbstractController extends AbstractService {
     @Autowired
     protected AntiSpamService antiSpamService;
 
-    @Autowired(required = false)
+    @Autowired
     protected AbstractSearcher searcher;
+
+    @Autowired
+    protected Translators translators;
+
+    @Autowired
+    protected Markdown markdown;
+
 }

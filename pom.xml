@@ -184,19 +184,6 @@
 				</configuration>
 			</plugin>
 
-			<!-- compiler for Java 11 -->
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<configuration>
-					<release>11</release>
-					<compilerArgs>
-						<arg>-parameters</arg>
-						<arg>-Xlint:all</arg>
-					</compilerArgs>
-				</configuration>
-			</plugin>
-
 			<!-- docker build -->
 			<plugin>
 				<groupId>com.spotify</groupId>

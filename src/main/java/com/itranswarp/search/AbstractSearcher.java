@@ -124,14 +124,14 @@ public abstract class AbstractSearcher extends AbstractService {
         return doc;
     }
 
-    public SearchableDocument toSearchableDocument(Wiki wiki, WikiPage w) {
+    public SearchableDocument toSearchableDocument(Wiki wiki, WikiPage wp) {
         var doc = new SearchableDocument();
-        doc.id = w.id;
+        doc.id = wp.id;
         doc.type = SearchableDocument.TYPE_WIKI_PAGE;
-        doc.name = wiki.name + " / " + w.name;
-        doc.content = markdown.toText(textService.getById(w.textId).content);
-        doc.publishAt = Long.max(wiki.publishAt, w.publishAt);
-        doc.url = "/wiki/" + w.wikiId + "/" + w.id;
+        doc.name = wiki.name + " / " + wp.name;
+        doc.content = markdown.toText(textService.getById(wp.textId).content);
+        doc.publishAt = Long.max(wiki.publishAt, wp.publishAt);
+        doc.url = "/wiki/" + wp.wikiId + "/" + wp.id;
         return doc;
     }
 

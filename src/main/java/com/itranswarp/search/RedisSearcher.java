@@ -85,11 +85,14 @@ public class RedisSearcher extends AbstractSearcher {
             logger.info("search query: {}", q);
             return commands.search(REDISEARCH_INDEX_NAME, q, builder.build());
         });
-        logger.info("search results: count = {}", sr.getCount());
-        sr.forEach(doc -> {
-            logger.info("result id = {}: type = {}, name = {}, url = {}, content = {}", doc.getId(), doc.get("type"), doc.get("name"), doc.get("url"),
-                    doc.get("content"));
-        });
+        if (logger.isDebugEnabled()) {
+            logger.debug("search results: count = {}", sr.getCount());
+            sr.forEach(doc -> {
+                logger.debug("result id = {}: type = {}, name = {}, url = {}, content = {}", doc.getId(), doc.get("type"), doc.get("name"), doc.get("url"),
+                        doc.get("content"));
+            });
+        }
+
         if (sr.isEmpty()) {
             return Hits.empty();
         }

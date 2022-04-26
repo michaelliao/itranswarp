@@ -7,6 +7,7 @@ Full-featured CMS including blog, wiki, discussion, etc. Cloud native applicatio
 [![Docker Pulls](https://img.shields.io/docker/pulls/michaelliao/itranswarp?color=%2334D058&style=plastic)](https://hub.docker.com/repository/docker/michaelliao/itranswarp)
 
 * Based on SpringBoot 2.x
+* Search support
 * OAuth2 integration (weibo, QQ, facebook, etc.)
 * SEO support
 * REST API
@@ -14,7 +15,7 @@ Full-featured CMS including blog, wiki, discussion, etc. Cloud native applicatio
 
 ### Environment
 
-- JDK 11
+- JDK 17
 - MySQL 5.7
 - Redis 5/6
 
@@ -49,6 +50,10 @@ $ mysql -u root -p it < release/init.sql
 ```
 java -jar itranswarp.jar
 ```
+
+### Search
+
+Search is auto-enabled if RediSearch 2.x is detected. [How to install RediSearch in Redis](https://redis.io/docs/stack/search/quick_start/).
 
 ### Configuration
 

@@ -2,6 +2,7 @@ package com.itranswarp.web.support;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 import org.slf4j.Logger;
@@ -9,6 +10,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Primary;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.web.servlet.ViewResolver;
@@ -25,6 +27,7 @@ import com.mitchellbosecke.pebble.extension.Filter;
 import com.mitchellbosecke.pebble.extension.Function;
 import com.mitchellbosecke.pebble.loader.ClasspathLoader;
 import com.mitchellbosecke.pebble.spring.servlet.PebbleViewResolver;
+import org.springframework.web.servlet.i18n.SessionLocaleResolver;
 
 /**
  * MVC configuration.
@@ -114,5 +117,13 @@ public class MvcConfiguration {
                 return map;
             }
         };
+    }
+
+    @Bean
+    @Primary
+    SessionLocaleResolver sessionLocaleResolver() {
+      SessionLocaleResolver sessionLocaleResolver = new SessionLocaleResolver();
+      sessionLocaleResolver.setDefaultLocale(Locale.forLanguageTag("zh_CN"));
+      return sessionLocaleResolver;
     }
 }

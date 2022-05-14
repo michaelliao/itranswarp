@@ -45,6 +45,7 @@ public class MvcConfiguration {
      * @return LocaleResolver object.
      */
     @Bean
+    @Primary
     public CookieLocaleResolver createLocaleResolver() {
         var resolver = new CookieLocaleResolver();
         resolver.setCookieName("_locale_");
@@ -119,11 +120,4 @@ public class MvcConfiguration {
         };
     }
 
-    @Bean
-    @Primary
-    SessionLocaleResolver sessionLocaleResolver() {
-      SessionLocaleResolver sessionLocaleResolver = new SessionLocaleResolver();
-      sessionLocaleResolver.setDefaultLocale(Locale.forLanguageTag("zh_CN"));
-      return sessionLocaleResolver;
-    }
 }

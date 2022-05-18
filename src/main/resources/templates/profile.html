@@ -30,7 +30,7 @@
         <img src="{{ user.imageUrl }}" class="uk-comment-avatar uk-border-circle x-avatar" style="width:100px">
     </div>
 
-    <h3>{{ _('Registration Date') }}</h3>
+    <h3 class="uk-margin-top">{{ _('Registration Date') }}</h3>
     <p><span class="x-smart-datetime" data="{{ user.createdAt }}"></span></p>
 {% endblock %}
 
@@ -39,13 +39,20 @@
     <table class="uk-table uk-table-hover">
         <thead>
             <tr>
-                <th>{{ _('Recent Posts') }}</th>
+                <th>
+                	{{ _('Recent Posts') }}
+                	<span class="x-can-delete">
+                		[<a href="javascript:deleteTopics($('.x-topic-id').map(function(){return $(this).text()}).get())" class="uk-text-danger">{{ _('Delete All') }}</a>]
+                		[<a href="javascript:deleteTopicsAndLockUser($('.x-topic-id').map(function(){return $(this).text()}).get(), '{{ user.id }}')" class="uk-text-danger">{{ _('Delete All and Lock User') }}</a>]
+                	</span>
+                </th>
             </tr>
         </thead>
         <tbody>
         {% for t in topics %}
             <tr>
                 <td>
+                	<div class="x-topic-id uk-hidden">{{ t.id }}</div>
                     <a href="/user/{{ user.id }}" target="_blank"><img class="uk-comment-avatar uk-border-circle x-avatar" src="{{ user.imageUrl }}" style="width:50px"></a>
                     <div style="margin-left:70px;">
                         <div class="uk-margin" style="font-size:16px;"><a href="/discuss/{{ t.boardId }}/{{ t.id }}">{{ t.name }}</a></div>

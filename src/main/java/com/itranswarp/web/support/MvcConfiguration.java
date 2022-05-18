@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.web.servlet.LocaleResolver;
 import org.springframework.web.servlet.ViewResolver;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -41,10 +42,10 @@ public class MvcConfiguration {
      *
      * @return LocaleResolver object.
      */
-    @Bean
-    public CookieLocaleResolver createLocaleResolver() {
+    @Bean(name = "localeResolver")
+    public LocaleResolver createLocaleResolver() {
         var resolver = new CookieLocaleResolver();
-        resolver.setCookieName("_locale_");
+        resolver.setCookieName("__locale__");
         resolver.setCookieHttpOnly(true);
         resolver.setCookieMaxAge(Integer.MAX_VALUE);
         resolver.setCookiePath("/");

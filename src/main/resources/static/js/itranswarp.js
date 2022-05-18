@@ -116,13 +116,44 @@ function deleteTopic(topicId) {
     });
 }
 
+function deleteTopics(topicIds) {
+    UIkit.modal.confirm("Are you sure to delete " + topicIds.length + " topics?", function () {
+    	for (let i=0; i<topicIds.length; i++) {
+    		let topicId = topicIds[i];
+    		setTimeout(function () {
+		        postJSON('/api/topics/' + topicId + '/delete', {}, function (err, resp) {
+		            if (err) {
+		                return showError(err);
+		            }
+		        });
+		    }, 250 * i);
+    	}
+    });
+}
+
+function deleteTopicsAndLockUser(topicIds, userId) {
+    UIkit.modal.confirm("Are you sure to delete " + topicIds.length + " topics and lock user?", function () {
+    	_lockUser(userId);
+    	for (let i=0; i<topicIds.length; i++) {
+    		let topicId = topicIds[i];
+    		setTimeout(function () {
+		        postJSON('/api/topics/' + topicId + '/delete', {}, function (err, resp) {
+		            if (err) {
+		                return showError(err);
+		            }
+		        });
+		    }, 250 * i);
+    	}
+    });
+}
+
 function deleteTopicAndLockUser(topicId, userId) {
     UIkit.modal.confirm("Are you sure to delete this topic and lock user?", function () {
+        _lockUser(userId);
         postJSON('/api/topics/' + topicId + '/delete', {}, function (err, resp) {
             if (err) {
                 return showError(err);
             }
-            _lockUser(userId);
         });
     });
 }
@@ -140,11 +171,11 @@ function deleteReply(replyId) {
 
 function deleteReplyAndLockUser(replyId, userId) {
     UIkit.modal.confirm("Are you sure to delete this reply and lock user?", function () {
+        _lockUser(userId);
         postJSON('/api/replies/' + replyId + '/delete', {}, function (err, resp) {
             if (err) {
                 return showError(err);
             }
-            _lockUser(userId);
         });
     });
 }
@@ -154,7 +185,6 @@ function _lockUser(userId) {
         if (err) {
             return showError(err);
         }
-        refresh();
     });
 }
 

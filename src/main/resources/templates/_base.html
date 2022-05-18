@@ -128,6 +128,15 @@
 
 	<link rel="stylesheet" href="/static/css/itranswarp.css?v={{ __version__ }}">
 
+	<!-- override font family -->
+	<style>
+	{% if __website__.customFont != "" %}
+	html,body,h1,h2,h3,h4,h5,h6 {
+		font-family: {{ __website__.customFont|raw }}
+	}
+	{% endif %}
+	</style>
+
 	<script src="/static/js/shared.js?v={{ __version__ }}"></script>
 	<script src="/static/js/itranswarp.js?v={{ __version__ }}"></script>
 	<script src="/static/js/extension.js?v={{ __version__ }}"></script>
@@ -139,7 +148,7 @@
 			display: none;
 		}
 
-		/* {% if __user__ !=null %} */
+		/* {% if __user__ != null %} */
 
 		.x-display-if-not-signin {
 			display: none;

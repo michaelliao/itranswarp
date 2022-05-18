@@ -28,7 +28,7 @@ $(function() {
     	        	page = data.page,
         	    	adMaterials = data.results;
             	adMaterials.forEach(m => {
-            		m.adPeriod = adPeriods.find(p => p.id===m.adPeriodId);
+            		m.adPeriod = adPeriods.find(p => p.id === m.adPeriodId);
 	            });
     	        initVM(page, adMaterials);
 	        });

@@ -131,7 +131,7 @@
 	<!-- override font family -->
 	<style>
 	{% if __website__.customFont != "" %}
-	html,body,h1,h2,h3,h4,h5,h6 {
+	html,body,h1,h2,h3,h4,h5,h6,.uk-navbar-nav>li>a {
 		font-family: {{ __website__.customFont|raw }}
 	}
 	{% endif %}

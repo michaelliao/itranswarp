@@ -36,8 +36,14 @@
 	<logger name="org.hibernate.validator.internal.util.Version" level="WARN" />
 	<logger name="org.springframework.boot.actuate.autoconfigure.CrshAutoConfiguration" level="WARN" />
 
-	<root level="INFO">
-		<appender-ref ref="CONSOLE" />
-		<appender-ref ref="APP_LOG" />
-	</root>
+	<springProfile name="native">
+		<root level="INFO">
+			<appender-ref ref="CONSOLE" />
+		</root>
+	</springProfile>
+	<springProfile name="!native">
+		<root level="INFO">
+			<appender-ref ref="APP_LOG" />
+		</root>
+	</springProfile>
 </configuration>

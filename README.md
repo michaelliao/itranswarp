@@ -17,7 +17,20 @@ Full-featured CMS including blog, wiki, discussion, etc. Cloud native applicatio
 
 - JDK 17
 - MySQL 5.7
-- Redis 5/6
+- Redis 5/6 with RediSearch 2
+
+### Run with Docker
+
+Run MySQL, RediSearch in background.
+
+Run:
+
+```
+docker run -d -p 2019:2019 --rm \
+  --env-file /path/to/env-file \
+  -v /var/log/itranswarp:/var/log/itranswarp \
+  --name itranswarp michaelliao/itranswarp:1.1
+```
 
 ### Build
 

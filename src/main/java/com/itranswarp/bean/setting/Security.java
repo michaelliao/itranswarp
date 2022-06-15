@@ -26,6 +26,9 @@ public class Security extends AbstractSettingBean {
     }
 
     private List<String> splitByLines(String text, boolean toLowerCase) {
+        if (text == null) {
+            text = "";
+        }
         if (toLowerCase) {
             text = text.toLowerCase();
         }

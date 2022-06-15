@@ -4,18 +4,26 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.LocaleResolver;
 import org.springframework.web.servlet.ViewResolver;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.i18n.CookieLocaleResolver;
+import org.springframework.web.servlet.resource.PathResourceResolver;
+import org.springframework.web.servlet.resource.ResourceResolver;
+import org.springframework.web.servlet.resource.ResourceResolverChain;
 
 import com.itranswarp.util.JsonUtil;
 import com.itranswarp.web.view.AbstractFilter;
@@ -53,14 +61,38 @@ public class MvcConfiguration {
     }
 
     @Bean
-    public WebMvcConfigurer webMvcConfigurer() {
+    public WebMvcConfigurer webMvcConfigurer(@Value("${spring.application.domain}") String domain) {
         return new WebMvcConfigurer() {
             /**
              * Keep "/static/" prefix
              */
             @Override
             public void addResourceHandlers(ResourceHandlerRegistry registry) {
-                registry.addResourceHandler("/static/**").addResourceLocations("classpath:/static/");
+                final String httpReferer = "http://" + domain;
+                final String httpsReferer = "https://" + domain;
+                registry.addResourceHandler("/static/**").addResourceLocations("classpath:/static/").resourceChain(true)
+                        // Referer check:
+                        .addResolver(new ResourceResolver() {
+                            @Override
+                            public Resource resolveResource(HttpServletRequest request, String requestPath, List<? extends Resource> locations,
+                                    ResourceResolverChain chain) {
+                                String referer = request.getHeader("Referer");
+                                if (referer != null) {
+                                    referer = referer.toLowerCase();
+                                    if (!referer.startsWith(httpsReferer) && !referer.startsWith(httpReferer)) {
+                                        throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+                                    }
+                                }
+                                return chain.resolveResource(request, requestPath, locations);
+                            }
+
+                            @Override
+                            public String resolveUrlPath(String resourcePath, List<? extends Resource> locations, ResourceResolverChain chain) {
+                                return chain.resolveUrlPath(resourcePath, locations);
+                            }
+                        })
+                        // Path-resource-resolver:
+                        .addResolver(new PathResourceResolver());
             }
 
             @Override

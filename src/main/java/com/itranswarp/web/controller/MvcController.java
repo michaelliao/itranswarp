@@ -64,12 +64,6 @@ public class MvcController extends AbstractController {
     @Value("#{applicationConfiguration.name}")
     String name;
 
-    @Value("#{applicationConfiguration.cdnMaster}")
-    String cdnMaster;
-
-    @Value("#{applicationConfiguration.cdnSlave}")
-    String cdnSlave;
-
     @Value("#{applicationConfiguration.profiles eq 'native'}")
     Boolean dev;
 
@@ -494,9 +488,6 @@ public class MvcController extends AbstractController {
         mv.addObject("__scheme__", ctx.scheme);
         mv.addObject("__host__", ctx.host);
         mv.addObject("__url__", ctx.url);
-        // cdn:
-        mv.addObject("__cdn_master__", this.cdnMaster);
-        mv.addObject("__cdn_slave__", this.cdnSlave);
         // timestamp as millis:
         mv.addObject("__timestamp__", ctx.timestamp);
         // settings:

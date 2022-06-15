@@ -10,11 +10,9 @@ spring:
     active: ${PROFILES:native}
   application:
     name: ${NAME:itranswarp}
+    domain: ${DOMAIN:local.itranswarp.com}
     # default to empty (use default timezone of server):
     timezone: ${TIMEZONE:}
-    cdn:
-      master: ${CDN_MASTER:https://cdn.jsdelivr.net/npm}
-      slave: ${CDN_SLAVE:https://unpkg.com}
 
   # mysql configuration:
   datasource:

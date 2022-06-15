@@ -244,6 +244,8 @@
 {% block content %}
 <h4>{{ current.name }}</h4>
 <div class="x-wiki-info">
+	{{ _('Last updated') }}: <span class="x-smart-datetime" data="{{ current.updatedAt }}">...</span>
+	/
     <span>{{ _('Reads') }}: {{ current.views }}</span>
     <a href="/manage/wiki/{% if current.id == wiki.id %}wiki_update{% else %}wikipage_update{% endif %}?id={{ current.id }}"
         target="_blank" class="x-can-edit uk-text-danger">{{ _('Edit') }}</a>

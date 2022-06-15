@@ -56,75 +56,7 @@
 	<!-- meta here -->
 	{% endblock %}
 
-	<!-- BEGIN CSS -->
-	<link rel="stylesheet" href="{{ __cdn_master__ }}/uikit@2.27.4/vendor/codemirror/codemirror.css">
-	<link rel="stylesheet" href="{{ __cdn_master__ }}/uikit@2.27.4/vendor/highlight/highlight.css">
-	<link rel="stylesheet" href="{{ __cdn_master__ }}/katex@0.15.1/dist/katex.min.css">
-	<link rel="stylesheet" href="{{ __cdn_master__ }}/simditor@2.3.22/styles/simditor.css">
-	<link rel="stylesheet" href="{{ __cdn_master__ }}/uikit@2.27.4/dist/css/uikit.min.css">
-	<link rel="stylesheet" href="{{ __cdn_master__ }}/uikit@2.27.4/dist/css/uikit.almost-flat.css">
-	<!-- END CSS -->
-
-	<!-- BEGIN JAVASCRIPT -->
-	<script src="{{ __cdn_master__ }}/jquery@2.1.4/dist/jquery.min.js"></script>
-	<script src="{{ __cdn_master__ }}/underscore@1.12.1/underscore-min.js"></script>
-	<script src="{{ __cdn_master__ }}/moment@2.29.1/min/moment-with-locales.min.js"></script>
-	<script src="{{ __cdn_master__ }}/uikit@2.27.4/vendor/codemirror/codemirror.js"></script>
-	<script src="{{ __cdn_master__ }}/uikit@2.27.4/vendor/highlight/highlight.js"></script>
-	<script src="{{ __cdn_master__ }}/uikit@2.27.4/vendor/commonmark.js"></script>
-	<script src="{{ __cdn_master__ }}/katex@0.15.1/dist/katex.min.js"></script>
-	<script src="{{ __cdn_master__ }}/simple-module@2.0.6/lib/module.js"></script>
-	<script src="{{ __cdn_master__ }}/simple-hotkeys@1.0.3/lib/hotkeys.js"></script>
-	<script src="{{ __cdn_master__ }}/simditor@2.3.22/lib/simditor.js"></script>
-	<script src="{{ __cdn_master__ }}/turndown@7.1.1/dist/turndown.js"></script>
-	<script src="{{ __cdn_master__ }}/uikit@2.27.4/dist/js/uikit.min.js"></script>
-	<script src="{{ __cdn_master__ }}/uikit@2.27.4/dist/js/components/tooltip.min.js"></script>
-	<script src="{{ __cdn_master__ }}/uikit@2.27.4/dist/js/components/slideshow.min.js"></script>
-	<script src="{{ __cdn_master__ }}/uikit@2.27.4/dist/js/components/datepicker.min.js"></script>
-	<script src="{{ __cdn_master__ }}/uikit@2.27.4/dist/js/components/autocomplete.min.js"></script>
-	<script src="{{ __cdn_master__ }}/uikit@2.27.4/dist/js/components/notify.js"></script>
-	<script src="{{ __cdn_master__ }}/uikit@2.27.4/dist/js/components/lightbox.min.js"></script>
-	<script src="{{ __cdn_master__ }}/uikit@2.27.4/dist/js/components/htmleditor.min.js"></script>
-	<!-- END JAVASCRIPT -->
-
-	<script>
-		function writeCss(path) {
-			document.write('<link rel="stylesheet" href="{{ __cdn_slave__ }}' + path + '">');
-		}
-		function writeJs(path) {
-			document.write('<scr' + 'ipt src="{{ __cdn_slave__ }}' + path + '"></scr' + 'ipt>');
-		}
-
-		if (window.jQuery === undefined && '{{ __cdn_slave__ }}' != '') {
-			console.log('resource from jsdelivr not loaded. try other source...');
-			writeCss('/uikit@2.27.4/vendor/codemirror/codemirror.css');
-			writeCss('/uikit@2.27.4/vendor/highlight/highlight.css');
-			writeCss('/katex@0.15.1/dist/katex.min.css');
-			writeCss('/simditor@2.3.22/styles/simditor.css');
-			writeCss('/uikit@2.27.4/dist/css/uikit.min.css');
-			writeCss('/uikit@2.27.4/dist/css/uikit.almost-flat.css');
-
-			writeJs('/jquery@2.1.4/dist/jquery.min.js');
-			writeJs('/underscore@1.12.1/underscore-min.js');
-			writeJs('/moment@2.29.1/min/moment-with-locales.min.js');
-			writeJs('/uikit@2.27.4/vendor/codemirror/codemirror.js');
-			writeJs('/uikit@2.27.4/vendor/highlight/highlight.js');
-			writeJs('/uikit@2.27.4/vendor/commonmark.js');
-			writeJs('/katex@0.15.1/dist/katex.min.js');
-			writeJs('/simple-module@2.0.6/lib/module.js');
-			writeJs('/simple-hotkeys@1.0.3/lib/hotkeys.js');
-			writeJs('/simditor@2.3.22/lib/simditor.js');
-			writeJs('/turndown@7.1.1/dist/turndown.js');
-			writeJs('/uikit@2.27.4/dist/js/uikit.min.js');
-			writeJs('/uikit@2.27.4/dist/js/components/tooltip.min.js');
-			writeJs('/uikit@2.27.4/dist/js/components/slideshow.min.js');
-			writeJs('/uikit@2.27.4/dist/js/components/datepicker.min.js');
-			writeJs('/uikit@2.27.4/dist/js/components/autocomplete.min.js');
-			writeJs('/uikit@2.27.4/dist/js/components/notify.js');
-			writeJs('/uikit@2.27.4/dist/js/components/lightbox.min.js');
-			writeJs('/uikit@2.27.4/dist/js/components/htmleditor.min.js');
-		}
-	</script>
+	{% include("_inc_static.html") %}
 
 	<link rel="stylesheet" href="/static/css/itranswarp.css?v={{ __version__ }}">
 

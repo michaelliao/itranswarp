@@ -40,34 +40,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>{% block title %} ??? {% endblock %} - {{ _('Management Console') }}</title>
 
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/uikit@2.27.4/vendor/codemirror/codemirror.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/uikit@2.27.4/vendor/highlight/highlight.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/uikit@2.27.4/dist/css/uikit.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/uikit@2.27.4/dist/css/uikit.almost-flat.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/uikit@2.27.4/dist/css/components/htmleditor.min.css">
-    <link rel="stylesheet"
-        href="https://cdn.jsdelivr.net/npm/uikit@2.27.4/dist/css/components/htmleditor.almost-flat.min.css">
+	{% include("_inc_static.html") %}
 
     <link rel="stylesheet" href="/static/css/itranswarp.css?v={{ __version__ }}">
-
-    <script src="https://cdn.jsdelivr.net/npm/jquery@2.1.4/dist/jquery.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/jqtree@1.6.2/tree.jquery.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/underscore@1.8.3/underscore-min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/js-sha256@0.9.0/build/sha256.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/uikit@2.27.4/vendor/codemirror/codemirror.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/moment@2.29.1/min/moment-with-locales.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/vue@2.6.10/dist/vue.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/vue-resource@1.2.1/dist/vue-resource.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/marked@3.0.8/marked.min.js"></script>
-
-    <script src="https://cdn.jsdelivr.net/npm/uikit@2.27.4/dist/js/uikit.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/uikit@2.27.4/dist/js/components/tooltip.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/uikit@2.27.4/dist/js/components/slideshow.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/uikit@2.27.4/dist/js/components/datepicker.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/uikit@2.27.4/dist/js/components/autocomplete.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/uikit@2.27.4/dist/js/components/notify.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/uikit@2.27.4/dist/js/components/lightbox.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/uikit@2.27.4/dist/js/components/htmleditor.min.js"></script>
 
     <script src="/static/js/shared.js?v={{ __version__ }}"></script>
     <script src="/static/js/itranswarp.js?v={{ __version__ }}"></script>

@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 
 import com.itranswarp.bean.setting.Website;
@@ -32,7 +33,6 @@ import com.itranswarp.model.User;
 import com.itranswarp.model.Wiki;
 import com.itranswarp.model.WikiPage;
 import com.itranswarp.util.HashUtil;
-import com.itranswarp.util.IdUtil;
 import com.itranswarp.warpdb.WarpDb;
 
 /**
@@ -44,11 +44,11 @@ public class SchemaBuilder {
         SchemaBuilder builder = new SchemaBuilder();
         String ddl = builder.generateDDL();
         String inserts = builder.generateEntities();
-        File ddlFile = new File("release/ddl.sql").getAbsoluteFile();
+        File ddlFile = new File("dev/sql/ddl.sql").getAbsoluteFile();
         try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(ddlFile), "UTF-8"))) {
             writer.write(ddl);
         }
-        File initFile = new File("release/init.sql").getAbsoluteFile();
+        File initFile = new File("dev/sql/init.sql").getAbsoluteFile();
         try (BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(initFile), "UTF-8"))) {
             writer.write(inserts);
         }
@@ -66,6 +66,8 @@ public class SchemaBuilder {
     User editor;
     User subscriber;
     long[] imageIds;
+
+    AtomicLong nextId = new AtomicLong();
 
     SchemaBuilder() {
         db = new WarpDb();
@@ -131,7 +133,7 @@ public class SchemaBuilder {
         sb.append("USE it;\n\n");
         entities.forEach(entity -> {
             if (entity.id == 0) {
-                entity.id = IdUtil.nextId();
+                entity.id = nextId.incrementAndGet();
             }
             if (entity.createdAt == 0) {
                 entity.createdAt = entity.updatedAt = System.currentTimeMillis();
@@ -144,7 +146,7 @@ public class SchemaBuilder {
     void initSinglePages(List<AbstractEntity> entities) {
         Text text = initText(entities);
         SinglePage page = new SinglePage();
-        page.id = IdUtil.nextId();
+        page.id = nextId.incrementAndGet();
         page.name = "Help";
         page.tags = "help,doc";
         page.textId = text.id;
@@ -164,7 +166,7 @@ public class SchemaBuilder {
         // insert users with password:
         emails.forEach(email -> {
             User user = new User();
-            user.id = IdUtil.nextId();
+            user.id = nextId.incrementAndGet();
             user.email = email;
             user.name = email.substring(0, email.indexOf('@'));
             user.role = Role.valueOf(user.name.toUpperCase());
@@ -181,7 +183,7 @@ public class SchemaBuilder {
             }
             final String hashedPasswd = HashUtil.hmacSha256(loginPassword, user.email);
             LocalAuth auth = new LocalAuth();
-            auth.id = IdUtil.nextId();
+            auth.id = nextId.incrementAndGet();
             auth.userId = user.id;
             auth.salt = HashUtil.sha256(user.email);
             auth.passwd = HashUtil.hmacSha256(hashedPasswd, auth.salt);
@@ -191,7 +193,7 @@ public class SchemaBuilder {
 
     void initArticles(List<AbstractEntity> entities) {
         Category category = new Category();
-        category.id = IdUtil.nextId();
+        category.id = nextId.incrementAndGet();
         category.name = "Sample";
         category.tag = "sample";
         category.description = "Java Series";
@@ -231,7 +233,7 @@ public class SchemaBuilder {
         }
         String content = sb.toString();
         Text t = new Text();
-        t.id = IdUtil.nextId();
+        t.id = nextId.incrementAndGet();
         t.content = content;
         t.hash = HashUtil.sha256(content);
         entities.add(t);
@@ -240,7 +242,7 @@ public class SchemaBuilder {
 
     void initWiki(List<AbstractEntity> entities) {
         Wiki wiki = new Wiki();
-        wiki.id = IdUtil.nextId();
+        wiki.id = nextId.incrementAndGet();
         wiki.description = "A Sample Wiki";
         wiki.imageId = imageIds[0];
         wiki.name = "Sample Tutorial";
@@ -251,7 +253,7 @@ public class SchemaBuilder {
 
         for (int i = 0; i < 3; i++) {
             WikiPage p = new WikiPage();
-            p.id = IdUtil.nextId();
+            p.id = nextId.incrementAndGet();
             p.wikiId = wiki.id;
             p.displayOrder = i;
             p.name = "page " + (i + 1);
@@ -262,7 +264,7 @@ public class SchemaBuilder {
 
             for (int j = 0; j < 4; j++) {
                 WikiPage sub = new WikiPage();
-                sub.id = IdUtil.nextId();
+                sub.id = nextId.incrementAndGet();
                 sub.wikiId = wiki.id;
                 sub.displayOrder = j;
                 sub.name = "sub " + (j + 1);
@@ -274,7 +276,7 @@ public class SchemaBuilder {
                 if (j == 2) {
                     for (int n = 0; n < 3; n++) {
                         WikiPage leaf = new WikiPage();
-                        leaf.id = IdUtil.nextId();
+                        leaf.id = nextId.incrementAndGet();
                         leaf.wikiId = wiki.id;
                         leaf.displayOrder = n;
                         leaf.name = "leaf " + (n + 1);
@@ -297,7 +299,7 @@ public class SchemaBuilder {
 
     void initDiscuss(List<AbstractEntity> entities) {
         Board board = new Board();
-        board.id = IdUtil.nextId();
+        board.id = nextId.incrementAndGet();
         board.name = "Discuss Sample";
         board.description = "Discuss Sample.";
         board.tag = "sample";
@@ -305,7 +307,7 @@ public class SchemaBuilder {
 
         for (int i = 0; i < 20; i++) {
             Topic topic = new Topic();
-            topic.id = IdUtil.nextId();
+            topic.id = nextId.incrementAndGet();
             topic.boardId = board.id;
             topic.content = randomLine(50);
             topic.userId = subscriber.id;
@@ -335,14 +337,14 @@ public class SchemaBuilder {
         imageIds = new long[12];
         for (int i = 0; i < imageIds.length; i++) {
             Resource r = new Resource();
-            r.id = IdUtil.nextId();
+            r.id = nextId.incrementAndGet();
             r.encoding = ResourceEncoding.BASE64;
             r.content = IMGS[i];
             r.hash = HashUtil.sha256(r.content);
             entities.add(r);
 
             Attachment a = new Attachment();
-            a.id = IdUtil.nextId();
+            a.id = nextId.incrementAndGet();
             a.width = 640;
             a.height = 360;
             a.mime = "image/jpeg";

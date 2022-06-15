@@ -34,7 +34,7 @@ Run iTranswarp application:
 docker run -d -p 2019:2019 --rm \
   --env-file /path/to/env-file \
   -v /var/log/itranswarp:/var/log/itranswarp \
-  --name itranswarp michaelliao/itranswarp:1.1
+  --name itranswarp michaelliao/itranswarp:1.2
 ```
 
 ### Build
@@ -69,6 +69,8 @@ $ mysql -u root -p it < dev/sql/init.sql
 java -jar itranswarp.jar
 ```
 
+Visit [http://localhost:2019](http://localhost:2019) for demo.
+
 ### Search
 
 Search is auto-enabled if RediSearch 2.x is detected. [How to install RediSearch in Redis](https://redis.io/docs/stack/search/quick_start/).
@@ -78,7 +80,7 @@ Search is auto-enabled if RediSearch 2.x is detected. [How to install RediSearch
 All configurations are passed by environments:
 
 ```
-$ PROFILES=production TIME_ZONE=Asia/Shanghai DOMAIN=example.com \
+$ PROFILES=production TIME_ZONE=Asia/Shanghai DOMAIN=www.example.com \
   DB_HOST=localhost DB_PASSWORD=changeit \
   REDIS_HOST=localhost \
   java -jar itranswarp.jar

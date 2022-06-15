@@ -67,10 +67,7 @@ public abstract class AbstractEntity extends AbstractBean {
     // hook for pre-update:
     @PreUpdate
     void preUpdate() {
-        if (this.updatedAt == 0L) {
-            this.updatedAt = System.currentTimeMillis();
-        }
+        this.updatedAt = System.currentTimeMillis();
         this.version++;
     }
-
 }

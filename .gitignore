@@ -23,7 +23,7 @@ docker/.env
 
 *.class
 
-backup/
+/backup/
 
 # Mobile Tools for Java (J2ME)
 .mtj.tmp/
@@ -38,7 +38,7 @@ hs_err_pid*
 
 # Maven.gitignore #############################################################
 
-target/
+/target/
 pom.xml.tag
 pom.xml.releaseBackup
 pom.xml.versionsBackup
@@ -64,10 +64,10 @@ local.properties
 # NetBeans.gitignore ##########################################################
 
 nbproject/private/
-build/
+/build/
 nbbuild/
-dist/
-nbdist/
+/dist/
+/nbdist/
 nbactions.xml
 nb-configuration.xml
 
@@ -160,16 +160,6 @@ tramp
 # Packages
 *.egg
 *.egg-info
-dist
-build
-eggs
-parts
-bin
-var
-sdist
-develop-eggs
-lib
-lib64
 __pycache__
 
 # Installer logs

@@ -140,12 +140,6 @@ spring:
         color:         "${OAUTH_WEIBO_COLOR:#e92b00}"
         client-id:     "${OAUTH_WEIBO_CLIENT_ID:}"
         client-secret: "${OAUTH_WEIBO_CLIENT_SECRET:}"
-      yahoo:
-        name:          "${OAUTH_YAHOO_NAME:Yahoo}"
-        icon:          "${OAUTH_YAHOO_ICON:yahoo}"
-        color:         "${OAUTH_YAHOO_COLOR:#720e9e}"
-        client-id:     "${OAUTH_YAHOO_CLIENT_ID:}"
-        client-secret: "${OAUTH_YAHOO_CLIENT_SECRET:}"
 
   # external configuration:
   external:

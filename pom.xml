@@ -184,6 +184,25 @@
 				</configuration>
 			</plugin>
 
+			<!-- create bundle css and js -->
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>exec-maven-plugin</artifactId>
+				<version>3.0.0</version>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>java</goal>
+						</goals>
+					</execution>
+				</executions>
+				<configuration>
+					<mainClass>com.itranswarp.MergeResources</mainClass>
+					<workingDirectory>${project.basedir}</workingDirectory>
+				</configuration>
+			</plugin>
+
 			<!-- docker build -->
 			<plugin>
 				<groupId>com.spotify</groupId>

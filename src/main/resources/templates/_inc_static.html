@@ -1,41 +1,45 @@
 <!-- static resources -->
 
-{% set __cdn__ = __website__.cdn %}
-{% if __cdn__ is empty %}
-{% set __cdn__ = '/static/cdn' %}
+{% if __dev__ %}
+
+<link rel="stylesheet" href="/static/3rdparty/uikit@2.27.4/vendor/codemirror/codemirror.css">
+<link rel="stylesheet" href="/static/3rdparty/uikit@2.27.4/vendor/highlight/highlight.css">
+<link rel="stylesheet" href="/static/3rdparty/katex@0.15.1/dist/katex.min.css">
+<link rel="stylesheet" href="/static/3rdparty/simditor@2.3.22/styles/simditor.css">
+<link rel="stylesheet" href="/static/3rdparty/uikit@2.27.4/dist/css/uikit.min.css">
+<link rel="stylesheet" href="/static/3rdparty/uikit@2.27.4/dist/css/uikit.almost-flat.min.css">
+<link rel="stylesheet" href="/static/3rdparty/uikit@2.27.4/dist/css/components/htmleditor.min.css">
+
+<script src="/static/3rdparty/jquery@2.1.4/dist/jquery.min.js"></script>
+<script src="/static/3rdparty/jqtree@1.6.2/tree.jquery.js"></script>
+<script src="/static/3rdparty/underscore@1.12.1/underscore-min.js"></script>
+<script src="/static/3rdparty/moment@2.29.1/min/moment-with-locales.min.js"></script>
+<script src="/static/3rdparty/uikit@2.27.4/vendor/codemirror/codemirror.js"></script>
+<script src="/static/3rdparty/uikit@2.27.4/vendor/highlight/highlight.js"></script>
+<script src="/static/3rdparty/uikit@2.27.4/vendor/commonmark.js"></script>
+<script src="/static/3rdparty/marked@3.0.8/marked.min.js"></script>
+<script src="/static/3rdparty/vue@2.6.10/dist/vue.min.js"></script>
+<script src="/static/3rdparty/vue-resource@1.2.1/dist/vue-resource.min.js"></script>
+<script src="/static/3rdparty/katex@0.15.1/dist/katex.min.js"></script>
+<script src="/static/3rdparty/simple-module@2.0.6/lib/module.js"></script>
+<script src="/static/3rdparty/simple-hotkeys@1.0.3/lib/hotkeys.js"></script>
+<script src="/static/3rdparty/simditor@2.3.22/lib/simditor.js"></script>
+<script src="/static/3rdparty/turndown@7.1.1/dist/turndown.js"></script>
+<script src="/static/3rdparty/uikit@2.27.4/dist/js/uikit.min.js"></script>
+<script src="/static/3rdparty/uikit@2.27.4/dist/js/components/tooltip.min.js"></script>
+<script src="/static/3rdparty/uikit@2.27.4/dist/js/components/slideshow.min.js"></script>
+<script src="/static/3rdparty/uikit@2.27.4/dist/js/components/datepicker.min.js"></script>
+<script src="/static/3rdparty/uikit@2.27.4/dist/js/components/autocomplete.min.js"></script>
+<script src="/static/3rdparty/uikit@2.27.4/dist/js/components/notify.min.js"></script>
+<script src="/static/3rdparty/uikit@2.27.4/dist/js/components/lightbox.min.js"></script>
+<script src="/static/3rdparty/uikit@2.27.4/dist/js/components/htmleditor.min.js"></script>
+<script src="/static/3rdparty/js-sha256@0.9.0/build/sha256.min.js"></script>
+
+{% else %}
+
+<link rel="stylesheet" href="/static/css/bundle.css?v={{ __version__ }}">
+<script src="/static/js/bundle.js?v={{ __version__ }}"></script>
+
 {% endif %}
-
-<link rel="stylesheet" href="{{ __cdn__ }}/uikit@2.27.4/vendor/codemirror/codemirror.css">
-<link rel="stylesheet" href="{{ __cdn__ }}/uikit@2.27.4/vendor/highlight/highlight.css">
-<link rel="stylesheet" href="{{ __cdn__ }}/katex@0.15.1/dist/katex.min.css">
-<link rel="stylesheet" href="{{ __cdn__ }}/simditor@2.3.22/styles/simditor.css">
-<link rel="stylesheet" href="{{ __cdn__ }}/uikit@2.27.4/dist/css/uikit.min.css">
-<link rel="stylesheet" href="{{ __cdn__ }}/uikit@2.27.4/dist/css/uikit.almost-flat.min.css">
-<link rel="stylesheet" href="{{ __cdn__ }}/uikit@2.27.4/dist/css/components/htmleditor.min.css">
-
-<script src="{{ __cdn__ }}/jquery@2.1.4/dist/jquery.min.js"></script>
-<script src="{{ __cdn__ }}/jqtree@1.6.2/tree.jquery.js"></script>
-<script src="{{ __cdn__ }}/underscore@1.12.1/underscore-min.js"></script>
-<script src="{{ __cdn__ }}/moment@2.29.1/min/moment-with-locales.min.js"></script>
-<script src="{{ __cdn__ }}/uikit@2.27.4/vendor/codemirror/codemirror.js"></script>
-<script src="{{ __cdn__ }}/uikit@2.27.4/vendor/highlight/highlight.js"></script>
-<script src="{{ __cdn__ }}/uikit@2.27.4/vendor/commonmark.js"></script>
-<script src="{{ __cdn__ }}/marked@3.0.8/marked.min.js"></script>
-<script src="{{ __cdn__ }}/vue@2.6.10/dist/vue.min.js"></script>
-<script src="{{ __cdn__ }}/vue-resource@1.2.1/dist/vue-resource.min.js"></script>
-<script src="{{ __cdn__ }}/katex@0.15.1/dist/katex.min.js"></script>
-<script src="{{ __cdn__ }}/simple-module@2.0.6/lib/module.js"></script>
-<script src="{{ __cdn__ }}/simple-hotkeys@1.0.3/lib/hotkeys.js"></script>
-<script src="{{ __cdn__ }}/simditor@2.3.22/lib/simditor.js"></script>
-<script src="{{ __cdn__ }}/turndown@7.1.1/dist/turndown.js"></script>
-<script src="{{ __cdn__ }}/uikit@2.27.4/dist/js/uikit.min.js"></script>
-<script src="{{ __cdn__ }}/uikit@2.27.4/dist/js/components/tooltip.min.js"></script>
-<script src="{{ __cdn__ }}/uikit@2.27.4/dist/js/components/slideshow.min.js"></script>
-<script src="{{ __cdn__ }}/uikit@2.27.4/dist/js/components/datepicker.min.js"></script>
-<script src="{{ __cdn__ }}/uikit@2.27.4/dist/js/components/autocomplete.min.js"></script>
-<script src="{{ __cdn__ }}/uikit@2.27.4/dist/js/components/notify.min.js"></script>
-<script src="{{ __cdn__ }}/uikit@2.27.4/dist/js/components/lightbox.min.js"></script>
-<script src="{{ __cdn__ }}/uikit@2.27.4/dist/js/components/htmleditor.min.js"></script>
-<script src="{{ __cdn__ }}/js-sha256@0.9.0/build/sha256.min.js"></script>
 
 <!-- // static resources -->

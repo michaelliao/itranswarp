@@ -20,9 +20,6 @@ public class Website extends AbstractSettingBean {
     @SettingInput(value = InputType.TEXT, order = 5, description = "XML namespace")
     public String xmlns;
 
-    @SettingInput(value = InputType.TEXT, order = 6, description = "CDN Prefix")
-    public String cdn;
-
     @SettingInput(value = InputType.TEXT, order = 7, description = "Copyright")
     public String copyright;
 

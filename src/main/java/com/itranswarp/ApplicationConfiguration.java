@@ -12,5 +12,7 @@ public class ApplicationConfiguration {
     @Value("${spring.profiles.active:native}")
     public String profiles;
 
+    @Value("${spring.application.dev:false}")
+    public Boolean dev;
 
 }

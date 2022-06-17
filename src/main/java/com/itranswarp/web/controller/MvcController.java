@@ -24,6 +24,7 @@ import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.view.RedirectView;
 
 import com.itranswarp.Application;
+import com.itranswarp.bean.setting.Website;
 import com.itranswarp.common.ApiException;
 import com.itranswarp.enums.ApiError;
 import com.itranswarp.enums.RefType;
@@ -64,7 +65,7 @@ public class MvcController extends AbstractController {
     @Value("#{applicationConfiguration.name}")
     String name;
 
-    @Value("#{applicationConfiguration.profiles eq 'native'}")
+    @Value("#{applicationConfiguration.dev}")
     Boolean dev;
 
     @Value("${spring.signin.password.enabled}")
@@ -475,7 +476,8 @@ public class MvcController extends AbstractController {
     }
 
     private void appendGlobalModel(ModelAndView mv) {
-        HttpContext ctx = HttpContext.getContext();
+        final HttpContext ctx = HttpContext.getContext();
+        final Website website = settingService.getWebsiteFromCache();
         // development mode?
         mv.addObject("__dev__", this.dev);
         // application name:
@@ -491,9 +493,10 @@ public class MvcController extends AbstractController {
         // timestamp as millis:
         mv.addObject("__timestamp__", ctx.timestamp);
         // settings:
-        mv.addObject("__website__", settingService.getWebsiteFromCache());
+        mv.addObject("__website__", website);
         mv.addObject("__snippet__", settingService.getSnippetFromCache());
         mv.addObject("__follows__", settingService.getFollowFromCache().getFollows());
+        // CDN:
         // navigation menus:
         mv.addObject("__navigations__", navigationService.getNavigationsFromCache());
         // can search?

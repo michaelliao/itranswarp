@@ -34,7 +34,7 @@ Run iTranswarp application:
 docker run -d -p 2019:2019 --rm \
   --env-file /path/to/env-file \
   -v /var/log/itranswarp:/var/log/itranswarp \
-  --name itranswarp michaelliao/itranswarp:1.2
+  --name itranswarp michaelliao/itranswarp:1.3
 ```
 
 ### Build

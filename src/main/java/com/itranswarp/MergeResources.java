@@ -49,7 +49,6 @@ public class MergeResources {
         });
         merge(cssFiles, "/static/css/bundle.css");
         merge(jsFiles, "/static/js/bundle.js");
-
     }
 
     static void merge(List<String> files, String mergeToFile) throws IOException {

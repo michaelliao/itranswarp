@@ -2,7 +2,7 @@
 
 Full-featured CMS including blog, wiki, discussion, etc. Cloud native application that powered by SpringBoot.
 
-![Github Workflow](https://github.com/michaelliao/itranswarp/actions/workflows/maven.yml/badge.svg)
+[![Github Workflow](https://github.com/michaelliao/itranswarp/actions/workflows/maven.yml/badge.svg)](https://github.com/michaelliao/itranswarp/actions)
 
 [![Docker Pulls](https://img.shields.io/docker/pulls/michaelliao/itranswarp?color=%2334D058&style=plastic)](https://hub.docker.com/repository/docker/michaelliao/itranswarp)
 

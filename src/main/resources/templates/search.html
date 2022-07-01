@@ -67,7 +67,11 @@ div.x-search-result {
     </div>
 
     <div class="x-search-results">
-        {% if hits == null or hits.total == 0 %}
+        {% if q == '' %}
+            <div class="uk-alert uk-alert-warning x-search-no-result">
+                <p>{{ _('~search-no-input-message') }}</p>
+            </div>
+        {% elseif hits == null or hits.total == 0 %}
             <div class="uk-alert uk-alert-warning x-search-no-result">
                 <h4>{{ _('~search-not-found-error') }} ({{ time }} seconds)</h4>
                 <p>{{ _('~search-not-found-message') }}</p>

@@ -192,6 +192,7 @@
     "Wiki Index": "维基目录",
     "Wikis": "维基",
 
+    "~search-no-input-message": "请输入关键字开始搜索。",
     "~search-not-found-error": "很抱歉，未找到相关结果。",
     "~search-not-found-message": "请检查输入字词有无错误，或者尝试使用其他关键字再搜索。"
 }

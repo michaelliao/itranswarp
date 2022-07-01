@@ -215,7 +215,10 @@
 				<div id="navbar-user-info" class="uk-navbar-flip">
 					<ul class="uk-navbar-nav">
 						{% if __searchable__ %}
-						<li>
+						<li class="uk-visible-small">
+							<a href="/search"><i class="uk-icon-search"></i></a>
+						</li>
+						<li class="uk-hidden-small">
 							<form action="/search" class="uk-form uk-display-inline-block" style="margin: 8px 8px">
 								<div class="uk-form-icon">
 									<i class="uk-icon-search"></i>

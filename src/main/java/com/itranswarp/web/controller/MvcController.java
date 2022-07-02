@@ -1,7 +1,12 @@
 package com.itranswarp.web.controller;
 
 import java.io.IOException;
+import java.math.BigInteger;
+import java.nio.charset.StandardCharsets;
+import java.security.SignatureException;
 import java.time.LocalDate;
+import java.time.ZonedDateTime;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -22,6 +27,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.LocaleResolver;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.view.RedirectView;
+import org.web3j.crypto.Keys;
+import org.web3j.crypto.Sign;
+import org.web3j.crypto.Sign.SignatureData;
+import org.web3j.utils.Numeric;
 
 import com.itranswarp.Application;
 import com.itranswarp.bean.setting.Website;
@@ -35,6 +44,7 @@ import com.itranswarp.model.AdSlot;
 import com.itranswarp.model.Article;
 import com.itranswarp.model.Board;
 import com.itranswarp.model.Category;
+import com.itranswarp.model.EthAuth;
 import com.itranswarp.model.LocalAuth;
 import com.itranswarp.model.OAuth;
 import com.itranswarp.model.Reply;
@@ -70,6 +80,9 @@ public class MvcController extends AbstractController {
 
     @Value("${spring.signin.password.enabled}")
     boolean passauthEnabled;
+
+    @Value("${spring.signin.eth.enabled}")
+    boolean ethauthEnabled;
 
     @Autowired
     LocaleResolver localeResolver;
@@ -343,7 +356,7 @@ public class MvcController extends AbstractController {
     ///////////////////////////////////////////////////////////////////////////////////////////////
 
     @GetMapping("/auth/signin")
-    public ModelAndView signin(@RequestParam(value = "type", defaultValue = "") String type) {
+    public ModelAndView signin(@RequestParam(value = "type", defaultValue = "") String type, HttpServletRequest request) {
         boolean oauthEnabled = !this.oauthProviders.getOAuthProviders().isEmpty();
         boolean passauthEnabled = this.passauthEnabled;
         if (!oauthEnabled && !passauthEnabled) {
@@ -361,11 +374,14 @@ public class MvcController extends AbstractController {
         if (type.isEmpty() && passauthEnabled) {
             type = "passauth";
         }
-        return prepareModelAndView("signin.html", Map.of("type", type, "oauthEnabled", oauthEnabled, "passauthEnabled", passauthEnabled, "oauthConfigurations",
-                this.oauthProviders.getOAuthConfigurations()));
+        if (type.isEmpty() && ethauthEnabled) {
+            type = "ethauth";
+        }
+        return prepareModelAndView("signin.html", Map.of("type", type, "oauthEnabled", oauthEnabled, "passauthEnabled", passauthEnabled, "ethauthEnabled",
+                ethauthEnabled, "oauthConfigurations", this.oauthProviders.getOAuthConfigurations()));
     }
 
-    @PostMapping("/auth/signin")
+    @PostMapping("/auth/signin/local")
     public ModelAndView signinLocal(@RequestParam("email") String email, @RequestParam("passwd") String password, HttpServletRequest request,
             HttpServletResponse response) {
         if (!this.passauthEnabled) {
@@ -397,8 +413,58 @@ public class MvcController extends AbstractController {
     }
 
     private ModelAndView passwordAuthFailed() {
-        return prepareModelAndView("signin.html",
-                Map.of("type", "passauth", "oauthConfigurations", this.oauthProviders.getOAuthConfigurations(), "error", Boolean.TRUE));
+        boolean oauthEnabled = !this.oauthProviders.getOAuthProviders().isEmpty();
+        return prepareModelAndView("signin.html", Map.of("type", "passauth", "oauthEnabled", oauthEnabled, "passauthEnabled", passauthEnabled, "ethauthEnabled",
+                ethauthEnabled, "oauthConfigurations", this.oauthProviders.getOAuthConfigurations(), "error", Boolean.TRUE));
+    }
+
+    @PostMapping("/auth/signin/eth")
+    public ModelAndView signinByEth(@RequestParam("message") String message, @RequestParam("signature") String signature, HttpServletRequest request,
+            HttpServletResponse response) {
+        if (signature.length() != 132) {
+            throw new ApiException(ApiError.AUTH_SIGNIN_FAILED, null, "Signin by Web3 failed.");
+        }
+        int n = message.indexOf("\r\n");
+        if (n == -1) {
+            throw new ApiException(ApiError.AUTH_SIGNIN_FAILED, null, "Signin by Web3 failed.");
+        }
+        String line1 = message.substring(0, n);
+        if (!line1.equals("Signin: " + request.getServerName())) {
+            throw new ApiException(ApiError.AUTH_SIGNIN_FAILED, null, "Signin by Web3 failed.");
+        }
+        String expiresStr = message.substring(n + 2);
+        if (!expiresStr.startsWith("Expires: ")) {
+            throw new ApiException(ApiError.AUTH_SIGNIN_FAILED, null, "Signin by Web3 failed.");
+        }
+        long expires = ZonedDateTime.parse(expiresStr.substring(9)).toEpochSecond() * 1000;
+        if (expires - 3600000 < System.currentTimeMillis()) {
+            throw new ApiException(ApiError.AUTH_SIGNIN_FAILED, null, "Signin by Web3 failed.");
+        }
+        // check signature:
+        byte[] sign = Numeric.hexStringToByteArray(signature);
+        if (sign.length != 65) {
+            throw new ApiException(ApiError.AUTH_SIGNIN_FAILED, null, "Signin by Web3 failed.");
+        }
+        byte[] r = Arrays.copyOfRange(sign, 0, 32);
+        byte[] s = Arrays.copyOfRange(sign, 32, 64);
+        byte[] v = Arrays.copyOfRange(sign, 64, 65);
+        SignatureData signatureData = new SignatureData(v, r, s);
+        BigInteger pubKey = null;
+        try {
+            pubKey = Sign.signedPrefixedMessageToKey(message.getBytes(StandardCharsets.UTF_8), signatureData);
+        } catch (SignatureException e) {
+            throw new ApiException(ApiError.AUTH_SIGNIN_FAILED, null, "Invalid signature.");
+        }
+        String address = Keys.getAddress(pubKey);
+        if (!address.startsWith("0x")) {
+            address = "0x" + address;
+        }
+        logger.info("recover address: {}", address);
+        EthAuth ethAuth = this.userService.getEthAuth(address, expires);
+        // set cookie:
+        String cookieStr = CookieUtil.encodeSessionCookie(ethAuth, expires, encryptService.getSessionHmacKey());
+        CookieUtil.setSessionCookie(request, response, cookieStr, (int) ((expires - System.currentTimeMillis()) / 1000));
+        return new ModelAndView("redirect:" + HttpUtil.getReferer(request));
     }
 
     @GetMapping("/auth/from/{authProviderId}")

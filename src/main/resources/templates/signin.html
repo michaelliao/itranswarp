@@ -46,18 +46,82 @@ button.x-oauth-button-{{ providerId }}
 </style>
 
 <script>
+function getWeb3Provider() {
+    if (!window.web3Provider) {
+        window.web3Provider = new ethers.providers.Web3Provider(window.ethereum, "any");
+    }
+    return window.web3Provider;
+}
+
+function translateError(err) {
+    if (typeof (err) === 'string') {
+        return err;
+    }
+    if (err.code && err.message && err.data) {
+        return `Error (${err.code}): ${err.message} Data: ${err.data}`;
+    }
+    if (err.code && err.message) {
+        return `Error (${err.code}): ${err.message}`;
+    }
+    return err.message || err.toString();
+}
+
+function ethAuth() {
+	if (!ethereum.isMetaMask) {
+		UIkit.modal.alert('MetaMask is not installed.');
+		return;
+	}
+	doEthAuth().then(r => {
+		console.log('eth sign ok');
+		$('#ethForm input[name=message]').val(r.message);
+		$('#ethForm input[name=signature]').val(r.signature);
+		$('#ethForm').submit();
+	}).catch(err => UIkit.modal.alert(translateError(err)));
+}
+
+function ethExpires() {
+	let
+		ts = parseInt('{{ __timestamp__ }}') + 604800000,
+		d = new Date(ts),
+		s = d.toISOString();
+	return s.substring(0, 13) + ':00:00Z';
+}
+
+async function doEthAuth() {
+	if (!window.ethCurrentAddress) {
+		let accounts = await window.ethereum.request({ method: 'eth_requestAccounts' });
+		if (accounts.length > 0) {
+			window.ethCurrentAddress = accounts[0];
+			console.log('set current address = ' + window.ethCurrentAddress);
+		}
+	}
+	let message = 'Signin: {{ __host__ }}\r\nExpires: ' + ethExpires();
+	let sign = await getWeb3Provider().getSigner().signMessage(message);
+	return {
+		message: message,
+		signature: sign
+	};
+}
+
 function showOAuth() {
-	$('#x-tab-passauth').removeClass('uk-active');
-	$('#x-tab-oauth').addClass('uk-active');
-	$('#x-panel-passauth').hide();
-	$('#x-panel-oauth').show();
+	$('#signin .x-tab').removeClass('uk-active');
+	$('#signin .x-tab-oauth').addClass('uk-active');
+	$('#signin .uk-panel').hide();
+	$('#signin .x-panel-oauth').show();
 }
 
 function showPasswordAuth() {
-	$('#x-tab-oauth').removeClass('uk-active');
-	$('#x-tab-passauth').addClass('uk-active');
-	$('#x-panel-oauth').hide();
-	$('#x-panel-passauth').show();
+	$('#signin .x-tab').removeClass('uk-active');
+	$('#signin .x-tab-passauth').addClass('uk-active');
+	$('#signin .uk-panel').hide();
+	$('#signin .x-panel-passauth').show();
+}
+
+function showEthAuth() {
+	$('#signin .x-tab').removeClass('uk-active');
+	$('#signin .x-tab-ethauth').addClass('uk-active');
+	$('#signin .uk-panel').hide();
+	$('#signin .x-panel-ethauth').show();
 }
 
 function onPasswordAuth() {
@@ -73,7 +137,16 @@ $(function () {
 		showOAuth();
 	{% elseif type == "passauth" %}
 		showPasswordAuth();
+	{% elseif type == "ethauth" %}
+		showEthAuth();
 	{% endif %}
+
+	if (!window.ethereum) {
+		$('#signin .x-tab-ethauth').hide();
+		$('#signin .x-panel-ethauth').hide();
+		return;
+	}
+
 	{% if error %}
 		$('div.uk-alert-danger').show();
 	{% endif %}
@@ -83,16 +156,20 @@ $(function () {
 {% endblock %}
 
 {% block content %}
-	<div style="width:480px; margin:0 auto;">
-    	<ul id="x-tab" class="uk-tab" data-uk-tab>
-    	{% if oauthEnabled %}
-    		<li id="x-tab-oauth"><a href="#0" onclick="showOAuth()">Sign in with 3rd Party</a></li>
-    	{% endif %}
-    	{% if passauthEnabled %}
-    		<li id="x-tab-passauth"><a href="#0" onclick="showPasswordAuth()">Sign in with Password</a></li>
-    	{% endif %}
+	<div id="signin" style="width:480px; margin:0 auto;">
+    	<ul id="x-tab" class="uk-tab">
+    		{% if oauthEnabled %}
+    		<li class="x-tab x-tab-oauth"><a href="#0" onclick="showOAuth()">OAuth</a></li>
+    		{% endif %}
+    		{% if passauthEnabled %}
+    		<li class="x-tab x-tab-passauth"><a href="#0" onclick="showPasswordAuth()">Password</a></li>
+    		{% endif %}
+			{% if ethauthEnabled %}
+    		<li class="x-tab x-tab-ethauth"><a href="#0" onclick="showEthAuth()">Web3</a></li>
+    		{% endif %}
 		</ul>
-		<div id="x-panel-oauth" style="display:none" class="uk-panel uk-panel-box uk-panel-box-secondary x-signin-panel x-oauth-signin-panel">
+
+		<div style="display:none" class="x-panel-oauth uk-panel uk-panel-box uk-panel-box-secondary x-signin-panel x-oauth-signin-panel">
 			<h3>Please signin without registration:</h3>
 
 			{% for providerId in oauthConfigurations.keySet() %}
@@ -101,9 +178,10 @@ $(function () {
 			{% endfor %}
 
 		</div>
-		<div id="x-panel-passauth" style="display:none" class="uk-panel uk-panel-box uk-panel-box-secondary x-signin-panel x-password-signin-panel">
+
+		<div style="display:none" class="x-panel-passauth uk-panel uk-panel-box uk-panel-box-secondary x-signin-panel x-password-signin-panel">
 			<h3>Please signin with password:</h3>
-        	<form method="post" action="/auth/signin" onsubmit="return onPasswordAuth()" class="uk-form uk-form-stack">
+        	<form method="post" action="/auth/signin/local" onsubmit="return onPasswordAuth()" class="uk-form uk-form-stack">
 	            <div class="uk-alert uk-alert-danger" style="display:none">{{ _('Bad email or password.') }}</div>
 	            <div class="uk-form-row">
 	                <label class="uk-form-label" for="email">{{ _('Email') }}:</label>
@@ -136,5 +214,18 @@ $(function () {
 	            </div>
 	        </form>
 		</div>
+
+		<div style="display:none" class="x-panel-ethauth uk-panel uk-panel-box uk-panel-box-secondary x-signin-panel x-ethauth-signin-panel">
+			<h3>Please signin with Web3:</h3>
+			<p><button class="uk-button uk-button-large" onclick="ethAuth()">
+			<div style="display: block; float: left; margin-top: 12px; margin-right: 6px; width: 24px; height: 24px; background: no-repeat url(/static/img/metamask.svg); background-position: center center;"></div>
+			{{ _('Sign in with MetaMask') }}
+			</button></p>
+			<form id="ethForm" method="post" action="/auth/signin/eth" class="uk-hidden">
+				<input type="hidden" name="message">
+				<input type="hidden" name="signature">
+			</form>
+		</div>
+
     </div>
 {% endblock %}

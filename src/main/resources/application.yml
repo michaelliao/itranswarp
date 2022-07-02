@@ -88,6 +88,8 @@ spring:
     password:
       # enable password signin:
       enabled: ${SIGNIN_PASSWORD_ENABLED:true}
+    eth:
+      enabled: ${SIGNIN_ETH_ENABLED:true}
     # oauth authentication configuration:
     # - name: display name
     # - icon: icon name, check https://getuikit.com/v2/docs/icon.html

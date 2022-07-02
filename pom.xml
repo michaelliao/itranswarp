@@ -36,6 +36,7 @@
 		<lettucemod.version>2.17.0</lettucemod.version>
 		<pebble.version>3.1.2</pebble.version>
 		<warpdb.version>5.0.4</warpdb.version>
+		<web3j.version>4.8.4</web3j.version>
 	</properties>
 
 	<dependencies>
@@ -110,6 +111,13 @@
 			<groupId>com.itranswarp</groupId>
 			<artifactId>warpdb</artifactId>
 			<version>${warpdb.version}</version>
+		</dependency>
+
+		<!-- web3 -->
+		<dependency>
+			<groupId>org.web3j</groupId>
+			<artifactId>core</artifactId>
+			<version>${web3j.version}</version>
 		</dependency>
 
 		<!-- junit5 -->

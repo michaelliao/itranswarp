@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.itranswarp.bean.SessionCookieBean;
+import com.itranswarp.model.EthAuth;
 import com.itranswarp.model.LocalAuth;
 import com.itranswarp.model.OAuth;
 
@@ -26,6 +27,10 @@ public class CookieUtil {
 
     public static String encodeSessionCookie(LocalAuth auth, long expiresAt, String hmacKey) {
         return encodeSessionCookie("local", auth.id, expiresAt, auth.passwd, hmacKey);
+    }
+
+    public static String encodeSessionCookie(EthAuth auth, long expiresAt, String hmacKey) {
+        return encodeSessionCookie("eth", auth.id, expiresAt, auth.address, hmacKey);
     }
 
     public static SessionCookieBean decodeSessionCookie(String str) {

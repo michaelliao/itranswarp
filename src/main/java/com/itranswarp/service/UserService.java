@@ -8,11 +8,13 @@ import java.util.concurrent.TimeUnit;
 import org.apache.commons.validator.routines.EmailValidator;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+import org.web3j.crypto.Keys;
 
 import com.itranswarp.common.ApiException;
 import com.itranswarp.enums.ApiError;
 import com.itranswarp.enums.Role;
 import com.itranswarp.model.AbstractEntity;
+import com.itranswarp.model.EthAuth;
 import com.itranswarp.model.LocalAuth;
 import com.itranswarp.model.OAuth;
 import com.itranswarp.model.User;
@@ -94,6 +96,32 @@ public class UserService extends AbstractDbService<User> {
     }
 
     @Transactional
+    public EthAuth getEthAuth(String address, long expires) {
+        EthAuth auth = this.db.from(EthAuth.class).where("address = ?", address).first();
+        if (auth == null) {
+            String checksumAddress = Keys.toChecksumAddress(address);
+            User user = new User();
+            user.id = IdUtil.nextId();
+            user.email = address + "@eth";
+            user.name = checksumAddress.substring(0, 8) + "..." + checksumAddress.substring(36);
+            user.imageUrl = "/static/img/eth.svg";
+            user.role = Role.SUBSCRIBER;
+
+            auth = new EthAuth();
+            auth.address = address;
+            auth.expiresAt = expires;
+            auth.userId = user.id;
+
+            this.db.insert(user);
+            this.db.insert(auth);
+        } else {
+            auth.expiresAt = expires;
+            this.db.update(auth);
+        }
+        return auth;
+    }
+
+    @Transactional
     public OAuth getOAuth(String authProviderId, OAuthAuthentication authentication) {
         OAuth oauth = this.db.from(OAuth.class).where("authProviderId = ? AND authId = ?", authProviderId, authentication.getAuthenticationId()).first();
         if (oauth == null) {
@@ -106,7 +134,7 @@ public class UserService extends AbstractDbService<User> {
     }
 
     OAuth createOAuthUser(String authProviderId, OAuthAuthentication authentication) {
-        if ("local".equals(authProviderId)) {
+        if ("local".equals(authProviderId) || "eth".equals(authProviderId)) {
             throw new RuntimeException("Invalid provider: " + authProviderId);
         }
         User user = new User();
@@ -143,6 +171,10 @@ public class UserService extends AbstractDbService<User> {
         this.db.insert(user);
         this.db.insert(auth);
         return user;
+    }
+
+    public EthAuth fetchEthAuthById(Long id) {
+        return this.db.from(EthAuth.class).where("id = ?", id).first();
     }
 
     public OAuth fetchOAuthById(String authProviderId, Long id) {

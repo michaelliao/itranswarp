@@ -23,6 +23,7 @@ import org.springframework.stereotype.Component;
 
 import com.itranswarp.bean.SessionCookieBean;
 import com.itranswarp.enums.Role;
+import com.itranswarp.model.EthAuth;
 import com.itranswarp.model.LocalAuth;
 import com.itranswarp.model.OAuth;
 import com.itranswarp.model.User;
@@ -116,6 +117,13 @@ public class GlobalFilterRegistrationBean extends FilterRegistrationBean<Filter>
                     if ("local".equals(session.authProvider)) {
                         LocalAuth auth = userService.fetchLocalAuthById(session.id);
                         if (auth != null && session.validate(auth.passwd, encryptService.getSessionHmacKey())) {
+                            user = userService.getEnabledUserById(auth.userId);
+                        } else {
+                            CookieUtil.deleteSessionCookie(request, response);
+                        }
+                    } else if ("eth".equals(session.authProvider)) {
+                        EthAuth auth = userService.fetchEthAuthById(session.id);
+                        if (auth != null && session.validate(auth.address, encryptService.getSessionHmacKey())) {
                             user = userService.getEnabledUserById(auth.userId);
                         } else {
                             CookieUtil.deleteSessionCookie(request, response);

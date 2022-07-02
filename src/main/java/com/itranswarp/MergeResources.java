@@ -82,6 +82,7 @@ public class MergeResources {
                 buffer.addAll(lines);
             }
         }
+        buffer.add("");
         Files.writeString(Path.of(basedir + mergeToFile), String.join("\n", buffer), StandardCharsets.UTF_8);
     }
 

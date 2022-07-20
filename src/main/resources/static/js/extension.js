@@ -379,7 +379,7 @@ function initMarkdownRun() {
 		console.log("init " + $code);
 		if ($code.hasClass('language-ascii')) {
 			// set ascii style for markdown:
-			$code.css('font-family', '"Courier New",Consolas,monospace')
+			$code.css('font-family', 'JetBrainsMono,"Courier New",Consolas,monospace')
 				.parent('pre').addClass('ascii');
 		} else if (x_run) {
 			var fn = 'execute_' + x_run.substring('language-x-'.length);

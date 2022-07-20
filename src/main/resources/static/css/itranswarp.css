@@ -373,7 +373,7 @@ pre.ascii {
     padding: 10px 0;
     border: none;
     background-color: transparent;
-    font-family: "Courier New", Consolas, monospace !important;
+    font-family: JetBrainsMono, "Courier New", Consolas, monospace !important;
     word-break: normal !important;
 }
 

@@ -446,6 +446,7 @@ public class ApiController extends AbstractController {
     @RoleWith(Role.CONTRIBUTOR)
     public Map<String, List<NavigationMenu>> navigationUrls() {
         List<NavigationMenu> list = new ArrayList<>();
+        list.add(new NavigationMenu("Headline", "/headline"));
         this.articleService.getCategories().forEach(c -> {
             list.add(new NavigationMenu(c.name, "/category/" + c.id));
         });

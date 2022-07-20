@@ -1,0 +1,57 @@
+{% extends '_base.html' %}
+
+{% block layout %}
+	{% set __sidebar_right__ = true %}
+{% endblock %}
+
+{% block meta %}
+    <meta property="og:ad" content="true" />
+    <meta property="og:type" content="headline" />
+{% endblock %}
+
+{% block nav %} /headline {% endblock %}
+
+{% block title %}
+    {{ _('Headlines') }}
+{% endblock %}
+
+{% block head %}
+
+<script>
+function addHeadlineView(id) {
+}
+</script>
+
+{% endblock %}
+
+{% block sidebar_right_content %}
+	<div id="x-headline-right"></div>
+	<!-- empty -->
+{% endblock %}
+
+{% block content %}
+
+    <h3>{{ _('Headlines') }}</h3>
+
+	<div class="uk-margin uk-clearfix">
+		&nbsp;
+		{% if __user__!=null and __timestamp__ - __user__.createdAt > 604800000 %}
+	    <a href="/headline/create" class="uk-button uk-button-success uk-float-right"><i class="uk-icon-plus"></i> {{ _('New Headline') }}</a>
+	    {% endif %}
+	</div>
+
+    {% for h in headlines %}
+    <div class="uk-article">
+        <div style="padding-left: 0">
+            <h3><a target="_blank" href="{{ h.url }}" onclick="addHeadlineView('{{ h.id }}')">{{ h.name }}</a></h3>
+        </div>
+        <div style="padding-left: 0">
+            <p>{{ _('From') }} <a target="_blank" href="{{ h.url }}">{{ h.url|host }}</a> / <span class="x-smart-datetime" data="{{ h.publishAt }}">...</span></p>
+            <p>{{ h.description }}</p>
+            <p><a target="_blank" href="{{ h.url }}" onclick="addHeadlineView('{{ h.id }}')" class="uk-button uk-button-primary">{{ _('Read source') }} »</a></p>
+        </div>
+    </div>
+    {% endfor %}
+    {{ pagination("/headline?page=", page) }}
+
+{% endblock %}

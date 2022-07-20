@@ -464,6 +464,7 @@ $(function () {
                     console.error('Cannot call showFormError() on non-form object.');
                     return;
                 }
+                	$form.find('.uk-alert').removeClass('uk-hidden').hide();
                 $form.find('input').removeClass('uk-form-danger');
                 $form.find('select').removeClass('uk-form-danger');
                 $form.find('textarea').removeClass('uk-form-danger');
@@ -483,6 +484,31 @@ $(function () {
                 else {
                     $alert.addClass('uk-hidden').hide();
                     $form.find('.uk-form-danger').removeClass('uk-form-danger');
+                }
+            });
+        },
+        showFormSuccess: function (msg) {
+            return this.each(function () {
+                var
+                    $form = $(this),
+                    $alert = $form && $form.find('.uk-alert-success');
+                if (!$form.is('form')) {
+                    console.error('Cannot call showFormSuccess() on non-form object.');
+                    return;
+                }
+                	$form.find('.uk-alert').removeClass('uk-hidden').hide();
+                $form.find('input').removeClass('uk-form-danger');
+                $form.find('select').removeClass('uk-form-danger');
+                $form.find('textarea').removeClass('uk-form-danger');
+                if ($alert.length === 0) {
+                    console.warn('Cannot find .uk-alert-success element.');
+                    return;
+                }
+                if (msg) {
+                    $alert.text(msg).removeClass('uk-hidden').show();
+                    if (($alert.offset().top - 60) < $(window).scrollTop()) {
+                        $('html,body').animate({ scrollTop: $alert.offset().top - 60 });
+                    }
                 }
             });
         },

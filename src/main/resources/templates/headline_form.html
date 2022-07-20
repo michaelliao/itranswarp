@@ -1,0 +1,110 @@
+{% extends '_base.html' %}
+
+<!-- display sidebar on right -->
+{% set __sidebar_right__ = true %}
+
+{% block nav %} /headline {% endblock %}
+
+{% block title %}{{ _('New Headline') }}{% endblock %}
+
+{% block head %}
+
+<style>
+</style>
+
+<script>
+    $(function () {
+        var
+            $form = $('#headline-form'),
+            $name = $form.find('input[name=name]'),
+            $url = $form.find('input[name=url]'),
+            $description = $form.find('textarea[name=description]'),
+            $cancel = $form.find('button.x-cancel');
+        $form.submit(function (e) {
+            e.preventDefault();
+            var
+                name = $name.val().trim(),
+                url = $url.val().trim(),
+                description = $description.val().trim();
+            if (name === '') {
+                return $form.showFormError('Please input title');
+            }
+            if (description === '') {
+                return $form.showFormError('Please input description');
+            }
+            if (description.length < 100) {
+                return $form.showFormError('Please input description at least 100 characters');
+            }
+            if (description.length > 1000) {
+                return $form.showFormError('Please input description at most 1000 characters');
+            }
+            	if (!url.startsWith('https://') || url.length < 10) {
+                return $form.showFormError('Please input valid url starts with https://');
+            	}
+            $form.postJSON('/api/headlines', {
+                name: name,
+                	url: url,
+                description: description
+            }, function (err, r) {
+                if (err) {
+                    return;
+                }
+                $form.showFormSuccess('Submit successfully. Please wait for approval.');
+            });
+        });
+
+        $cancel.click(function () {
+            location.assign('/headline');
+        });
+    });
+</script>
+{% endblock %}
+
+{% block content %}
+
+<div class="uk-alert x-discuss-nav">
+    <a href="/headline">{{ _('Headlines') }}</a>
+    /
+    {{ _('New Headline') }}
+</div>
+
+<form id="headline-form" class="uk-form uk-form-stacked">
+    <legend>{{ _('New Headline') }}</legend>
+    <fieldset>
+        <div class="uk-alert uk-alert-danger uk-hidden"></div>
+        <div class="uk-alert uk-alert-success uk-hidden"></div>
+        <div class="uk-form-row">
+            <label class="uk-form-label">Title:</label>
+            <div class="uk-form-controls">
+                <input type="text" name="name" placeholder="Title" maxlength="100" style="width: 100%">
+            </div>
+        </div>
+        <div class="uk-form-row">
+            <label class="uk-form-label">URL:</label>
+            <div class="uk-form-controls">
+                <input type="text" name="url" placeholder="https://" maxlength="500" style="width: 100%">
+            </div>
+        </div>
+        <div class="uk-form-row">
+            <label class="uk-form-label">{{ _('Description') }}:</label>
+            <div class="uk-form-controls">
+                <textarea id="description" name="description" rows="6" style="resize: none; width: 100%"></textarea>
+            </div>
+        </div>
+        <div class="uk-form-row">
+            <div class="uk-form-controls">
+                <button type="submit" class="uk-button uk-button-primary">
+                    <i class="uk-icon-check"></i> {{ _('Submit') }}</button>
+                &nbsp;
+                <button type="button" class="uk-button x-cancel">
+                    <i class="uk-icon-times"></i> {{ _('Cancel') }}</button>
+            </div>
+        </div>
+    </fieldset>
+</form>
+
+{% endblock %}
+
+{% block sidebar_right_content %}
+
+{% endblock %}

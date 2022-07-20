@@ -45,6 +45,7 @@ import com.itranswarp.model.Article;
 import com.itranswarp.model.Board;
 import com.itranswarp.model.Category;
 import com.itranswarp.model.EthAuth;
+import com.itranswarp.model.Headline;
 import com.itranswarp.model.LocalAuth;
 import com.itranswarp.model.OAuth;
 import com.itranswarp.model.Reply;
@@ -159,6 +160,22 @@ public class MvcController extends AbstractController {
         default:
         }
         return notFound();
+    }
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////
+    // headline
+    ///////////////////////////////////////////////////////////////////////////////////////////////
+
+    @GetMapping("/headline")
+    public ModelAndView headlines(@RequestParam(value = "page", defaultValue = "1") int pageIndex) {
+        PagedResults<Headline> pr = headlineService.getPublishedHeadlines(pageIndex);
+        List<Headline> headlines = pr.getResults();
+        return prepareModelAndView("headline.html", Map.of("page", pr.page, "headlines", headlines));
+    }
+
+    @GetMapping("/headline/create")
+    public ModelAndView headlineCreate() {
+        return prepareModelAndView("headline_form.html");
     }
 
     ///////////////////////////////////////////////////////////////////////////////////////////////

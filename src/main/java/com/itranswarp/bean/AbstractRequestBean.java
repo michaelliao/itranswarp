@@ -111,12 +111,19 @@ public abstract class AbstractRequestBean {
         }
     }
 
-    protected String checkUrl(String url) {
+    protected String checkUrl(String url, boolean onlyFullUrl) {
         url = checkString("url", AbstractEntity.VAR_CHAR_URL, url);
-        if (url.startsWith("https://") || url.startsWith("http://") || url.startsWith("/")) {
+        if (url.startsWith("https://") || url.startsWith("http://")) {
+            return url;
+        }
+        if (!onlyFullUrl && url.startsWith("/")) {
             return url;
         }
         throw new ApiException(ApiError.PARAMETER_INVALID, "url", "Invalid URL.");
+    }
+
+    protected String checkUrl(String url) {
+        return checkUrl(url, false);
     }
 
     private String checkString(String paramName, int maxLength, String s) {

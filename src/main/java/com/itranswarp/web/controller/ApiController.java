@@ -1,9 +1,13 @@
 package com.itranswarp.web.controller;
 
+import java.time.Duration;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+
+import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -21,6 +25,7 @@ import com.itranswarp.bean.ArticleBean;
 import com.itranswarp.bean.AttachmentBean;
 import com.itranswarp.bean.BoardBean;
 import com.itranswarp.bean.CategoryBean;
+import com.itranswarp.bean.HeadlineBean;
 import com.itranswarp.bean.LinkBean;
 import com.itranswarp.bean.NavigationBean;
 import com.itranswarp.bean.ReplyBean;
@@ -45,6 +50,7 @@ import com.itranswarp.model.Article;
 import com.itranswarp.model.Attachment;
 import com.itranswarp.model.Board;
 import com.itranswarp.model.Category;
+import com.itranswarp.model.Headline;
 import com.itranswarp.model.Link;
 import com.itranswarp.model.Navigation;
 import com.itranswarp.model.Reply;
@@ -64,7 +70,10 @@ import com.itranswarp.web.support.RoleWith;
 public class ApiController extends AbstractController {
 
     @Value("${spring.security.anti-spam.lock-days:3650}")
-    int lockDaysForSpam = 0;
+    int lockDaysForSpam = 3650;
+
+    @Value("${spring.security.anti-spam.register-at-least:P7D}")
+    Duration registerAtLeast = Duration.ofDays(7);
 
     ///////////////////////////////////////////////////////////////////////////////////////////////
     // ad
@@ -167,6 +176,44 @@ public class ApiController extends AbstractController {
         User user = HttpContext.getRequiredCurrentUser();
         this.adService.deleteAdMaterial(user, id);
         this.adService.deleteAdInfoFromCache();
+        return API_RESULT_TRUE;
+    }
+
+    ///////////////////////////////////////////////////////////////////////////////////////////////
+    // headline
+    ///////////////////////////////////////////////////////////////////////////////////////////////
+
+    @GetMapping("/headlines")
+    @RoleWith(Role.CONTRIBUTOR)
+    public PagedResults<Headline> headline(@RequestParam(value = "published", defaultValue = "false") boolean published,
+            @RequestParam(value = "page", defaultValue = "1") int pageIndex) {
+        return published ? this.headlineService.getPublishedHeadlines(pageIndex) : this.headlineService.getUnpublishedHeadlines(pageIndex);
+    }
+
+    @PostMapping("/headlines")
+    @RoleWith(Role.SUBSCRIBER)
+    public Map<String, Boolean> headlineCreate(@RequestBody HeadlineBean bean) {
+        User user = HttpContext.getRequiredCurrentUser();
+        if (user.role == Role.SUBSCRIBER && user.createdAt < System.currentTimeMillis() - registerAtLeast.toMillis()) {
+            throw new ApiException(ApiError.USER_FORBIDDEN, null, "No permission to submit headline.");
+        }
+        this.headlineService.createHeadline(user.id, bean);
+        return API_RESULT_TRUE;
+    }
+
+    @PostMapping("/headlines/" + ID + "/delete")
+    @RoleWith(Role.EDITOR)
+    public Map<String, Boolean> headlineDelete(@PathVariable("id") Long id) {
+        this.headlineService.deleteHeadline(id);
+        this.headlineService.deleteHeadlinesFromCache();
+        return API_RESULT_TRUE;
+    }
+
+    @PostMapping("/headlines/" + ID + "/publish")
+    @RoleWith(Role.EDITOR)
+    public Map<String, Boolean> headlinePublish(@PathVariable("id") Long id) {
+        this.headlineService.publishHeadline(id);
+        this.headlineService.deleteHeadlinesFromCache();
         return API_RESULT_TRUE;
     }
 

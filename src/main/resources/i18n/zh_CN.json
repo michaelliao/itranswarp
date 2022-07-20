@@ -21,6 +21,7 @@
     "All Boards": "所有版块",
     "All Categories": "所有分类",
     "All Comments": "所有评论",
+    "All Headlines": "All Headlines",
     "All Links": "所有链接",
     "All Navigations": "所有导航",
     "All Pages": "所有页面",
@@ -50,8 +51,11 @@
     "Contributor": "贡献者",
     "Created": "Created",
     "Created at": "Created At",
+    "Creator": "Creator",
 
     "Delete": "删除",
+    "Delete All": "删除全部",
+    "Delete All and Lock User": "Delete All and Lock User",
     "Delete and Lock User": "删除并锁定用户",
     "Deleted": "已删除",
     "Description": "描述",
@@ -69,10 +73,12 @@
 
     "Feedback": "意见反馈",
     "Forgot password": "忘记口令",
+    "From": "From",
     "Full discussion": "全部讨论",
 
     "GEO": "GEO",
 
+    "Headlines": "头条",
     "Height": "权重",
     "Home": "首页",
     "Hot Articles": "热门文章",
@@ -94,6 +100,7 @@
 
     "Make a comment": "发表评论",
     "Manage": "管理",
+    "Management": "管理",
     "Management Console": "管理控制台",
     "More": "更多",
 
@@ -105,6 +112,7 @@
     "New Article": "新文章",
     "New Board": "新板块",
     "New Category": "新分类",
+    "New Headline": "New Headline",
     "New Link": "新链接",
     "New Navigation": "新导航",
     "New Single Page": "新页面",
@@ -132,9 +140,11 @@
     "Previous Page": "上一页",
     "Price": "价格",
     "Profile": "个人资料",
-    "Publish At": "发布于",
+    "Publish At": "Publish at",
+    "Published Headlines": "已发布头条",
 
     "Read more": "继续阅读",
+    "Read source": "阅读原文",
     "Reads": "阅读",
     "Recent Articles": "最新发表",
     "Recent Posts": "最新帖子",
@@ -157,6 +167,7 @@
     "Sign in to make a comment": "登录后发表评论",
     "Sign in to make a reply": "登录后发表回复",
     "Sign in with %1$s": "使用%1$s登录",
+    "Sign in with MetaMask": "使用MetaMask登录",
     "Sign Out": "登出",
     "Single Pages": "页面",
     "Size": "大小",
@@ -166,6 +177,7 @@
     "Start from": "开始日期",
     "Started at": "开始日期",
     "Status": "状态",
+    "Submit": "提交",
     "Subscriber": "订阅用户",
 
     "Tag": "标签",
@@ -180,6 +192,7 @@
     "Topics": "话题",
     "Type": "类型",
 
+    "Unpublished Headlines": "未发布头条",
     "URL": "链接",
     "User": "用户",
     "Users": "用户",

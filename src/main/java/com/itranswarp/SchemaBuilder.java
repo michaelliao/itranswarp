@@ -4,6 +4,9 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -20,6 +23,7 @@ import com.itranswarp.model.Article;
 import com.itranswarp.model.Attachment;
 import com.itranswarp.model.Board;
 import com.itranswarp.model.Category;
+import com.itranswarp.model.Headline;
 import com.itranswarp.model.LocalAuth;
 import com.itranswarp.model.Navigation;
 import com.itranswarp.model.OAuth;
@@ -39,6 +43,13 @@ import com.itranswarp.warpdb.WarpDb;
  * Generate database schema for API server.
  */
 public class SchemaBuilder {
+
+    static ZonedDateTime base = LocalDateTime.of(2022, 2, 22, 22, 22, 22).atZone(ZoneId.of("Z"));
+
+    static long currentTimeMillis() {
+        base = base.plusDays(1).plusHours(9).plusMinutes(18);
+        return base.toEpochSecond() * 1000L;
+    }
 
     public static void main(String[] args) throws Exception {
         SchemaBuilder builder = new SchemaBuilder();
@@ -103,6 +114,7 @@ public class SchemaBuilder {
         List<AbstractEntity> entities = new ArrayList<>();
         initUsers(entities);
         initSinglePages(entities);
+        initHeadlines(entities);
         initArticles(entities);
         initDiscuss(entities);
         initWiki(entities);
@@ -111,14 +123,14 @@ public class SchemaBuilder {
         nav.name = "Discuss";
         nav.icon = "commenting-o";
         nav.url = "/discuss";
-        nav.displayOrder = 4;
+        nav.displayOrder = 5;
         entities.add(nav);
 
         nav = new Navigation();
         nav.name = "External";
         nav.icon = "external-link";
         nav.url = "https://weibo.com/";
-        nav.displayOrder = 5;
+        nav.displayOrder = 6;
         nav.blank = true;
         entities.add(nav);
 
@@ -136,7 +148,7 @@ public class SchemaBuilder {
                 entity.id = nextId.incrementAndGet();
             }
             if (entity.createdAt == 0) {
-                entity.createdAt = entity.updatedAt = System.currentTimeMillis();
+                entity.createdAt = entity.updatedAt = currentTimeMillis();
             }
             sb.append(generateInsert(db.getTable(entity.getClass()), db.getInsertableFields(entity.getClass()), db.getInsertableValues(entity)));
         });
@@ -150,14 +162,14 @@ public class SchemaBuilder {
         page.name = "Help";
         page.tags = "help,doc";
         page.textId = text.id;
-        page.publishAt = System.currentTimeMillis();
+        page.publishAt = currentTimeMillis();
         entities.add(page);
 
         Navigation nav = new Navigation();
         nav.name = page.name;
         nav.icon = "plane";
         nav.url = "/single/" + page.id;
-        nav.displayOrder = 2;
+        nav.displayOrder = 3;
         entities.add(nav);
     }
 
@@ -191,6 +203,26 @@ public class SchemaBuilder {
         });
     }
 
+    void initHeadlines(List<AbstractEntity> entities) {
+        Navigation nav = new Navigation();
+        nav.name = "Headlines";
+        nav.icon = "calendar";
+        nav.url = "/headline";
+        nav.displayOrder = 0;
+        entities.add(nav);
+
+        for (int n = 0; n < 25; n++) {
+            Headline h = new Headline();
+            h.userId = admin.id;
+            h.name = randomLine(1) + " " + n;
+            h.published = n < 15;
+            h.publishAt = currentTimeMillis();
+            h.description = randomLine(30);
+            h.url = "https://www.google.com/search?q=headline+" + n;
+            entities.add(h);
+        }
+    }
+
     void initArticles(List<AbstractEntity> entities) {
         Category category = new Category();
         category.id = nextId.incrementAndGet();
@@ -203,18 +235,17 @@ public class SchemaBuilder {
         nav.name = category.name;
         nav.icon = "coffee";
         nav.url = "/category/" + category.id;
-        nav.displayOrder = 0;
+        nav.displayOrder = 1;
         entities.add(nav);
 
         initAttachments(entities);
 
-        long ts = System.currentTimeMillis();
         for (int n = 0; n < imageIds.length; n++) {
             Text t = initText(entities);
             Article a = new Article();
             a.userId = admin.id;
             a.categoryId = category.id;
-            a.publishAt = ts + n;
+            a.publishAt = currentTimeMillis();
             a.name = randomLine(1) + " " + n;
             a.description = randomLine(10);
             a.tags = "abc,xyz,hello";
@@ -259,7 +290,7 @@ public class SchemaBuilder {
             p.name = "page " + (i + 1);
             p.parentId = wiki.id;
             p.textId = initText(entities).id;
-            p.publishAt = System.currentTimeMillis() + (i % 2 == 1 ? 3600_000 : 0);
+            p.publishAt = currentTimeMillis();
             entities.add(p);
 
             for (int j = 0; j < 4; j++) {
@@ -270,7 +301,7 @@ public class SchemaBuilder {
                 sub.name = "sub " + (j + 1);
                 sub.parentId = p.id;
                 sub.textId = initText(entities).id;
-                sub.publishAt = System.currentTimeMillis() + (i % 2 == 1 ? 3600_000 : 0);
+                sub.publishAt = currentTimeMillis();
                 entities.add(sub);
 
                 if (j == 2) {
@@ -282,7 +313,7 @@ public class SchemaBuilder {
                         leaf.name = "leaf " + (n + 1);
                         leaf.parentId = sub.id;
                         leaf.textId = initText(entities).id;
-                        leaf.publishAt = System.currentTimeMillis();
+                        leaf.publishAt = currentTimeMillis();
                         entities.add(leaf);
                     }
                 }
@@ -313,7 +344,7 @@ public class SchemaBuilder {
             topic.userId = subscriber.id;
             topic.userName = subscriber.name;
             topic.userImageUrl = subscriber.imageUrl;
-            topic.createdAt = topic.updatedAt = System.currentTimeMillis() - 3600_000 * i;
+            topic.createdAt = topic.updatedAt = currentTimeMillis();
             topic.name = randomLine(3) + (i + 1);
             topic.refId = 0;
             topic.refType = RefType.NONE;
@@ -326,7 +357,7 @@ public class SchemaBuilder {
                 reply.userId = subscriber.id;
                 reply.userName = subscriber.name;
                 reply.userImageUrl = subscriber.imageUrl;
-                reply.createdAt = reply.updatedAt = topic.createdAt - 3600_000 * j - 60_000;
+                reply.createdAt = reply.updatedAt = currentTimeMillis();
                 reply.content = randomLine(50);
                 entities.add(reply);
             }

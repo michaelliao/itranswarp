@@ -5,6 +5,8 @@ services:
     container_name: redis
     ports:
       - "6379:6379"
+    volumes:
+      - "./docker/redis-data:/data"
 
   mysql:
     image: mysql:5.7.38
@@ -15,5 +17,6 @@ services:
     environment:
       - MYSQL_ROOT_PASSWORD=password
     volumes:
+      - "./docker/mysql-data:/var/lib/mysql"
       - "./sql/ddl.sql:/docker-entrypoint-initdb.d/1.sql:ro"
       - "./sql/init.sql:/docker-entrypoint-initdb.d/2.sql:ro"

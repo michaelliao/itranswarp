@@ -134,6 +134,22 @@ CREATE TABLE eth_auths (
 ) Engine=INNODB DEFAULT CHARSET=UTF8MB4;
 
 
+CREATE TABLE headlines (
+  id BIGINT NOT NULL,
+  published BOOL NOT NULL,
+  createdAt BIGINT NOT NULL,
+  publishAt BIGINT NOT NULL,
+  updatedAt BIGINT NOT NULL,
+  userId BIGINT NOT NULL,
+  version BIGINT NOT NULL,
+  name VARCHAR(100) NOT NULL,
+  description VARCHAR(1000) NOT NULL,
+  url VARCHAR(1000) NOT NULL,
+  INDEX IDX_PUB (published,publishAt),
+  PRIMARY KEY(id)
+) Engine=INNODB DEFAULT CHARSET=UTF8MB4;
+
+
 CREATE TABLE links (
   id BIGINT NOT NULL,
   createdAt BIGINT NOT NULL,

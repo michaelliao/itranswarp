@@ -86,13 +86,13 @@ public class ApiController extends AbstractController {
 
     @GetMapping("/adSlots/" + ID)
     @RoleWith(Role.ADMIN)
-    public AdSlot adSlot(@PathVariable("id") long id) {
+    public AdSlot adSlot(@PathVariable("id") Long id) {
         return this.adService.getById(id);
     }
 
     @PostMapping("/adSlots/" + ID)
     @RoleWith(Role.ADMIN)
-    public AdSlot adSlotUpdate(@PathVariable("id") long id, @RequestBody AdSlotBean bean) {
+    public AdSlot adSlotUpdate(@PathVariable("id") Long id, @RequestBody AdSlotBean bean) {
         AdSlot as = this.adService.updateAdSlot(id, bean);
         this.adService.deleteAdInfoFromCache();
         return as;
@@ -100,7 +100,7 @@ public class ApiController extends AbstractController {
 
     @PostMapping("/adSlots/" + ID + "/delete")
     @RoleWith(Role.ADMIN)
-    public Map<String, Boolean> adSlotDelete(@PathVariable("id") long id) {
+    public Map<String, Boolean> adSlotDelete(@PathVariable("id") Long id) {
         this.adService.deleteAdSlot(id);
         this.adService.deleteAdInfoFromCache();
         return API_RESULT_TRUE;
@@ -114,7 +114,7 @@ public class ApiController extends AbstractController {
 
     @GetMapping("/adPeriods/" + ID)
     @RoleWith(Role.ADMIN)
-    public AdPeriod adPeriodGet(@PathVariable("id") long id) {
+    public AdPeriod adPeriodGet(@PathVariable("id") Long id) {
         return this.adService.getAdPeriodById(id);
     }
 
@@ -128,7 +128,7 @@ public class ApiController extends AbstractController {
 
     @PostMapping("/adPeriods/" + ID)
     @RoleWith(Role.ADMIN)
-    public AdPeriod adPeriodUpdate(@PathVariable("id") long id, @RequestBody AdPeriodBean bean) {
+    public AdPeriod adPeriodUpdate(@PathVariable("id") Long id, @RequestBody AdPeriodBean bean) {
         AdPeriod ap = this.adService.updateAdPeriod(id, bean);
         this.adService.deleteAdInfoFromCache();
         return ap;
@@ -136,7 +136,7 @@ public class ApiController extends AbstractController {
 
     @PostMapping("/adPeriods/" + ID + "/delete")
     @RoleWith(Role.ADMIN)
-    public Map<String, Boolean> adPeriodDelete(@PathVariable("id") long id) {
+    public Map<String, Boolean> adPeriodDelete(@PathVariable("id") Long id) {
         this.adService.deleteAdPeriod(id);
         this.adService.deleteAdInfoFromCache();
         return API_RESULT_TRUE;
@@ -150,7 +150,7 @@ public class ApiController extends AbstractController {
 
     @PostMapping("/adPeriods/" + ID + "/adMaterials")
     @RoleWith(Role.SPONSOR)
-    public AdMaterial adMaterialCreate(@PathVariable("id") long id, @RequestBody AdMaterialBean bean) {
+    public AdMaterial adMaterialCreate(@PathVariable("id") Long id, @RequestBody AdMaterialBean bean) {
         User user = HttpContext.getRequiredCurrentUser();
         AdPeriod adPeriod = this.adService.getAdPeriodById(id);
         if (adPeriod.userId != user.id) {
@@ -163,7 +163,7 @@ public class ApiController extends AbstractController {
 
     @PostMapping("/adMaterials/" + ID + "/delete")
     @RoleWith(Role.SPONSOR)
-    public Map<String, Boolean> adMaterialDelete(@PathVariable("id") long id) {
+    public Map<String, Boolean> adMaterialDelete(@PathVariable("id") Long id) {
         User user = HttpContext.getRequiredCurrentUser();
         this.adService.deleteAdMaterial(user, id);
         this.adService.deleteAdInfoFromCache();
@@ -176,7 +176,7 @@ public class ApiController extends AbstractController {
 
     @GetMapping("/articles/" + ID)
     @RoleWith(Role.CONTRIBUTOR)
-    public ArticleWithContent article(@PathVariable("id") long id) {
+    public ArticleWithContent article(@PathVariable("id") Long id) {
         Article article = this.articleService.getById(id);
         String content = this.textService.getById(article.textId).content;
         return new ArticleWithContent(article, content);
@@ -199,7 +199,7 @@ public class ApiController extends AbstractController {
 
     @PostMapping("/articles/" + ID)
     @RoleWith(Role.CONTRIBUTOR)
-    public Article articleUpdate(@PathVariable("id") long id, @RequestBody ArticleBean bean) {
+    public Article articleUpdate(@PathVariable("id") Long id, @RequestBody ArticleBean bean) {
         Article article = this.articleService.updateArticle(HttpContext.getRequiredCurrentUser(), id, bean);
         this.articleService.deleteArticlesFromCache(article.categoryId);
         asyncIndex(article);
@@ -208,7 +208,7 @@ public class ApiController extends AbstractController {
 
     @PostMapping("/articles/" + ID + "/delete")
     @RoleWith(Role.CONTRIBUTOR)
-    public Map<String, Boolean> articleDelete(@PathVariable("id") long id) {
+    public Map<String, Boolean> articleDelete(@PathVariable("id") Long id) {
         Article article = this.articleService.deleteArticle(HttpContext.getRequiredCurrentUser(), id);
         this.articleService.deleteArticlesFromCache(article.categoryId);
         asyncUnindex(id);
@@ -227,7 +227,7 @@ public class ApiController extends AbstractController {
 
     @GetMapping("/attachments/" + ID)
     @RoleWith(Role.SPONSOR)
-    public Attachment attachment(@PathVariable("id") long id) {
+    public Attachment attachment(@PathVariable("id") Long id) {
         return this.attachmentService.getById(id);
     }
 
@@ -239,7 +239,7 @@ public class ApiController extends AbstractController {
 
     @PostMapping("/attachments/" + ID + "/delete")
     @RoleWith(Role.SPONSOR)
-    public Map<String, Boolean> attachmentDelete(@PathVariable("id") long id) {
+    public Map<String, Boolean> attachmentDelete(@PathVariable("id") Long id) {
         this.attachmentService.deleteAttachment(HttpContext.getRequiredCurrentUser(), id);
         return API_RESULT_TRUE;
     }
@@ -256,7 +256,7 @@ public class ApiController extends AbstractController {
 
     @GetMapping("/boards/" + ID)
     @RoleWith(Role.CONTRIBUTOR)
-    public Board board(@PathVariable("id") long id) {
+    public Board board(@PathVariable("id") Long id) {
         return this.boardService.getById(id);
     }
 
@@ -278,7 +278,7 @@ public class ApiController extends AbstractController {
 
     @PostMapping("/boards/" + ID)
     @RoleWith(Role.ADMIN)
-    public Board boardUpdate(@PathVariable("id") long id, @RequestBody BoardBean bean) {
+    public Board boardUpdate(@PathVariable("id") Long id, @RequestBody BoardBean bean) {
         Board board = this.boardService.updateBoard(id, bean);
         this.boardService.deleteBoardsFromCache();
         return board;
@@ -286,7 +286,7 @@ public class ApiController extends AbstractController {
 
     @PostMapping("/boards/" + ID + "/delete")
     @RoleWith(Role.ADMIN)
-    public Map<String, Boolean> boardDelete(@PathVariable("id") long id) {
+    public Map<String, Boolean> boardDelete(@PathVariable("id") Long id) {
         this.boardService.deleteBoard(id);
         this.boardService.deleteBoardFromCache(id);
         this.boardService.deleteTopicsFromCache(id);
@@ -305,7 +305,7 @@ public class ApiController extends AbstractController {
 
     @GetMapping("/categories/" + ID)
     @RoleWith(Role.CONTRIBUTOR)
-    public Category category(@PathVariable("id") long id) {
+    public Category category(@PathVariable("id") Long id) {
         return this.articleService.getCategoryById(id);
     }
 
@@ -325,7 +325,7 @@ public class ApiController extends AbstractController {
 
     @PostMapping("/categories/" + ID)
     @RoleWith(Role.ADMIN)
-    public Category categoryUpdate(@PathVariable("id") long id, @RequestBody CategoryBean bean) {
+    public Category categoryUpdate(@PathVariable("id") Long id, @RequestBody CategoryBean bean) {
         Category category = this.articleService.updateCategory(id, bean);
         this.articleService.deleteCategoryFromCache(id);
         return category;
@@ -333,7 +333,7 @@ public class ApiController extends AbstractController {
 
     @PostMapping("/categories/" + ID + "/delete")
     @RoleWith(Role.ADMIN)
-    public Map<String, Boolean> categoryDelete(@PathVariable("id") long id) {
+    public Map<String, Boolean> categoryDelete(@PathVariable("id") Long id) {
         this.articleService.deleteCategory(id);
         this.articleService.deleteCategoryFromCache(id);
         return API_RESULT_TRUE;
@@ -351,7 +351,7 @@ public class ApiController extends AbstractController {
 
     @GetMapping("/links/" + ID)
     @RoleWith(Role.CONTRIBUTOR)
-    public Link linkGet(@PathVariable("id") long id) {
+    public Link linkGet(@PathVariable("id") Long id) {
         return this.linkService.getById(id);
     }
 
@@ -365,7 +365,7 @@ public class ApiController extends AbstractController {
 
     @PostMapping("/links/" + ID + "/delete")
     @RoleWith(Role.ADMIN)
-    public Map<String, Boolean> linkDelete(@PathVariable("id") long id) {
+    public Map<String, Boolean> linkDelete(@PathVariable("id") Long id) {
         this.linkService.deleteLink(id);
         this.linkService.updateLinksCache();
         return API_RESULT_TRUE;
@@ -391,7 +391,7 @@ public class ApiController extends AbstractController {
 
     @GetMapping("/navigations/" + ID)
     @RoleWith(Role.CONTRIBUTOR)
-    public Navigation navigationGet(@PathVariable("id") long id) {
+    public Navigation navigationGet(@PathVariable("id") Long id) {
         return this.navigationService.getById(id);
     }
 
@@ -423,7 +423,7 @@ public class ApiController extends AbstractController {
 
     @PostMapping("/navigations/" + ID + "/delete")
     @RoleWith(Role.ADMIN)
-    public Map<String, Boolean> navigationDelete(@PathVariable("id") long id) {
+    public Map<String, Boolean> navigationDelete(@PathVariable("id") Long id) {
         this.navigationService.deleteNavigation(id);
         this.navigationService.removeNavigationsFromCache();
         return API_RESULT_TRUE;
@@ -439,7 +439,7 @@ public class ApiController extends AbstractController {
 
     @PostMapping("/navigations/" + ID)
     @RoleWith(Role.ADMIN)
-    public Navigation navigationUpdate(@PathVariable("id") long id, @RequestBody NavigationBean bean) {
+    public Navigation navigationUpdate(@PathVariable("id") Long id, @RequestBody NavigationBean bean) {
         Navigation navigation = this.navigationService.updateNavigation(id, bean);
         this.navigationService.removeNavigationsFromCache();
         return navigation;
@@ -469,7 +469,7 @@ public class ApiController extends AbstractController {
 
     @PostMapping("/topics/" + ID + "/replies")
     @RoleWith(Role.SUBSCRIBER)
-    public Reply replyCreate(@PathVariable("id") long id, @RequestBody ReplyBean bean) {
+    public Reply replyCreate(@PathVariable("id") Long id, @RequestBody ReplyBean bean) {
         User user = HttpContext.getRequiredCurrentUser();
         Topic topic = this.boardService.getTopicById(id);
         Reply reply = null;
@@ -488,7 +488,7 @@ public class ApiController extends AbstractController {
 
     @PostMapping("/replies/" + ID + "/delete")
     @RoleWith(Role.EDITOR)
-    public Map<String, Boolean> replyDelete(@PathVariable("id") long id) {
+    public Map<String, Boolean> replyDelete(@PathVariable("id") Long id) {
         this.boardService.deleteReply(HttpContext.getRequiredCurrentUser(), id);
         return API_RESULT_TRUE;
     }
@@ -536,7 +536,7 @@ public class ApiController extends AbstractController {
 
     @GetMapping("/singlePages/" + ID)
     @RoleWith(Role.CONTRIBUTOR)
-    public SinglePageWithContent singlePage(@PathVariable("id") long id) {
+    public SinglePageWithContent singlePage(@PathVariable("id") Long id) {
         SinglePage sp = this.singlePageService.getById(id);
         String content = this.textService.getById(sp.textId).content;
         return new SinglePageWithContent(sp, content);
@@ -550,7 +550,7 @@ public class ApiController extends AbstractController {
 
     @PostMapping("/singlePages/" + ID)
     @RoleWith(Role.ADMIN)
-    public SinglePage singlePageUpdate(@PathVariable("id") long id, @RequestBody SinglePageBean bean) {
+    public SinglePage singlePageUpdate(@PathVariable("id") Long id, @RequestBody SinglePageBean bean) {
         SinglePage sp = this.singlePageService.updateSinglePage(id, bean);
         this.singlePageService.deleteSinglePageFromCache(id);
         return sp;
@@ -558,7 +558,7 @@ public class ApiController extends AbstractController {
 
     @PostMapping("/singlePages/" + ID + "/delete")
     @RoleWith(Role.ADMIN)
-    public Map<String, Boolean> singlePageDelete(@PathVariable("id") long id) {
+    public Map<String, Boolean> singlePageDelete(@PathVariable("id") Long id) {
         this.singlePageService.deleteSinglePage(id);
         this.singlePageService.deleteSinglePageFromCache(id);
         return API_RESULT_TRUE;
@@ -575,7 +575,7 @@ public class ApiController extends AbstractController {
     }
 
     @GetMapping("/ref/" + ID + "/topics")
-    public Map<String, List<TopicWithReplies>> topicsByRefId(@PathVariable("id") long refId) {
+    public Map<String, List<TopicWithReplies>> topicsByRefId(@PathVariable("id") Long refId) {
         return Map.of(RESULTS, this.boardService.getTopicsByRefId(refId));
     }
 
@@ -620,7 +620,7 @@ public class ApiController extends AbstractController {
 
     @PostMapping("/boards/" + ID + "/topics")
     @RoleWith(Role.SUBSCRIBER)
-    public Topic topicCreate(@PathVariable("id") long id, @RequestBody TopicBean bean) {
+    public Topic topicCreate(@PathVariable("id") Long id, @RequestBody TopicBean bean) {
         Board board = this.boardService.getBoardFromCache(id);
         if (board.locked) {
             throw new ApiException(ApiError.OPERATION_FAILED, "board", "Board is locked.");
@@ -660,7 +660,7 @@ public class ApiController extends AbstractController {
 
     @PostMapping("/topics/" + ID + "/delete")
     @RoleWith(Role.EDITOR)
-    public Map<String, Boolean> topicDelete(@PathVariable("id") long id) {
+    public Map<String, Boolean> topicDelete(@PathVariable("id") Long id) {
         Topic topic = this.boardService.deleteTopic(HttpContext.getRequiredCurrentUser(), id);
         this.boardService.deleteBoardFromCache(topic.boardId);
         this.boardService.deleteTopicsFromCache(topic.boardId);
@@ -692,7 +692,12 @@ public class ApiController extends AbstractController {
 
     @GetMapping("/users/ids")
     @RoleWith(Role.CONTRIBUTOR)
-    public Map<Long, User> usersByIds(@RequestParam("id") long[] ids) {
+    public Map<Long, User> usersByIds(HttpServletRequest request) {
+        String[] idList = request.getParameterValues("id");
+        if (idList == null) {
+            return Map.of();
+        }
+        long[] ids = Arrays.stream(idList).mapToLong(Long::parseLong).toArray();
         List<User> users = this.userService.getUsersByIds(ids);
         return users.stream().collect(Collectors.toMap(u -> u.id, u -> u));
     }
@@ -705,7 +710,7 @@ public class ApiController extends AbstractController {
 
     @PostMapping("/users/" + ID + "/lock/{timestamp}")
     @RoleWith(Role.ADMIN)
-    public User userUpdateLock(@PathVariable("id") long id, @PathVariable("timestamp") long timestamp) {
+    public User userUpdateLock(@PathVariable("id") Long id, @PathVariable("timestamp") long timestamp) {
         if (timestamp < 0) {
             throw new ApiException(ApiError.PARAMETER_INVALID, "timestamp", "Invalid timestamp.");
         }
@@ -724,7 +729,7 @@ public class ApiController extends AbstractController {
 
     @GetMapping("/wikis/" + ID)
     @RoleWith(Role.CONTRIBUTOR)
-    public WikiWithContent wiki(@PathVariable("id") long id) {
+    public WikiWithContent wiki(@PathVariable("id") Long id) {
         Wiki wiki = this.wikiService.getById(id);
         String content = this.textService.getById(wiki.textId).content;
         return new WikiWithContent(wiki, content);
@@ -732,7 +737,7 @@ public class ApiController extends AbstractController {
 
     @GetMapping("/wikis/" + ID + "/tree")
     @RoleWith(Role.CONTRIBUTOR)
-    public Wiki wikiTree(@PathVariable("id") long id) {
+    public Wiki wikiTree(@PathVariable("id") Long id) {
         return this.wikiService.getWikiTree(id);
     }
 
@@ -747,7 +752,7 @@ public class ApiController extends AbstractController {
 
     @PostMapping("/wikis/" + ID)
     @RoleWith(Role.EDITOR)
-    public Wiki wikiUpdate(@PathVariable("id") long id, @RequestBody WikiBean bean) {
+    public Wiki wikiUpdate(@PathVariable("id") Long id, @RequestBody WikiBean bean) {
         Wiki wiki = this.wikiService.updateWiki(HttpContext.getRequiredCurrentUser(), id, bean);
         this.wikiService.removeWikiFromCache(id);
         asyncIndex(wiki);
@@ -756,7 +761,7 @@ public class ApiController extends AbstractController {
 
     @PostMapping("/wikis/" + ID + "/delete")
     @RoleWith(Role.EDITOR)
-    public Map<String, Boolean> wikiDelete(@PathVariable("id") long id) {
+    public Map<String, Boolean> wikiDelete(@PathVariable("id") Long id) {
         this.wikiService.deleteWiki(HttpContext.getRequiredCurrentUser(), id);
         this.wikiService.removeWikiFromCache(id);
         asyncUnindex(id);
@@ -765,7 +770,7 @@ public class ApiController extends AbstractController {
 
     @PostMapping("/wikis/" + ID + "/wikiPages")
     @RoleWith(Role.EDITOR)
-    public WikiPage wikiPageCreate(@PathVariable("id") long id, @RequestBody WikiPageBean bean) {
+    public WikiPage wikiPageCreate(@PathVariable("id") Long id, @RequestBody WikiPageBean bean) {
         Wiki wiki = this.wikiService.getById(id);
         WikiPage wikiPage = this.wikiService.createWikiPage(HttpContext.getRequiredCurrentUser(), wiki, bean);
         this.wikiService.removeWikiFromCache(id);
@@ -775,7 +780,7 @@ public class ApiController extends AbstractController {
 
     @GetMapping("/wikiPages/" + ID)
     @RoleWith(Role.EDITOR)
-    public WikiPageWithContent wikiPage(@PathVariable("id") long id) {
+    public WikiPageWithContent wikiPage(@PathVariable("id") Long id) {
         WikiPage wp = this.wikiService.getWikiPageById(id);
         String content = this.textService.getById(wp.textId).content;
         return new WikiPageWithContent(wp, content);
@@ -783,7 +788,7 @@ public class ApiController extends AbstractController {
 
     @PostMapping("/wikiPages/" + ID)
     @RoleWith(Role.EDITOR)
-    public WikiPage wikiPageUpdate(@PathVariable("id") long id, @RequestBody WikiPageBean bean) {
+    public WikiPage wikiPageUpdate(@PathVariable("id") Long id, @RequestBody WikiPageBean bean) {
         WikiPage wikiPage = this.wikiService.updateWikiPage(HttpContext.getRequiredCurrentUser(), id, bean);
         this.wikiService.removeWikiFromCache(wikiPage.wikiId);
         Wiki wiki = this.wikiService.getById(wikiPage.wikiId);
@@ -793,7 +798,7 @@ public class ApiController extends AbstractController {
 
     @PostMapping("/wikiPages/" + ID + "/move")
     @RoleWith(Role.EDITOR)
-    public WikiPage wikiPageUpdate(@PathVariable("id") long wikiPageId, @RequestBody WikiPageMoveBean bean) {
+    public WikiPage wikiPageUpdate(@PathVariable("id") Long wikiPageId, @RequestBody WikiPageMoveBean bean) {
         bean.validate(true);
         WikiPage wikiPage = this.wikiService.moveWikiPage(HttpContext.getRequiredCurrentUser(), wikiPageId, bean.parentId, bean.displayIndex);
         this.wikiService.removeWikiFromCache(wikiPage.wikiId);
@@ -804,7 +809,7 @@ public class ApiController extends AbstractController {
 
     @PostMapping("/wikiPages/" + ID + "/delete")
     @RoleWith(Role.EDITOR)
-    public Map<String, Boolean> wikiPageDelete(@PathVariable("id") long id) {
+    public Map<String, Boolean> wikiPageDelete(@PathVariable("id") Long id) {
         WikiPage wikiPage = this.wikiService.deleteWikiPage(HttpContext.getRequiredCurrentUser(), id);
         this.wikiService.removeWikiFromCache(wikiPage.wikiId);
         asyncUnindex(id);

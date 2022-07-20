@@ -14,7 +14,7 @@ public class TopicBean extends AbstractRequestBean {
         this.name = checkName(this.name);
         this.content = checkContent(this.content);
         if (refType == RefType.NONE) {
-            this.refId = 0;
+            this.refId = 0L;
         } else {
             checkId("refId", this.refId);
         }

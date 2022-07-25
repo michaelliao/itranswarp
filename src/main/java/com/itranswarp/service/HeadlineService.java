@@ -44,7 +44,7 @@ public class HeadlineService extends AbstractDbService<Headline> {
     }
 
     @Transactional
-    public Headline deleteHeadline(Long id) {
+    public Headline deleteHeadline(long id) {
         Headline hl = this.getById(id);
         this.db.remove(hl);
         return hl;
@@ -73,7 +73,7 @@ public class HeadlineService extends AbstractDbService<Headline> {
     }
 
     @Transactional
-    public Headline updateHeadline(Long id, HeadlineBean bean) {
+    public Headline updateHeadline(long id, HeadlineBean bean) {
         bean.validate(false);
         Headline hl = getHeadline(id);
         hl.copyPropertiesFrom(bean);
@@ -82,7 +82,7 @@ public class HeadlineService extends AbstractDbService<Headline> {
     }
 
     @Transactional
-    public Headline publishHeadline(Long id) {
+    public Headline publishHeadline(long id) {
         Headline hl = this.getById(id);
         if (hl.published) {
             return hl;
@@ -93,7 +93,7 @@ public class HeadlineService extends AbstractDbService<Headline> {
         return hl;
     }
 
-    public Headline getHeadline(Long id) {
+    public Headline getHeadline(long id) {
         Headline hl = this.db.fetch(Headline.class, id);
         if (hl == null) {
             throw new ApiException(ApiError.ENTITY_NOT_FOUND, "Headline", "Headline not found.");

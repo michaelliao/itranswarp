@@ -34,7 +34,7 @@ public class AbstractDbService<T extends AbstractEntity> extends AbstractService
         this.entityClass = ClassUtil.getParameterizedType(this.getClass());
     }
 
-    public T getById(Long id) {
+    public T getById(long id) {
         T t = this.db.fetch(entityClass, id);
         if (t == null) {
             throw new ApiException(ApiError.ENTITY_NOT_FOUND, entityClass.getSimpleName(), entityClass.getSimpleName() + " not found");
@@ -42,7 +42,7 @@ public class AbstractDbService<T extends AbstractEntity> extends AbstractService
         return t;
     }
 
-    public T fetchById(Long id) {
+    public T fetchById(long id) {
         return this.db.fetch(entityClass, id);
     }
 

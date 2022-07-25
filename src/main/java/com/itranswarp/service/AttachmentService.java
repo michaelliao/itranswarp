@@ -66,7 +66,7 @@ public class AttachmentService extends AbstractDbService<Attachment> {
     }
 
     @Transactional
-    public void deleteAttachment(User user, Long id) {
+    public void deleteAttachment(User user, long id) {
         Attachment a = this.getById(id);
         if (user.role != Role.ADMIN && user.id != a.userId) {
             throw new ApiException(ApiError.PERMISSION_DENIED);
@@ -80,7 +80,7 @@ public class AttachmentService extends AbstractDbService<Attachment> {
         }
     }
 
-    public DownloadBean downloadAttachment(Long id, char size) {
+    public DownloadBean downloadAttachment(long id, char size) {
         if ("0sml".indexOf(size) == (-1)) {
             throw new ApiException(ApiError.PARAMETER_INVALID, "size", "Invalid size.");
         }

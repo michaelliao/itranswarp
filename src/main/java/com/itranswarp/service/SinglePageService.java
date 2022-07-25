@@ -26,7 +26,7 @@ public class SinglePageService extends AbstractDbService<SinglePage> {
         return this.db.from(SinglePage.class).orderBy("publishAt").desc().orderBy("id").desc().list();
     }
 
-    public SinglePage getPublishedById(Long id) {
+    public SinglePage getPublishedById(long id) {
         SinglePage sp = this.redisService.hget(KEY_SINGLE_PAGES, id, SinglePage.class);
         if (sp == null) {
             sp = getById(id);
@@ -54,13 +54,13 @@ public class SinglePageService extends AbstractDbService<SinglePage> {
     }
 
     @Transactional
-    public void deleteSinglePage(Long id) {
+    public void deleteSinglePage(long id) {
         SinglePage sp = this.getById(id);
         this.db.remove(sp);
     }
 
     @Transactional
-    public SinglePage updateSinglePage(Long id, SinglePageBean bean) {
+    public SinglePage updateSinglePage(long id, SinglePageBean bean) {
         bean.validate(false);
         SinglePage sp = this.getById(id);
         sp.name = bean.name;
@@ -73,7 +73,7 @@ public class SinglePageService extends AbstractDbService<SinglePage> {
         return sp;
     }
 
-    public void deleteSinglePageFromCache(Long id) {
+    public void deleteSinglePageFromCache(long id) {
         this.redisService.hdel(KEY_SINGLE_PAGES, id);
     }
 }

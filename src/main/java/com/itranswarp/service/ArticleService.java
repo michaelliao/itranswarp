@@ -39,7 +39,7 @@ public class ArticleService extends AbstractDbService<Article> {
 
     static final long KEY_TIMEOUT = 3600;
 
-    public Category getCategoryFromCache(Long id) {
+    public Category getCategoryFromCache(long id) {
         Category c = this.redisService.hget(KEY_CATEGORIES, id, Category.class);
         if (c == null) {
             c = getCategoryById(id);
@@ -57,7 +57,7 @@ public class ArticleService extends AbstractDbService<Article> {
         this.redisService.del(KEY_RECENT_ARTICLES);
     }
 
-    public void deleteCategoryFromCache(Long id) {
+    public void deleteCategoryFromCache(long id) {
         this.redisService.hdel(KEY_CATEGORIES, id);
     }
 
@@ -65,7 +65,7 @@ public class ArticleService extends AbstractDbService<Article> {
         return this.db.from(Category.class).orderBy("displayOrder").list();
     }
 
-    public Category getCategoryById(Long id) {
+    public Category getCategoryById(long id) {
         Category cat = db.fetch(Category.class, id);
         if (cat == null) {
             throw new ApiException(ApiError.ENTITY_NOT_FOUND, "Category", "Category not found.");
@@ -87,7 +87,7 @@ public class ArticleService extends AbstractDbService<Article> {
     }
 
     @Transactional
-    public Category updateCategory(Long id, CategoryBean bean) {
+    public Category updateCategory(long id, CategoryBean bean) {
         bean.validate(false);
         Category category = this.getCategoryById(id);
         category.name = bean.name;
@@ -98,7 +98,7 @@ public class ArticleService extends AbstractDbService<Article> {
     }
 
     @Transactional
-    public void deleteCategory(Long id) {
+    public void deleteCategory(long id) {
         Category category = this.getCategoryById(id);
         if (getArticles(category, 1).page.isEmpty) {
             this.db.remove(category);
@@ -152,7 +152,7 @@ public class ArticleService extends AbstractDbService<Article> {
                 ITEMS_PER_PAGE);
     }
 
-    public Article getPublishedById(Long id) {
+    public Article getPublishedById(long id) {
         Article article = getById(id);
         if (article.publishAt > System.currentTimeMillis()) {
             User user = HttpContext.getCurrentUser();
@@ -188,7 +188,7 @@ public class ArticleService extends AbstractDbService<Article> {
     }
 
     @Transactional
-    public Article deleteArticle(User user, Long id) {
+    public Article deleteArticle(User user, long id) {
         Article article = this.getById(id);
         checkPermission(user, article.userId);
         this.db.remove(article);
@@ -196,7 +196,7 @@ public class ArticleService extends AbstractDbService<Article> {
     }
 
     @Transactional
-    public Article updateArticle(User user, Long id, ArticleBean bean) {
+    public Article updateArticle(User user, long id, ArticleBean bean) {
         bean.validate(false);
         Article article = this.getById(id);
         checkPermission(user, article.userId);

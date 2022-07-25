@@ -41,7 +41,7 @@ public class LinkService extends AbstractDbService<Link> {
     }
 
     @Transactional
-    public Link updateLink(Long id, LinkBean bean) {
+    public Link updateLink(long id, LinkBean bean) {
         bean.validate(false);
         Link link = this.getById(id);
         link.name = bean.name;
@@ -51,7 +51,7 @@ public class LinkService extends AbstractDbService<Link> {
     }
 
     @Transactional
-    public void deleteLink(Long id) {
+    public void deleteLink(long id) {
         Link link = this.getById(id);
         this.db.remove(link);
     }

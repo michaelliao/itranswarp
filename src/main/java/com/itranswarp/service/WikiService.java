@@ -31,11 +31,11 @@ public class WikiService extends AbstractDbService<Wiki> {
 
     static final String KEY_WIKIS = "__wikis__";
 
-    public void removeWikiFromCache(Long id) {
+    public void removeWikiFromCache(long id) {
         this.redisService.del(KEY_WIKIS + id);
     }
 
-    public Wiki getWikiTreeFromCache(Long id) {
+    public Wiki getWikiTreeFromCache(long id) {
         Wiki wiki = this.redisService.get(KEY_WIKIS + id, Wiki.class);
         if (wiki == null) {
             wiki = getWikiTree(id);
@@ -44,7 +44,7 @@ public class WikiService extends AbstractDbService<Wiki> {
         return wiki;
     }
 
-    public Wiki getWikiTree(Long id) {
+    public Wiki getWikiTree(long id) {
         Wiki wiki = getById(id);
         List<WikiPage> children = getWikiPages(id);
         Map<Long, WikiPage> nodes = new LinkedHashMap<>();
@@ -61,7 +61,7 @@ public class WikiService extends AbstractDbService<Wiki> {
         return wiki;
     }
 
-    public List<WikiPage> getWikiPages(Long wikiId) {
+    public List<WikiPage> getWikiPages(long wikiId) {
         return this.db.from(WikiPage.class).where("wikiId = ?", wikiId).orderBy("parentId").orderBy("displayOrder").orderBy("id").list();
     }
 
@@ -123,7 +123,7 @@ public class WikiService extends AbstractDbService<Wiki> {
     }
 
     @Transactional
-    public Wiki updateWiki(User user, Long id, WikiBean bean) {
+    public Wiki updateWiki(User user, long id, WikiBean bean) {
         bean.validate(false);
         Wiki wiki = this.getById(id);
         wiki.name = bean.name;
@@ -144,7 +144,7 @@ public class WikiService extends AbstractDbService<Wiki> {
     }
 
     @Transactional
-    public WikiPage updateWikiPage(User user, Long id, WikiPageBean bean) {
+    public WikiPage updateWikiPage(User user, long id, WikiPageBean bean) {
         bean.validate(false);
         WikiPage wikipage = getWikiPageById(id);
         Wiki wiki = getById(wikipage.wikiId);
@@ -213,7 +213,7 @@ public class WikiService extends AbstractDbService<Wiki> {
     }
 
     @Transactional
-    public void deleteWiki(User user, Long id) {
+    public void deleteWiki(User user, long id) {
         Wiki wiki = getById(id);
         super.checkPermission(user, wiki.userId);
         WikiPage child = this.db.from(WikiPage.class).where("parentId = ?", id).first();
@@ -225,7 +225,7 @@ public class WikiService extends AbstractDbService<Wiki> {
     }
 
     @Transactional
-    public WikiPage deleteWikiPage(User user, Long id) {
+    public WikiPage deleteWikiPage(User user, long id) {
         WikiPage wikiPage = getWikiPageById(id);
         Wiki wiki = getById(wikiPage.wikiId);
         super.checkPermission(user, wiki.userId);
@@ -237,7 +237,7 @@ public class WikiService extends AbstractDbService<Wiki> {
         return wikiPage;
     }
 
-    public WikiPage getWikiPageById(Long id) {
+    public WikiPage getWikiPageById(long id) {
         WikiPage wikipage = this.db.fetch(WikiPage.class, id);
         if (wikipage == null) {
             throw new ApiException(ApiError.PARAMETER_INVALID, null, "not found");
@@ -245,12 +245,12 @@ public class WikiService extends AbstractDbService<Wiki> {
         return wikipage;
     }
 
-    List<Long> getLeafToRootIds(Wiki wiki, Long leafId) {
-        if (leafId.equals(wiki.id)) {
+    List<Long> getLeafToRootIds(Wiki wiki, long leafId) {
+        if (leafId == wiki.id) {
             return List.of(leafId);
         }
         List<Long> nodeIds = new ArrayList<>();
-        Long currentId = leafId;
+        long currentId = leafId;
         for (int i = 0; i < 100; i++) {
             nodeIds.add(currentId);
             WikiPage node = getWikiPageById(currentId);

@@ -90,7 +90,7 @@ public class AdService extends AbstractDbService<AdSlot> {
     }
 
     @Transactional
-    public AdSlot updateAdSlot(Long id, AdSlotBean bean) {
+    public AdSlot updateAdSlot(long id, AdSlotBean bean) {
         bean.validate(false);
         AdSlot slot = this.getById(id);
         slot.name = bean.name;

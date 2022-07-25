@@ -329,7 +329,7 @@ public class MvcController extends AbstractController {
     }
 
     @GetMapping("/discuss/topic/" + ID + "/find/" + ID2)
-    public ModelAndView discussFindReplyInTopic(@PathVariable("id") Long topicId, @PathVariable("id2") Long replyId) {
+    public ModelAndView discussFindReplyInTopic(@PathVariable("id") long topicId, @PathVariable("id2") long replyId) {
         Reply reply = boardService.getReplyById(replyId);
         if (reply.topicId != topicId) {
             return notFound();

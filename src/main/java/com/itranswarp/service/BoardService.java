@@ -65,7 +65,7 @@ public class BoardService extends AbstractDbService<Board> {
         return b;
     }
 
-    public Board getBoardFromCache(Long id) {
+    public Board getBoardFromCache(long id) {
         Board c = this.redisService.hget(KEY_BOARDS, id, Board.class);
         if (c == null) {
             c = getById(id);
@@ -78,7 +78,7 @@ public class BoardService extends AbstractDbService<Board> {
         this.redisService.del(KEY_BOARDS);
     }
 
-    public void deleteBoardFromCache(Long id) {
+    public void deleteBoardFromCache(long id) {
         this.redisService.hdel(KEY_BOARDS, id);
         this.redisService.del(KEY_TOPICS_FIRST_PAGE + id);
     }
@@ -101,7 +101,7 @@ public class BoardService extends AbstractDbService<Board> {
     }
 
     @Transactional
-    public Board updateBoard(Long id, BoardBean bean) {
+    public Board updateBoard(long id, BoardBean bean) {
         bean.validate(false);
         Board board = this.getById(id);
         board.name = bean.name;
@@ -112,7 +112,7 @@ public class BoardService extends AbstractDbService<Board> {
     }
 
     @Transactional
-    public void deleteBoard(Long id) {
+    public void deleteBoard(long id) {
         Board board = this.getById(id);
         if (db.from(Topic.class).where("boardId = ?", id).first() == null) {
             this.db.remove(board);
@@ -201,7 +201,7 @@ public class BoardService extends AbstractDbService<Board> {
         return new PagedResults<>(page, list);
     }
 
-    public int getReplyPageIndex(Long topicId, Long replyId) {
+    public int getReplyPageIndex(long topicId, long replyId) {
         int offset = 2 + this.db.from(Reply.class).where("topicId = ? AND id < ?", topicId, replyId).count();
         return offset / ITEMS_PER_PAGE + (offset % ITEMS_PER_PAGE == 0 ? 0 : 1);
     }
@@ -227,7 +227,7 @@ public class BoardService extends AbstractDbService<Board> {
     }
 
     @Transactional
-    public Topic deleteTopic(User user, Long id) {
+    public Topic deleteTopic(User user, long id) {
         Topic topic = getTopicById(id);
         super.checkPermission(user, topic.userId);
         this.db.remove(topic);
@@ -236,7 +236,7 @@ public class BoardService extends AbstractDbService<Board> {
         return topic;
     }
 
-    public Topic getTopicById(Long id) {
+    public Topic getTopicById(long id) {
         Topic topic = this.db.fetch(Topic.class, id);
         if (topic == null) {
             throw new ApiException(ApiError.PARAMETER_INVALID, "topic", "Topic not exist.");
@@ -244,7 +244,7 @@ public class BoardService extends AbstractDbService<Board> {
         return topic;
     }
 
-    public Reply getReplyById(Long id) {
+    public Reply getReplyById(long id) {
         Reply reply = this.db.fetch(Reply.class, id);
         if (reply == null) {
             throw new ApiException(ApiError.PARAMETER_INVALID, "reply", "Reply not exist.");
@@ -270,7 +270,7 @@ public class BoardService extends AbstractDbService<Board> {
     }
 
     @Transactional
-    public void deleteReply(User user, Long id) {
+    public void deleteReply(User user, long id) {
         Reply reply = getReplyById(id);
         super.checkPermission(user, reply.userId);
         this.db.remove(reply);

@@ -46,7 +46,7 @@ public class NavigationService extends AbstractDbService<Navigation> {
     }
 
     @Transactional
-    public Navigation updateNavigation(Long id, NavigationBean bean) {
+    public Navigation updateNavigation(long id, NavigationBean bean) {
         bean.validate(false);
         Navigation nav = this.getById(id);
         nav.name = bean.name;
@@ -58,7 +58,7 @@ public class NavigationService extends AbstractDbService<Navigation> {
     }
 
     @Transactional
-    public void deleteNavigation(Long id) {
+    public void deleteNavigation(long id) {
         Navigation nav = this.getById(id);
         this.db.remove(nav);
     }

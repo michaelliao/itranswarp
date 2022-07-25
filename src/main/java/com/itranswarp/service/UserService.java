@@ -46,7 +46,7 @@ public class UserService extends AbstractDbService<User> {
         return null;
     }
 
-    public User getEnabledUserById(Long id) {
+    public User getEnabledUserById(long id) {
         User user = this.getById(id);
         if (user.lockedUntil > System.currentTimeMillis()) {
             return null;
@@ -54,7 +54,7 @@ public class UserService extends AbstractDbService<User> {
         return user;
     }
 
-    public User getUserFromCache(Long id) {
+    public User getUserFromCache(long id) {
         User user = this.redisService.hget(KEY_USERS, id, User.class);
         if (user == null) {
             user = getById(id);
@@ -173,26 +173,26 @@ public class UserService extends AbstractDbService<User> {
         return user;
     }
 
-    public EthAuth fetchEthAuthById(Long id) {
+    public EthAuth fetchEthAuthById(long id) {
         return this.db.from(EthAuth.class).where("id = ?", id).first();
     }
 
-    public OAuth fetchOAuthById(String authProviderId, Long id) {
+    public OAuth fetchOAuthById(String authProviderId, long id) {
         return this.db.from(OAuth.class).where("id = ? AND authProviderId = ?", id, authProviderId).first();
     }
 
-    public LocalAuth fetchLocalAuthById(Long id) {
+    public LocalAuth fetchLocalAuthById(long id) {
         return this.db.fetch(LocalAuth.class, id);
 
     }
 
-    public LocalAuth fetchLocalAuthByUserId(Long userId) {
+    public LocalAuth fetchLocalAuthByUserId(long userId) {
         return this.db.from(LocalAuth.class).where("userId = ?", userId).first();
 
     }
 
     @Transactional
-    public User updateUserRole(Long id, Role role) {
+    public User updateUserRole(long id, Role role) {
         User user = getById(id);
         if (user.role == Role.ADMIN) {
             throw new ApiException(ApiError.OPERATION_FAILED, "role", "Could not change admin role.");
@@ -205,7 +205,7 @@ public class UserService extends AbstractDbService<User> {
     }
 
     @Transactional
-    public User updateUserLockedUntil(Long id, long ts) {
+    public User updateUserLockedUntil(long id, long ts) {
         User user = getById(id);
         if (user.role == Role.ADMIN) {
             throw new ApiException(ApiError.OPERATION_FAILED, null, "Could not lock admin user.");
@@ -224,7 +224,7 @@ public class UserService extends AbstractDbService<User> {
         this.db.updateProperties(user, "lockedUntil");
     }
 
-    public void clearUserFromCache(Long id) {
+    public void clearUserFromCache(long id) {
         this.redisService.hdel(KEY_USERS, id);
     }
 

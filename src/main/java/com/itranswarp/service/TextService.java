@@ -33,7 +33,7 @@ public class TextService extends AbstractDbService<Text> {
         return t;
     }
 
-    public String getTextFromCache(Long textId) {
+    public String getTextFromCache(long textId) {
         final String key = KEY_TEXT_PREFIEX + textId;
         String content = this.redisService.get(key);
         if (content == null) {
@@ -43,7 +43,7 @@ public class TextService extends AbstractDbService<Text> {
         return content;
     }
 
-    public String getHtmlFromCache(Long textId) {
+    public String getHtmlFromCache(long textId) {
         final String key = KEY_TEXT_PREFIEX + textId;
         String content = this.redisService.get(key);
         if (content == null) {

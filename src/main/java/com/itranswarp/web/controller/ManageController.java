@@ -86,6 +86,11 @@ public class ManageController extends AbstractController {
         return prepareModelAndView("manage/headline/headline_list.html", Map.of("published", published, "page", pageIndex));
     }
 
+    @GetMapping("/headline/headline_update")
+    public ModelAndView headlineUpdate(@RequestParam("id") long id) {
+        return prepareModelAndView("manage/headline/headline_form.html", Map.of("id", id, "action", "/api/headlines/" + id));
+    }
+
     ///////////////////////////////////////////////////////////////////////////////////////////////
     // article and categories
     ///////////////////////////////////////////////////////////////////////////////////////////////

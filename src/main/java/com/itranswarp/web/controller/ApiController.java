@@ -201,6 +201,27 @@ public class ApiController extends AbstractController {
         return API_RESULT_TRUE;
     }
 
+    @GetMapping("/headlines/" + ID)
+    @RoleWith(Role.SUBSCRIBER)
+    public Headline headline(@PathVariable("id") long id) {
+        Headline h = this.headlineService.getHeadline(id);
+        if (!h.published) {
+            User user = HttpContext.getRequiredCurrentUser();
+            if (h.userId != user.id && user.role == Role.SUBSCRIBER) {
+                throw new ApiException(ApiError.USER_FORBIDDEN, null, "No permission to get headline.");
+            }
+        }
+        return h;
+    }
+
+    @PostMapping("/headlines/" + ID)
+    @RoleWith(Role.EDITOR)
+    public Headline headlineUpdate(@PathVariable("id") long id, @RequestBody HeadlineBean bean) {
+        Headline h = this.headlineService.updateHeadline(id, bean);
+        this.headlineService.deleteHeadlinesFromCache();
+        return h;
+    }
+
     @PostMapping("/headlines/" + ID + "/delete")
     @RoleWith(Role.EDITOR)
     public Map<String, Boolean> headlineDelete(@PathVariable("id") Long id) {

@@ -1,0 +1,95 @@
+{% extends '../_manage.html' %}
+
+{% block title %} Edit Headline {% endblock %}
+
+{% block head %}
+
+<script>
+
+$(function() {
+    var id = parseInt('{{ id }}');
+    getJSON('/api/headlines/' + id, function (err, resp) {
+        if (err) {
+            return showError(err);
+        }
+        initVM({
+    		title: 'Edit Headline',
+        		headline: resp
+        });
+    });
+});
+
+function initVM(data) {
+    window.vm = new Vue({
+        el: '#vm',
+        data: {
+        		title: data.title,
+            headline: data.headline
+        },
+        created: function () {
+            $('#loading').hide();
+            $('#vm').show();
+        },
+        methods: {
+            submit: function() {
+                clearFormError();
+                this.$resource('{{ action }}').save(this.headline).then(function (resp) {
+                    resp.json().then(function (result) {
+                        location.assign('/manage/headline/');
+                    });
+                }, onJsonFormError);
+            },
+            cancel: function () {
+                location.assign('/manage/headline/');
+            }
+        }
+    });
+}
+</script>
+
+{% endblock %}
+
+{% block main %}
+
+    <div id="loading" class="uk-width-1-1">
+        <i class="uk-icon-spinner uk-icon-spin"></i> {{ _('Loading') }}...
+    </div>
+
+    <div id="vm" class="uk-width-1-1">
+        <ul class="uk-tab" data-uk-tab>
+        <li v-bind:class="{'uk-active':!headline.published}"><a onclick="location.assign('?published=false')">{{ _('Unpublished Headlines') }}</a></li>
+        <li v-bind:class="{'uk-active':headline.published}"><a onclick="location.assign('?published=true')">{{ _('Published Headlines') }}</a></li>
+        </ul>
+        <form v-on:submit.prevent="submit" class="uk-margin uk-form uk-form-stacked">
+            <legend v-text="title"></legend>
+            <fieldset>
+                <div class="uk-alert uk-alert-danger uk-hidden"></div>
+                <div class="uk-form-row">
+                    <label class="uk-form-label">{{ _('Name') }}:</label>
+                    <div class="uk-form-controls">
+                        <input v-model="headline.name" name="name" type="text" maxlength="100" class="uk-width-1-1">
+                    </div>
+                </div>
+                <div class="uk-form-row">
+                    <label class="uk-form-label">{{ _('URL') }}:</label>
+                    <div class="uk-form-controls">
+                        <input v-model="headline.url" name="url" type="text" maxlength="1000" class="uk-width-1-1">
+                    </div>
+                </div>
+                <div class="uk-form-row">
+                    <label class="uk-form-label">{{ _('Description') }}:</label>
+                    <div class="uk-form-controls">
+                        <textarea v-model="headline.description" name="description" rows="10" class="uk-width-1-1" style="resize:none"></textarea>
+                    </div>
+                </div>
+                <div class="uk-form-row">
+                    <div class="uk-form-controls">
+                        <button type="submit" class="uk-button uk-button-primary"><i class="uk-icon-check"></i> {{ _('Save') }}</button>
+                        <button type="button" v-on:click="cancel" class="uk-button"><i class="uk-icon-times"></i> {{ _('Cancel') }}</button>
+                    </div>
+                </div>
+            </fieldset>
+        </form>
+    </div>
+
+{% endblock %}

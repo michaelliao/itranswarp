@@ -45,6 +45,9 @@
                 $('#vm').show();
             },
             methods: {
+                editHeadline: function (id) {
+                		location.assign('/manage/headline/headline_update?id='+id);
+                },
                 publishHeadline: function (id) {
                     var that = this;
                     var a = that.headlines.find(a => a.id === id);
@@ -115,6 +118,7 @@
                     <span v-show="!published" v-text="h.createdAt.toDateTime()"></span>
                 </td>
                 <td>
+                    <a v-on:click="editHeadline(h.id)" title="Edit Headline" href="#0" class="x-btn"><i class="uk-icon-edit"></i></a>
                     <a v-show="!published" v-on:click="publishHeadline(h.id)" title="Publish Headline" href="#0" class="x-btn"><i class="uk-icon-check"></i></a>
                     <a v-on:click="deleteHeadline(h.id)" title="Delete Headline" href="#0" class="x-btn"><i class="uk-icon-trash"></i></a>
                 </td>

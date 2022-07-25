@@ -73,6 +73,15 @@ public class HeadlineService extends AbstractDbService<Headline> {
     }
 
     @Transactional
+    public Headline updateHeadline(Long id, HeadlineBean bean) {
+        bean.validate(false);
+        Headline hl = getHeadline(id);
+        hl.copyPropertiesFrom(bean);
+        this.db.update(hl);
+        return hl;
+    }
+
+    @Transactional
     public Headline publishHeadline(Long id) {
         Headline hl = this.getById(id);
         if (hl.published) {

@@ -194,7 +194,7 @@ public class ApiController extends AbstractController {
     @RoleWith(Role.SUBSCRIBER)
     public Map<String, Boolean> headlineCreate(@RequestBody HeadlineBean bean) {
         User user = HttpContext.getRequiredCurrentUser();
-        if (user.role == Role.SUBSCRIBER && user.createdAt < System.currentTimeMillis() - registerAtLeast.toMillis()) {
+        if (user.role == Role.SUBSCRIBER && user.createdAt > (System.currentTimeMillis() - registerAtLeast.toMillis())) {
             throw new ApiException(ApiError.USER_FORBIDDEN, null, "No permission to submit headline.");
         }
         this.headlineService.createHeadline(user.id, bean);

@@ -382,6 +382,10 @@ pre>code {
     word-break: break-all;
 }
 
+pre.ascii>code {
+	white-space: pre;
+}
+
 :not(pre) > code, :not(pre) > kbd, :not(pre) > samp {
     font-size: 14px;
     color: #333;

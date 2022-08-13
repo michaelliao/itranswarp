@@ -75,6 +75,9 @@ public class ApiController extends AbstractController {
     @Value("${spring.security.anti-spam.register-at-least:P7D}")
     Duration registerAtLeast = Duration.ofDays(7);
 
+    @Value("${spring.security.anti-spam.frequency-per-minute:3}")
+    int freqPerMin = 3;
+
     ///////////////////////////////////////////////////////////////////////////////////////////////
     // ad
     ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -648,6 +651,15 @@ public class ApiController extends AbstractController {
         return Map.of(RESULTS, this.boardService.getTopicsByRefId(refId));
     }
 
+    private void checkTopicSpam(User user) {
+        long start = System.currentTimeMillis() - 60_000;
+        int n = this.boardService.getRecentTopicCountByUser(user.id, start);
+        if (n >= this.freqPerMin) {
+            this.userService.lockUser(user, 60);
+            throw new ApiException(ApiError.OPERATION_FAILED, "topic", "rate limit");
+        }
+    }
+
     @PostMapping("/comments/{tag}")
     @RoleWith(Role.SUBSCRIBER)
     public Topic topicCreateByRefType(@PathVariable("tag") String tag, @RequestBody TopicBean bean) {
@@ -674,6 +686,7 @@ public class ApiController extends AbstractController {
         }
         Topic topic = null;
         User user = HttpContext.getRequiredCurrentUser();
+        checkTopicSpam(user);
         try {
             topic = this.boardService.createTopic(user, board, bean);
         } catch (ApiException e) {
@@ -714,6 +727,7 @@ public class ApiController extends AbstractController {
         }
         Topic topic = null;
         User user = HttpContext.getRequiredCurrentUser();
+        checkTopicSpam(user);
         try {
             topic = this.boardService.createTopic(user, board, bean);
         } catch (ApiException e) {

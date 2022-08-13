@@ -136,6 +136,10 @@ public class BoardService extends AbstractDbService<Board> {
         return topics;
     }
 
+    public int getRecentTopicCountByUser(long userId, long startTime) {
+        return this.db.from(Topic.class).where("userId = ? AND createdAt >= ?", userId, startTime).count();
+    }
+
     public void deleteTopicsFromCache(long boardId) {
         this.redisService.del(KEY_TOPICS_FIRST_PAGE + boardId);
         this.redisService.del(KEY_RECENT_TOPICS);

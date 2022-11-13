@@ -19,6 +19,10 @@ Full-featured CMS including blog, wiki, discussion, etc. Cloud native applicatio
 - MySQL 5.7
 - Redis 5/6 with RediSearch 2
 
+### Quick Start
+
+Please check [Quick Start Guide](https://github.com/michaelliao/itranswarp/blob/master/quickstart/quickstart.md).
+
 ### Run with Docker
 
 Run MySQL, RediSearch in background:

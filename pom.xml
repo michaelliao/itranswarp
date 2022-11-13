@@ -3,7 +3,7 @@
 
 	<groupId>com.itranswarp.web</groupId>
 	<artifactId>itranswarp</artifactId>
-	<version>1.9</version>
+	<version>1.10</version>
 	<packaging>jar</packaging>
 
 	<parent>

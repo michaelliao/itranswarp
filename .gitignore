@@ -204,3 +204,5 @@ $RECYCLE.BIN/
 # Unignore:
 
 !.gitignore
+!quickstart.tar.gz
+

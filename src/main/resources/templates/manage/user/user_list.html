@@ -93,7 +93,7 @@ function initVM(data) {
             setUserPassword: function (u) {
                 var that = this;
                 UIkit.modal.prompt('Set user \"' + u.name + '\" password to:', '', function (newPassword) {
-                    if (! /^[\x00-\x7F]{8,32}$/.test(newPassword)) {
+                    if (! /^[\x20-\x7E]{8,32}$/.test(newPassword)) {
                         return UIkit.modal.alert('Invalid password.');
                     }
                     let email = u.email.trim().toLowerCase();

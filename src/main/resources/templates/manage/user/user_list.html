@@ -90,6 +90,23 @@ function initVM(data) {
                     refresh();
                 });
             },
+            setUserPassword: function (u) {
+                var that = this;
+                UIkit.modal.prompt('Set user \"' + u.name + '\" password to:', '', function (newPassword) {
+                    if (! /^[\x00-\x7F]{8,32}$/.test(newPassword)) {
+                        return UIkit.modal.alert('Invalid password.');
+                    }
+                    let email = u.email.trim().toLowerCase();
+                    let hashPassword = sha256.hmac(email, newPassword);
+                    that.$resource('/api/users/' + u.id + '/password').save({
+                        password: hashPassword
+                    }).then(function(resp) {
+                        resp.json().then(function (result) {
+                            refresh();
+                        });
+                    }, onJsonError);
+                });
+            },
             lockUser: function (u) {
                 var that = this;
                 var days = u.lockAction;
@@ -163,7 +180,7 @@ function initVM(data) {
                     <td>
                         <a v-bind:href="'/user/'+u.id" target="_blank"><span v-text="u.name"></span></a>
                         <br>
-                        <span v-if="u.role==='ADMIN'"><i class="uk-icon-key"></i> {{ _('Admin') }}</span>
+                        <span v-if="u.role==='ADMIN'"><i class="uk-icon-user-secret"></i> {{ _('Admin') }}</span>
                         <select v-if="u.role!=='ADMIN'" v-model="u.role" v-on:change="updateUserRole(u)">
                             <option value="EDITOR" class="x-role">{{ _('Editor') }}</option>
                             <option value="CONTRIBUTOR" class="x-role">{{ _('Contributor') }}</option>
@@ -205,6 +222,8 @@ function initVM(data) {
                             <option value="365" class="x-lock">1 year</option>
                             <option value="100000" class="x-lock">forever</option>
                         </select>
+                        <br/>
+                        <a href="#0" v-on:click="setUserPassword(u)" v-if="u.role != 'SUBSCRIBER'"><i class="uk-icon-key"></i> Set Password</a>
                     </td>
                 </tr>
             </tbody>

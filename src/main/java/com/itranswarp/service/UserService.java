@@ -205,6 +205,30 @@ public class UserService extends AbstractDbService<User> {
     }
 
     @Transactional
+    public User updateUserPassword(long userId, String password) {
+        if (password.length() != 64) {
+            throw new ApiException(ApiError.PARAMETER_INVALID, "password", "Invalid hash of password.");
+        }
+        User user = fetchById(userId);
+        if (user == null) {
+            throw new ApiException(ApiError.OPERATION_FAILED, "userId", "User not found.");
+        }
+        LocalAuth lauth = this.fetchLocalAuthByUserId(userId);
+        if (lauth == null) {
+            // no password:
+            throw new ApiException(ApiError.OPERATION_FAILED, "userId", "Could not set password for non-local user.");
+        }
+        // generate new password auth:
+        LocalAuth newLAuth = new LocalAuth();
+        newLAuth.userId = userId;
+        newLAuth.salt = RandomUtil.createRandomString(64);
+        newLAuth.passwd = HashUtil.hmacSha256(password, newLAuth.salt);
+        this.db.remove(lauth);
+        this.db.insert(newLAuth);
+        return user;
+    }
+
+    @Transactional
     public User updateUserLockedUntil(long id, long ts) {
         User user = getById(id);
         if (user.role == Role.ADMIN) {

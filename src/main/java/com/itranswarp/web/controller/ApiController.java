@@ -800,6 +800,12 @@ public class ApiController extends AbstractController {
         return this.userService.updateUserLockedUntil(id, timestamp);
     }
 
+    @PostMapping("/users/" + ID + "/password")
+    @RoleWith(Role.ADMIN)
+    public User userUpdatePassword(@PathVariable("id") long id, @RequestBody UpdatePasswordBean bean) {
+        return this.userService.updateUserPassword(id, bean.password);
+    }
+
     ///////////////////////////////////////////////////////////////////////////////////////////////
     // wiki and wiki page
     ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -1000,6 +1006,10 @@ public class ApiController extends AbstractController {
             this.name = name;
             this.url = url;
         }
+    }
+
+    public static class UpdatePasswordBean {
+        public String password;
     }
 
     private static final String RESULTS = "results";

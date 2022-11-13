@@ -134,7 +134,7 @@ spring:
         client-secret: "${OAUTH_QQ_CLIENT_SECRET:}"
       twitter:
         name:          "${OAUTH_TWITTER_NAME:Twitter}"
-        icon:          "${OAUTH_TWITTER_ICON:facebook}"
+        icon:          "${OAUTH_TWITTER_ICON:twitter}"
         color:         "${OAUTH_TWITTER_COLOR:#1da1f2}"
         client-id:     "${OAUTH_TWITTER_CLIENT_ID:}"
         client-secret: "${OAUTH_TWITTER_CLIENT_SECRET:}"

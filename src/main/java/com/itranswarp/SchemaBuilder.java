@@ -184,6 +184,7 @@ public class SchemaBuilder {
             user.email = email;
             user.name = email.substring(0, email.indexOf('@'));
             user.role = Role.valueOf(user.name.toUpperCase());
+            user.lockedUntil = user.role == Role.ADMIN ? 0 : 10000000000000L;
             user.imageUrl = user.role == Role.ADMIN ? "/static/img/admin.png" : "/static/img/user.png";
             entities.add(user);
             if (user.role == Role.ADMIN) {
@@ -193,7 +194,6 @@ public class SchemaBuilder {
                 this.editor = user;
             }
             if (user.role == Role.SUBSCRIBER) {
-                user.lockedUntil = 10000000000000L;
                 this.subscriber = user;
             }
             final String hashedPasswd = HashUtil.hmacSha256(loginPassword, user.email);

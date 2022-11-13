@@ -10,6 +10,7 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
@@ -44,6 +45,7 @@ import com.itranswarp.warpdb.WarpDb;
  */
 public class SchemaBuilder {
 
+    static final Random random = new Random(1234567890L);
     static ZonedDateTime base = LocalDateTime.of(2022, 2, 22, 22, 22, 22).atZone(ZoneId.of("Z"));
 
     static long currentTimeMillis() {
@@ -191,6 +193,7 @@ public class SchemaBuilder {
                 this.editor = user;
             }
             if (user.role == Role.SUBSCRIBER) {
+                user.lockedUntil = 10000000000000L;
                 this.subscriber = user;
             }
             final String hashedPasswd = HashUtil.hmacSha256(loginPassword, user.email);
@@ -258,7 +261,7 @@ public class SchemaBuilder {
     Text initText(List<AbstractEntity> entities) {
         StringBuilder sb = new StringBuilder(1024);
         sb.append("# ").append(randomLine(10)).append("\n\n");
-        int lines = (int) (Math.random() * 10) + 10;
+        int lines = (int) (random.nextDouble() * 10) + 10;
         for (int i = 0; i < lines; i++) {
             sb.append(randomLine(20)).append("\n\n");
         }
@@ -440,10 +443,10 @@ public class SchemaBuilder {
     }
 
     String randomLine(int n) {
-        int w = (int) (Math.random() * n) + 1;
+        int w = (int) (random.nextDouble() * n) + 1;
         String[] words = new String[w];
         for (int j = 0; j < w; j++) {
-            words[j] = WORDS[(int) (Math.random() * WORDS.length)];
+            words[j] = WORDS[(int) (random.nextDouble() * WORDS.length)];
         }
         return String.join(" ", words) + ".";
     }

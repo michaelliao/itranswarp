@@ -21,7 +21,7 @@ services:
       test: mysql -h 127.0.0.1 -u root --password=password -e "SELECT id FROM it.users ORDER BY id LIMIT 1;"
 
   itranswarp:
-    image: michaelliao/itranswarp:1.11
+    image: michaelliao/itranswarp:1.12
     container_name: itranswarp
     depends_on:
       redis:

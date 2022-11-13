@@ -70,17 +70,20 @@ public class MvcConfiguration {
             public void addResourceHandlers(ResourceHandlerRegistry registry) {
                 final String httpReferer = "http://" + domain;
                 final String httpsReferer = "https://" + domain;
+                final boolean checkReferer = !"localhost".equalsIgnoreCase(domain);
                 registry.addResourceHandler("/static/**").addResourceLocations("classpath:/static/").resourceChain(true)
                         // Referer check:
                         .addResolver(new ResourceResolver() {
                             @Override
                             public Resource resolveResource(HttpServletRequest request, String requestPath, List<? extends Resource> locations,
                                     ResourceResolverChain chain) {
-                                String referer = request.getHeader("Referer");
-                                if (referer != null) {
-                                    referer = referer.toLowerCase();
-                                    if (!referer.startsWith(httpsReferer) && !referer.startsWith(httpReferer)) {
-                                        throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+                                if (checkReferer) {
+                                    String referer = request.getHeader("Referer");
+                                    if (referer != null) {
+                                        referer = referer.toLowerCase();
+                                        if (!referer.startsWith(httpsReferer) && !referer.startsWith(httpReferer)) {
+                                            throw new ResponseStatusException(HttpStatus.FORBIDDEN);
+                                        }
                                     }
                                 }
                                 return chain.resolveResource(request, requestPath, locations);

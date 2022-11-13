@@ -1,0 +1,35 @@
+version: "3"
+services:
+  redis:
+    image: redislabs/redisearch:2.4.8
+    container_name: redis
+    volumes:
+      - "./docker/redis-data:/data"
+
+  mysql:
+    image: mysql:5.7.38
+    container_name: mysql
+    command: --default-authentication-plugin=mysql_native_password
+    environment:
+      - MYSQL_ROOT_PASSWORD=password
+    volumes:
+      - "./docker/mysql-data:/var/lib/mysql"
+      - "./sql/ddl.sql:/docker-entrypoint-initdb.d/1.sql:ro"
+      - "./sql/init.sql:/docker-entrypoint-initdb.d/2.sql:ro"
+    healthcheck:
+      interval: 10s
+      test: mysql -h 127.0.0.1 -u root --password=password -e "SELECT id FROM it.users ORDER BY id LIMIT 1;"
+
+  itranswarp:
+    image: michaelliao/itranswarp:1.11
+    container_name: itranswarp
+    depends_on:
+      redis:
+        condition: service_started
+      mysql:
+        condition: service_healthy
+    environment:
+      - DB_HOST=mysql
+      - REDIS_HOST=redis
+    ports:
+      - "80:2019"

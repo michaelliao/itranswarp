@@ -70,6 +70,7 @@ public class MvcConfiguration {
             public void addResourceHandlers(ResourceHandlerRegistry registry) {
                 final String httpReferer = "http://" + domain;
                 final String httpsReferer = "https://" + domain;
+                // check Referer if domain is configured:
                 final boolean checkReferer = !"localhost".equalsIgnoreCase(domain);
                 registry.addResourceHandler("/static/**").addResourceLocations("classpath:/static/").resourceChain(true)
                         // Referer check:
@@ -109,7 +110,7 @@ public class MvcConfiguration {
 
     /**
      * Init view resolver.
-     *
+     * 
      * @return PebbleViewResolver
      */
     @Bean

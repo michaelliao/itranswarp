@@ -130,7 +130,7 @@ public class BoardService extends AbstractDbService<Board> {
     public List<Topic> getRecentTopicsFromCache() {
         List<Topic> topics = this.redisService.get(KEY_RECENT_TOPICS, TYPE_LIST_TOPIC);
         if (topics == null) {
-            topics = this.db.from(Topic.class).orderBy("updatedAt").desc().limit(20).list();
+            topics = this.db.from(Topic.class).orderBy("updatedAt").desc().limit(30).list();
             this.redisService.set(KEY_RECENT_TOPICS, topics, CACHE_TOPICS_SECONDS);
         }
         return topics;

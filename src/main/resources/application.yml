@@ -13,8 +13,6 @@ spring:
     domain: ${DOMAIN:localhost}
     # default to empty (use default timezone of server):
     timezone: ${TIMEZONE:}
-    # dev mode?
-    dev: ${DEV:false}
 
   # mysql configuration:
   datasource:

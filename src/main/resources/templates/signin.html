@@ -30,18 +30,16 @@ div.x-oauth-signin-panel [class*=x-oauth-button-] i[class*=uk-icon-] {
 	filter: brightness(90%);
 }
 
-{% for providerId in oauthConfigurations.keySet() %}
-    {% set config = oauthConfigurations[providerId] %}
-
-button.x-oauth-button-{{ providerId }}:hover,
-button.x-oauth-button-{{ providerId }}:active,
-button.x-oauth-button-{{ providerId }}:focus,
-button.x-oauth-button-{{ providerId }}
-{
-    background-color: {{ config.color }};
+div.x-icon {
+    display: block;
+    float: left;
+    margin-top: 12px;
+    margin-right: 12px;
+    width: 24px;
+    height: 24px;
+    background-repeat: no-repeat;
+    background-position: center center;
 }
-
-{% endfor %}
 
 </style>
 
@@ -174,7 +172,12 @@ $(function () {
 
 			{% for providerId in oauthConfigurations.keySet() %}
 			{% set config = oauthConfigurations[providerId] %}
-			<p><button class="uk-button uk-button-large x-oauth-button-{{ providerId }}" onclick="window.location.assign('/auth/from/{{ providerId }}')"><i class="uk-icon-{{ config.icon }}"></i> {{ _('Sign in with %1$s', config.name) }}</button></p>
+			<p>
+				<button class="uk-button uk-button-large" style="text-align: left; width:280px" onclick="window.location.assign('/auth/from/{{ providerId }}')">
+					<div class="x-icon" style="background-image: url(/static/img/icon/{{ providerId }}.svg);"></div>
+					{{ _('Sign in with %1$s', config.name) }}
+				</button>
+			</p>
 			{% endfor %}
 
 		</div>
@@ -212,10 +215,12 @@ $(function () {
 
 		<div style="display:none" class="x-panel-ethauth uk-panel uk-panel-box uk-panel-box-secondary x-signin-panel x-ethauth-signin-panel">
 			<h3>Please signin with Web3:</h3>
-			<p><button class="uk-button uk-button-large" onclick="ethAuth()">
-			<div style="display: block; float: left; margin-top: 12px; margin-right: 6px; width: 24px; height: 24px; background: no-repeat url(/static/img/icon/metamask.svg); background-position: center center;"></div>
-			{{ _('Sign in with MetaMask') }}
-			</button></p>
+			<p>
+				<button class="uk-button uk-button-large" onclick="ethAuth()">
+					<div class="x-icon" style="background-image: url(/static/img/icon/metamask.svg);"></div>
+					{{ _('Sign in with %1$s', 'MetaMask') }}
+				</button>
+			</p>
 			<form id="ethForm" method="post" action="/auth/signin/eth" class="uk-hidden">
 				<input type="hidden" name="message">
 				<input type="hidden" name="signature">

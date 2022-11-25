@@ -81,65 +81,58 @@ spring:
     redisearch:
       default-language: ${REDISEARCH_DEFAULT_LANGUAGE:CHINESE}
 
-  # 3rd-party signin configurations:
+  # signin configurations:
   signin:
+    # local email / password signin:
     password:
-      # enable password signin:
       enabled: ${SIGNIN_PASSWORD_ENABLED:true}
+    # web3 metamask signin:
     eth:
       enabled: ${SIGNIN_ETH_ENABLED:true}
-    # oauth authentication configuration:
-    # - name: display name
-    # - icon: icon name, check https://getuikit.com/v2/docs/icon.html
-    # - color: the button css background color, must be quoted by "".
-    # an oauth provider is enabled if client-id and client-secret are both set.
+    # oauth signin configuration:
+    # {provider}: oauth provider id
+    #   - name: display name
+    #   - client-id: oauth client id
+    #   - client-secret: oauth client secret
+    # NOTE:
+    #   an oauth provider is enabled if client-id and client-secret are both set.
+    #   display icon is mapping to /static/img/icon/{provider}.svg
+    #   code is mapping to com.itranswarp.oauth.provider.{Provider}OAuthProvider.java
     oauth:
+      bilibili:
+        name:          "${OAUTH_BILIBILI_NAME:Bilibili}"
+        client-id:     "${OAUTH_BILIBILI_CLIENT_ID:}"
+        client-secret: "${OAUTH_BILIBILI_CLIENT_SECRET:}"
       facebook:
         name:          "${OAUTH_FACEBOOK_NAME:Facebook}"
-        icon:          "${OAUTH_FACEBOOK_ICON:facebook}"
-        color:         "${OAUTH_FACEBOOK_COLOR:#3b5998}"
         client-id:     "${OAUTH_FACEBOOK_CLIENT_ID:}"
         client-secret: "${OAUTH_FACEBOOK_CLIENT_SECRET:}"
       github:
         name:          "${OAUTH_GITHUB_NAME:Github}"
-        icon:          "${OAUTH_GITHUB_ICON:github}"
-        color:         "${OAUTH_GITHUB_COLOR:#666666}"
         client-id:     "${OAUTH_GITHUB_CLIENT_ID:}"
         client-secret: "${OAUTH_GITHUB_CLIENT_SECRET:}"
       google:
         name:          "${OAUTH_GOOGLE_NAME:Google}"
-        icon:          "${OAUTH_GOOGLE_ICON:google}"
-        color:         "${OAUTH_GOOGLE_COLOR:#4285f4}"
         client-id:     "${OAUTH_GOOGLE_CLIENT_ID:}"
         client-secret: "${OAUTH_GOOGLE_CLIENT_SECRET:}"
       linkedin:
         name:          "${OAUTH_LINKEDIN_NAME:LinkedIn}"
-        icon:          "${OAUTH_LINKEDIN_ICON:linkedin}"
-        color:         "${OAUTH_LINKEDIN_COLOR:#007bb6}"
         client-id:     "${OAUTH_LINKEDIN_CLIENT_ID:}"
         client-secret: "${OAUTH_LINKEDIN_CLIENT_SECRET:}"
       microsoft:
         name:          "${OAUTH_MICROSOFT_NAME:Microsoft}"
-        icon:          "${OAUTH_MICROSOFT_ICON:windows}"
-        color:         "${OAUTH_MICROSOFT_COLOR:#2672ec}"
         client-id:     "${OAUTH_MICROSOFT_CLIENT_ID:}"
         client-secret: "${OAUTH_MICROSOFT_CLIENT_SECRET:}"
       qq:
         name:          "${OAUTH_QQ_NAME:QQ}"
-        icon:          "${OAUTH_QQ_ICON:qq}"
-        color:         "${OAUTH_QQ_COLOR:#00a8e6}"
         client-id:     "${OAUTH_QQ_CLIENT_ID:}"
         client-secret: "${OAUTH_QQ_CLIENT_SECRET:}"
       twitter:
         name:          "${OAUTH_TWITTER_NAME:Twitter}"
-        icon:          "${OAUTH_TWITTER_ICON:twitter}"
-        color:         "${OAUTH_TWITTER_COLOR:#1da1f2}"
         client-id:     "${OAUTH_TWITTER_CLIENT_ID:}"
         client-secret: "${OAUTH_TWITTER_CLIENT_SECRET:}"
       weibo:
         name:          "${OAUTH_WEIBO_NAME:Weibo}"
-        icon:          "${OAUTH_WEIBO_ICON:weibo}"
-        color:         "${OAUTH_WEIBO_COLOR:#e92b00}"
         client-id:     "${OAUTH_WEIBO_CLIENT_ID:}"
         client-secret: "${OAUTH_WEIBO_CLIENT_SECRET:}"
 

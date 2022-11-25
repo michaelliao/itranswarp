@@ -73,12 +73,6 @@ import com.itranswarp.web.filter.HttpContext;
 @Controller
 public class MvcController extends AbstractController {
 
-    @Value("#{applicationConfiguration.name}")
-    String name;
-
-    @Value("#{applicationConfiguration.dev}")
-    Boolean dev;
-
     @Value("${spring.signin.password.enabled}")
     boolean passauthEnabled;
 

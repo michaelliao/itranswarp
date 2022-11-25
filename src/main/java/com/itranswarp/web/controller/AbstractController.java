@@ -1,6 +1,9 @@
 package com.itranswarp.web.controller;
 
+import javax.annotation.PostConstruct;
+
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 
 import com.itranswarp.common.AbstractService;
 import com.itranswarp.markdown.Markdown;
@@ -26,6 +29,22 @@ public abstract class AbstractController extends AbstractService {
 
     protected static final String ID = "{id:[0-9]{1,17}}";
     protected static final String ID2 = "{id2:[0-9]{1,17}}";
+
+    @Value("${spring.profiles.active:native}")
+    String activeProfile;
+
+    @Value("${spring.application.name:iTranswarp")
+    protected String name;
+
+    protected boolean dev;
+
+    @PostConstruct
+    public void initEnv() {
+        this.dev = "native".equals(this.activeProfile);
+        if (this.dev) {
+            logger.warn("application is set to dev mode.");
+        }
+    }
 
     @Autowired
     protected EncryptService encryptService;

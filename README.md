@@ -6,9 +6,9 @@ Full-featured CMS including blog, wiki, discussion, etc. Cloud native applicatio
 
 [![Docker Pulls](https://img.shields.io/docker/pulls/michaelliao/itranswarp?color=%2334D058&style=plastic)](https://hub.docker.com/repository/docker/michaelliao/itranswarp)
 
-* Based on SpringBoot 2.x
+* Based on SpringBoot 3.x
 * Search support
-* OAuth2 integration (weibo, QQ, facebook, etc.)
+* OAuth2 integration (Weibo, QQ, Facebook, etc.)
 * SEO support
 * REST API
 * Customized CSS with UIkit2

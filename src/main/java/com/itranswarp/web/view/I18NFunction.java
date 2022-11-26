@@ -8,8 +8,8 @@ import org.springframework.stereotype.Component;
 
 import com.itranswarp.web.support.AbstractFunction;
 import com.itranswarp.web.view.i18n.Translator;
-import com.mitchellbosecke.pebble.template.EvaluationContext;
-import com.mitchellbosecke.pebble.template.PebbleTemplate;
+import io.pebbletemplates.pebble.template.EvaluationContext;
+import io.pebbletemplates.pebble.template.PebbleTemplate;
 
 @Component
 public class I18NFunction extends AbstractFunction {

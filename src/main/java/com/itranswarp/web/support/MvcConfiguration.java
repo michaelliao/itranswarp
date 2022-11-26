@@ -1,10 +1,11 @@
 package com.itranswarp.web.support;
 
+import java.time.Duration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,13 +28,13 @@ import org.springframework.web.servlet.resource.ResourceResolverChain;
 
 import com.itranswarp.util.JsonUtil;
 import com.itranswarp.web.view.AbstractFilter;
-import com.mitchellbosecke.pebble.PebbleEngine;
-import com.mitchellbosecke.pebble.extension.AbstractExtension;
-import com.mitchellbosecke.pebble.extension.Extension;
-import com.mitchellbosecke.pebble.extension.Filter;
-import com.mitchellbosecke.pebble.extension.Function;
-import com.mitchellbosecke.pebble.loader.ClasspathLoader;
-import com.mitchellbosecke.pebble.spring.servlet.PebbleViewResolver;
+import io.pebbletemplates.pebble.PebbleEngine;
+import io.pebbletemplates.pebble.extension.AbstractExtension;
+import io.pebbletemplates.pebble.extension.Extension;
+import io.pebbletemplates.pebble.extension.Filter;
+import io.pebbletemplates.pebble.extension.Function;
+import io.pebbletemplates.pebble.loader.ClasspathLoader;
+import io.pebbletemplates.spring.servlet.PebbleViewResolver;
 
 /**
  * MVC configuration.
@@ -52,10 +53,9 @@ public class MvcConfiguration {
      */
     @Bean(name = "localeResolver")
     public LocaleResolver createLocaleResolver() {
-        var resolver = new CookieLocaleResolver();
-        resolver.setCookieName("__locale__");
+        var resolver = new CookieLocaleResolver("__locale__");
         resolver.setCookieHttpOnly(true);
-        resolver.setCookieMaxAge(Integer.MAX_VALUE);
+        resolver.setCookieMaxAge(Duration.ofSeconds(3600 * 24 * 356 * 100));
         resolver.setCookiePath("/");
         return resolver;
     }
@@ -119,10 +119,9 @@ public class MvcConfiguration {
         boolean cache = !"native".equals(activeProfile);
         logger.info("set cache as {} for active profile is {}.", cache, activeProfile);
         PebbleEngine engine = new PebbleEngine.Builder().autoEscaping(true).cacheActive(cache).extension(extension).loader(new ClasspathLoader()).build();
-        PebbleViewResolver viewResolver = new PebbleViewResolver();
+        PebbleViewResolver viewResolver = new PebbleViewResolver(engine);
         viewResolver.setPrefix("templates/");
         viewResolver.setSuffix("");
-        viewResolver.setPebbleEngine(engine);
         return viewResolver;
     }
 

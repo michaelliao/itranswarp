@@ -1,9 +1,9 @@
 package com.itranswarp.model;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Index;
-import javax.persistence.Table;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Index;
+import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "headlines", indexes = @Index(name = "IDX_PUB", columnList = "published,publishAt"))

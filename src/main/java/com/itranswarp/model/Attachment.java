@@ -1,8 +1,8 @@
 package com.itranswarp.model;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Table;
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
 
 /**
  * Store attachment which links resources with article, wiki or wikipages.

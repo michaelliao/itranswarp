@@ -2,7 +2,7 @@ package com.itranswarp.service;
 
 import java.time.Instant;
 
-import javax.annotation.PostConstruct;
+import jakarta.annotation.PostConstruct;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;

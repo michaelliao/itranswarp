@@ -3,7 +3,7 @@ package com.itranswarp.service;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import javax.annotation.PostConstruct;
+import jakarta.annotation.PostConstruct;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -130,7 +130,7 @@ public class BoardService extends AbstractDbService<Board> {
     public List<Topic> getRecentTopicsFromCache() {
         List<Topic> topics = this.redisService.get(KEY_RECENT_TOPICS, TYPE_LIST_TOPIC);
         if (topics == null) {
-            topics = this.db.from(Topic.class).orderBy("updatedAt").desc().limit(30).list();
+            topics = this.db.from(Topic.class).orderBy("updatedAt").desc().limit(25).list();
             this.redisService.set(KEY_RECENT_TOPICS, topics, CACHE_TOPICS_SECONDS);
         }
         return topics;

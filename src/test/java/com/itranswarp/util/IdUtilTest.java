@@ -2,11 +2,21 @@ package com.itranswarp.util;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.lang.reflect.Field;
+
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 class IdUtilTest {
 
-    // @Test
+    @BeforeAll
+    static void initIdUtil() throws ReflectiveOperationException {
+        Field f = IdUtil.class.getDeclaredField("shardingId");
+        f.setAccessible(true);
+        f.set(null, 1L);
+    }
+
+    @Test
     void testNextId() {
         for (int i = 0; i < 40; i++) {
             long id = IdUtil.nextId();
@@ -34,5 +44,4 @@ class IdUtilTest {
         assertEquals(1258830748973376L, IdUtil.stringIdToLongId("001546942076610f8e8bc7218ed4a7eb597ed2658047a17000"));
         assertEquals(1270783617794016L, IdUtil.stringIdToLongId("0015526416484437ca3e4b736e54075a9d5fec66c691a6e000"));
     }
-
 }

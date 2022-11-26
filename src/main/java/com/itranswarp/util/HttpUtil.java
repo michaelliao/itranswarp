@@ -1,6 +1,6 @@
 package com.itranswarp.util;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 public class HttpUtil {
 

@@ -2,14 +2,25 @@ package com.itranswarp.service;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.lang.reflect.Field;
 import java.util.List;
 
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import com.itranswarp.util.IdUtil;
 
 public class AntiSpamServiceTest {
 
     AntiSpamService antiSpamService;
+
+    @BeforeAll
+    static void initIdUtil() throws ReflectiveOperationException {
+        Field f = IdUtil.class.getDeclaredField("shardingId");
+        f.setAccessible(true);
+        f.set(null, 1L);
+    }
 
     @BeforeEach
     void setUp() throws Exception {

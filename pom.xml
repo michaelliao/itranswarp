@@ -3,13 +3,13 @@
 
 	<groupId>com.itranswarp.web</groupId>
 	<artifactId>itranswarp</artifactId>
-	<version>1.12</version>
+	<version>2.0</version>
 	<packaging>jar</packaging>
 
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>2.6.6</version>
+		<version>3.0.0</version>
 	</parent>
 
 	<scm>
@@ -28,14 +28,14 @@
 		<java.version>17</java.version>
 
 		<!-- override springboot managed mysql connector version -->
-		<mysql.version>5.1.47</mysql.version>
+		<mysql.version>5.1.49</mysql.version>
 
 		<commonmark.version>0.12.1</commonmark.version>
 		<commons-validator.version>1.6</commons-validator.version>
 		<jcseg.version>2.6.3</jcseg.version>
 		<lettucemod.version>2.17.0</lettucemod.version>
-		<pebble.version>3.1.2</pebble.version>
-		<warpdb.version>5.0.4</warpdb.version>
+		<pebble.version>3.2.0</pebble.version>
+		<warpdb.version>6.0.0</warpdb.version>
 		<web3j.version>4.8.4</web3j.version>
 	</properties>
 
@@ -90,7 +90,7 @@
 		<!-- pebble view engine -->
 		<dependency>
 			<groupId>io.pebbletemplates</groupId>
-			<artifactId>pebble-spring5</artifactId>
+			<artifactId>pebble-spring6</artifactId>
 			<version>${pebble.version}</version>
 		</dependency>
 
@@ -150,10 +150,6 @@
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
-				<configuration>
-					<!-- exclude devtools -->
-					<excludeDevtools>true</excludeDevtools>
-				</configuration>
 			</plugin>
 
 			<!-- create jar -->

@@ -2,7 +2,7 @@ package com.itranswarp.web.support;
 
 import java.util.List;
 
-import com.mitchellbosecke.pebble.extension.Function;
+import io.pebbletemplates.pebble.extension.Function;
 
 public abstract class AbstractFunction implements Function {
 

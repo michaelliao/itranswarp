@@ -1,7 +1,7 @@
 package com.itranswarp.model;
 
-import javax.persistence.Column;
-import javax.persistence.MappedSuperclass;
+import jakarta.persistence.Column;
+import jakarta.persistence.MappedSuperclass;
 
 @MappedSuperclass
 public abstract class AbstractSortableEntity extends AbstractEntity {

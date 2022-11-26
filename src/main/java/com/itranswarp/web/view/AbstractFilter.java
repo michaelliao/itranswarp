@@ -2,7 +2,7 @@ package com.itranswarp.web.view;
 
 import java.util.List;
 
-import com.mitchellbosecke.pebble.extension.Filter;
+import io.pebbletemplates.pebble.extension.Filter;
 
 public abstract class AbstractFilter implements Filter {
 

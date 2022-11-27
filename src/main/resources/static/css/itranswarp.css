@@ -377,7 +377,7 @@ pre.ascii {
     word-break: normal !important;
 }
 
-pre>code {
+pre>code, .uk-comment-body code {
     white-space: pre-wrap;
     word-break: break-all;
 }

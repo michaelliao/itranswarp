@@ -57,7 +57,7 @@ public class BilibiliOAuthProvider extends AbstractOAuthProvider {
         }
         BilibiliAuth auth = JsonUtil.readJson(responseAccessToken.body(), BilibiliAuth.class);
         if (auth.code != 0 || auth.data == null || auth.data.access_token == null || auth.data.expires_in <= 0) {
-            throw new IOException("Bad response: code = " + auth.code);
+            throw new IOException("Bad response: auth.code = " + auth.code);
         }
         String userInfoUrl = String.format("http://member.bilibili.com/arcopen/fn/user/account/info?client_id=%s&access_token=%s",
                 this.configuration.getClientId(), auth.data.access_token);
@@ -67,10 +67,13 @@ public class BilibiliOAuthProvider extends AbstractOAuthProvider {
             throw new IOException("Bad response: " + responseUser.statusCode());
         }
         BilibiliUser user = JsonUtil.readJson(responseUser.body(), BilibiliUser.class);
+        if (user.code != 0 || user.data == null || user.data.openid == null) {
+            throw new IOException("Bad response: user.code = " + user.code);
+        }
         return new OAuthAuthentication() {
             @Override
             public String getAuthenticationId() {
-                return user.openid;
+                return user.data.openid;
             }
 
             @Override
@@ -80,12 +83,17 @@ public class BilibiliOAuthProvider extends AbstractOAuthProvider {
 
             @Override
             public Duration getExpires() {
+                // fix Bilibili strange expires:
+                long epoch = System.currentTimeMillis() / 1000;
+                if (auth.data.expires_in > epoch) {
+                    return Duration.ofSeconds(auth.data.expires_in - epoch);
+                }
                 return Duration.ofSeconds(auth.data.expires_in);
             }
 
             @Override
             public String getName() {
-                return user.name;
+                return user.data.name;
             }
 
             @Override
@@ -95,7 +103,7 @@ public class BilibiliOAuthProvider extends AbstractOAuthProvider {
 
             @Override
             public String getImageUrl() {
-                return user.face;
+                return user.data.face;
             }
         };
     }
@@ -111,6 +119,11 @@ public class BilibiliOAuthProvider extends AbstractOAuthProvider {
     }
 
     public static class BilibiliUser {
+        public long code;
+        public BilibiliUserData data;
+    }
+
+    public static class BilibiliUserData {
         public String name;
         public String face;
         public String openid;

@@ -229,17 +229,7 @@ public class RedisService extends AbstractService {
             return callback.doInConnection(commands);
         }
     }
-
-    public <T> CompletableFuture<T> executeBatchAsync(BatchAsyncCommandCallback<T> callback) {
-        try (StatefulRedisModulesConnection<String, String> connection = redisClient.connect()) {
-            connection.setAutoFlushCommands(false);
-            RedisModulesAsyncCommands<String, String> commands = connection.async();
-            CompletableFuture<T> future = callback.doInConnection(commands);
-            commands.flushCommands();
-            return future;
-        }
-    }
-
+ 
     public <T> CompletableFuture<T> executeAsync(AsyncCommandCallback<T> callback) {
         try (StatefulRedisModulesConnection<String, String> connection = redisClient.connect()) {
             connection.setAutoFlushCommands(true);

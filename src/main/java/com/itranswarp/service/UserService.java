@@ -1,7 +1,5 @@
 package com.itranswarp.service;
 
-import java.net.URLEncoder;
-import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
 import java.util.StringJoiner;
@@ -45,7 +43,7 @@ public class UserService extends AbstractDbService<User> {
 
     String getDefaultImage(String name) {
         String s = this.defaultImage;
-        s = s.replace("{name}", URLEncoder.encode(name, StandardCharsets.UTF_8));
+        s = s.replace("{name}", HashUtil.sha1(name));
         return s;
     }
 

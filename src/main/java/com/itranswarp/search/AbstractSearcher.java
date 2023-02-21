@@ -1,16 +1,21 @@
 package com.itranswarp.search;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
+import java.net.URLDecoder;
+import java.security.CodeSource;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 
 import jakarta.annotation.PostConstruct;
 
 import org.lionsoul.jcseg.ISegment;
 import org.lionsoul.jcseg.dic.ADictionary;
-import org.lionsoul.jcseg.dic.DictionaryFactory;
+import org.lionsoul.jcseg.dic.HashMapDictionary;
 import org.lionsoul.jcseg.extractor.impl.TextRankKeywordsExtractor;
 import org.lionsoul.jcseg.segmenter.SegmenterConfig;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -74,8 +79,82 @@ public abstract class AbstractSearcher extends AbstractService {
     public void init() throws Exception {
         this.config = new SegmenterConfig(true);
         this.config.EN_WORD_SEG = false;
-        this.dict = DictionaryFactory.createSingletonDictionary(config);
+        this.dict = createCustomizedDictionary(config, true, true);
         createIndex();
+    }
+
+    /**
+     * copied from <code>DictionaryFactory.createDefaultDictionary()</code> to fix
+     * loading from classpath:
+     */
+    static ADictionary createCustomizedDictionary(SegmenterConfig config, boolean sync, boolean loadDic) {
+        final ADictionary dic = new HashMapDictionary(config, sync) {
+            /**
+             * Fix load classpath in SpringBoot:
+             */
+            @Override
+            public void loadClassPath() throws IOException {
+                final Class<?> dClass = ADictionary.class;
+                final CodeSource codeSrc = dClass.getProtectionDomain().getCodeSource();
+                if (codeSrc == null) {
+                    return;
+                }
+
+                final String codePath = codeSrc.getLocation().getPath();
+                // FIXME: add test for endsWith(".jar!/"):
+                if (codePath.toLowerCase().endsWith(".jar") || codePath.toLowerCase().endsWith(".jar!/")) {
+                    final ZipInputStream zip = new ZipInputStream(codeSrc.getLocation().openStream());
+                    while (true) {
+                        ZipEntry e = zip.getNextEntry();
+                        if (e == null) {
+                            break;
+                        }
+
+                        String fileName = e.getName();
+                        if (fileName.endsWith(".lex") && fileName.startsWith("lexicon/lex-")) {
+                            load(dClass.getResourceAsStream("/" + fileName));
+                        }
+                    }
+                } else {
+                    // now, the classpath is an IDE directory
+                    // like eclipse ./bin or maven ./target/classes/
+                    final File lexiconDir = new File(URLDecoder.decode(codeSrc.getLocation().getFile(), "utf-8"));
+                    loadDirectory(lexiconDir.getPath() + File.separator + "lexicon");
+                }
+            }
+
+        };
+        if (!loadDic) {
+            return dic;
+        }
+
+        try {
+            /*
+             * @Note: updated at 2016/07/07
+             * 
+             * check and load all the lexicons with more than one path if specified none
+             * lexicon paths (config.getLexiconPath() is null) And we directly load the
+             * default lexicons that in the class path
+             */
+            String[] lexPath = config.getLexiconPath();
+            if (lexPath == null) {
+                dic.loadClassPath();
+            } else {
+                for (String lPath : lexPath)
+                    dic.loadDirectory(lPath);
+                if (config.isAutoload())
+                    dic.startAutoload();
+            }
+
+            /*
+             * added at 2017/06/10 check and reset synonyms net of the current Dictionary
+             */
+            dic.resetSynonymsNet();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return dic;
     }
 
     public boolean ready() {

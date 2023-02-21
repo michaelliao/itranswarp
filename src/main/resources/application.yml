@@ -83,6 +83,7 @@ spring:
 
   # signin configurations:
   signin:
+    default-image: ${DEFAULT_IMAGE:/static/img/user.png}
     # local email / password signin:
     password:
       enabled: ${SIGNIN_PASSWORD_ENABLED:true}
@@ -94,6 +95,7 @@ spring:
     #   - name: display name
     #   - client-id: oauth client id
     #   - client-secret: oauth client secret
+    #   - ignore-image: should ignore image? default to false. set true if external image url cannot be displayed.
     # NOTE:
     #   an oauth provider is enabled if client-id and client-secret are both set.
     #   display icon is mapping to /static/img/icon/{provider}.svg
@@ -103,6 +105,7 @@ spring:
         name:          "${OAUTH_BILIBILI_NAME:Bilibili}"
         client-id:     "${OAUTH_BILIBILI_CLIENT_ID:}"
         client-secret: "${OAUTH_BILIBILI_CLIENT_SECRET:}"
+        ignore-image:  "${OAUTH_BILIBILI_IGNORE_IMAGE:true}"
       facebook:
         name:          "${OAUTH_FACEBOOK_NAME:Facebook}"
         client-id:     "${OAUTH_FACEBOOK_CLIENT_ID:}"
@@ -135,6 +138,7 @@ spring:
         name:          "${OAUTH_WEIBO_NAME:Weibo}"
         client-id:     "${OAUTH_WEIBO_CLIENT_ID:}"
         client-secret: "${OAUTH_WEIBO_CLIENT_SECRET:}"
+        ignore-image:  "${OAUTH_WEIBO_IGNORE_IMAGE:true}"
 
   # external configuration:
   external:

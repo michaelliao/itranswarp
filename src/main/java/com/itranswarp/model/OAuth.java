@@ -3,6 +3,7 @@ package com.itranswarp.model;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 import jakarta.persistence.UniqueConstraint;
 
 @Entity
@@ -33,4 +34,6 @@ public class OAuth extends AbstractEntity {
     @Column(nullable = false)
     public long expiresAt;
 
+    @Transient
+    public boolean isNew;
 }

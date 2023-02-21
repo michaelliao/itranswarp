@@ -12,6 +12,8 @@ public class AbstractOAuthConfiguration {
 
     private String clientSecret;
 
+    private boolean ignoreImage;
+
     public String getName() {
         return name;
     }
@@ -50,6 +52,14 @@ public class AbstractOAuthConfiguration {
 
     public void setClientSecret(String clientSecret) {
         this.clientSecret = clientSecret;
+    }
+
+    public boolean isIgnoreImage() {
+        return ignoreImage;
+    }
+
+    public void setIgnoreImage(boolean ignoreImage) {
+        this.ignoreImage = ignoreImage;
     }
 
 }

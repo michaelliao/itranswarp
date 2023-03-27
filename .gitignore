@@ -168,10 +168,6 @@ pip-log.txt
 # Unit test / coverage reports
 nosetests.xml
 
-# Icon must end with two \r
-Icon
-
-
 # Directories potentially created on remote AFP share
 Network Trash Folder
 Temporary Items

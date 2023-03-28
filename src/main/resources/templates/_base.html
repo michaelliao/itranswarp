@@ -116,7 +116,7 @@
 		var g_user = {
 			id: '{{ __user__.id }}',
 			name: JSON.parse(decodeURIComponent('{{ __user__.name|json|url|raw }}')),
-			image_url: '{{ __user__.image_url }}'
+			imageUrl: '{{ __user__.imageUrl }}'
 		};
 		/* {% else %} */
 		var g_user = null;

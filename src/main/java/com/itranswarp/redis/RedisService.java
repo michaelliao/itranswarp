@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
+import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +33,15 @@ public class RedisService extends AbstractService {
 
     public RedisService(@Autowired RedisModulesClient redisClient) {
         this.redisClient = redisClient;
+    }
+
+    @PostConstruct
+    public void init() {
+        logger.info("set redis maxmemory-policy = allkeys-lru");
+        this.executeSync(command -> {
+            command.configSet("maxmemory-policy", "allkeys-lru");
+            return Boolean.TRUE;
+        });
     }
 
     @PreDestroy
@@ -229,7 +239,7 @@ public class RedisService extends AbstractService {
             return callback.doInConnection(commands);
         }
     }
- 
+
     public <T> CompletableFuture<T> executeAsync(AsyncCommandCallback<T> callback) {
         try (StatefulRedisModulesConnection<String, String> connection = redisClient.connect()) {
             connection.setAutoFlushCommands(true);

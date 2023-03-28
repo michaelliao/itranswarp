@@ -74,7 +74,7 @@ function initVM(data) {
         	<tbody>
                 <tr v-for="a in attachments">
                     <td>
-                        <a v-bind:href="'/files/attachments/' + a.id + '/'" target="_blank"><img v-bind:src="'/files/attachments/' + a.id + '/s'" style="width: 160px;" /></a>
+                        <a v-bind:href="'/files/attachments/' + a.id + '/0'" target="_blank"><img v-bind:src="'/files/attachments/' + a.id + '/s'" style="width: 160px;" /></a>
                     </td>
                     <td>
                         <p v-text="a.mime"></p>

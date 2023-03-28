@@ -141,7 +141,14 @@ public class ExtApiController extends AbstractService {
             return JsonUtil.writeJson(Map.of("error", ApiError.TIMEOUT));
         });
         cf.thenAccept(resp -> {
-            dr.setResult(resp.body());
+            String gptResp = resp.body();
+            logger.info("gpt response: {}", gptResp);
+            ChatGptOutput gptOutput = JsonUtil.readJson(gptResp, ChatGptOutput.class);
+            if (gptOutput.choices != null && !gptOutput.choices.isEmpty()) {
+                dr.setResult(JsonUtil.writeJson(Map.of("content", gptOutput.choices.get(0).message.content)));
+            } else {
+                dr.setErrorResult(new ApiException(ApiError.INTERNAL_SERVER_ERROR));
+            }
         });
         cf.exceptionally(e -> {
             logger.error("call chat gpt error!", e);
@@ -209,7 +216,20 @@ public class ExtApiController extends AbstractService {
     // static bean class //////////////////////////////////////////////////////
 
     public static class ChatGptInput {
-        String content;
+        public String content;
+    }
+
+    public static class ChatGptOutput {
+        public List<Choice> choices;
+
+        public static class Choice {
+            public Message message;
+        }
+
+        public static class Message {
+            public String role;
+            public String content;
+        }
     }
 
     public static class RemoteCodeRunInput {

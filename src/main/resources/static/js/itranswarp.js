@@ -8,19 +8,12 @@ $(function () {
     // init scroll:
     var $window = $(window);
     var $body = $('body');
-    var $gotoTop = $('div.x-goto-top');
     // lazy load:
     var lazyImgs = _.map($('img[data-src]').get(), function (i) {
         return $(i);
     });
     var onScroll = function () {
         var wtop = $window.scrollTop();
-        if (wtop > 1200) {
-            $gotoTop.show();
-        }
-        else {
-            $gotoTop.hide();
-        }
         if (lazyImgs.length > 0) {
             var wheight = $window.height();
             var loadedIndex = [];
@@ -37,11 +30,6 @@ $(function () {
     };
     $window.scroll(onScroll);
     onScroll();
-
-    // go-top:
-    $gotoTop.click(function () {
-        $('html, body').animate({ scrollTop: 0 }, 1000);
-    });
 
     // on resize:
     var autoResizeNavBar = function () {

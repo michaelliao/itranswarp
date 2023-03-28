@@ -26,6 +26,8 @@ public enum ApiError {
 
     RATE_LIMIT,
 
+    TIMEOUT,
+
     SECURITY_ANTI_SPAM,
 
     OPERATION_FAILED,

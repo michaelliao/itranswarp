@@ -149,6 +149,13 @@ spring:
       wait: ${REMOTE_CODE_RUNNER_WAIT:15}
       timeout: ${REMOTE_CODE_RUNNER_TIMEOUT:10}
       max-concurrent: ${REMOTE_CODE_RUNNER_MAX_CONCURRENT:10}
+    chat-gpt:
+      enabled: ${CHAT_GPT_ENABLED:false}
+      url: ${CHAT_GPT_URL:https://api.openai.com/v1/chat/completions}
+      api-key: ${CHAT_GPT_API_KEY:}
+      model: ${CHAT_GPT_MODEL:gpt-3.5-turbo}
+      prompt: ${CHAT_GPT_PROMPT:}
+      rate-limit: ${CHAT_GPT_RATE_LIMIT:100}
 
 # default logging level:
 logging:

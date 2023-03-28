@@ -94,7 +94,7 @@ textarea.x-codearea {
 div.x-goto-top {
     display: none;
     opacity: 0.9;
-    z-index: 999999;
+    z-index: 99;
     position: fixed;
     bottom: 150px;
     right: 5%;

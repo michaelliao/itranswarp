@@ -103,21 +103,21 @@ public class ExtApiController extends AbstractService {
 
     // call chat-gpt //////////////////////////////////////////////////////////
 
-    boolean isGptRateLimitExceeded() {
+    boolean isGptRateLimitExceeded(long increment) {
         User user = HttpContext.getCurrentUser();
         if (user == null) {
             return true;
         }
         String key = "_cgpt_" + ZonedDateTime.now(this.zoneId).toLocalDate() + "_" + user.id;
         long times = redisService.executeSync(command -> {
-            return command.incr(key);
+            return command.incrby(key, increment);
         });
         return times > this.chatGptRateLimit;
     }
 
     @GetMapping("/gpt/ratelimit")
     public Map<String, Boolean> chatGptRateLimit() {
-        return Map.of("result", !this.chatGptEnabled || isGptRateLimitExceeded());
+        return Map.of("result", !this.chatGptEnabled || isGptRateLimitExceeded(0));
     }
 
     @PostMapping("/gpt")
@@ -137,7 +137,7 @@ public class ExtApiController extends AbstractService {
             throw new ApiException(ApiError.PARAMETER_INVALID, "content", "Invalid content.");
         }
         // check rate limit:
-        if (isGptRateLimitExceeded()) {
+        if (isGptRateLimitExceeded(1)) {
             throw new ApiException(ApiError.RATE_LIMIT, null, "Maximum reached.");
         }
         List<Map<String, String>> messages = new ArrayList<>(2);

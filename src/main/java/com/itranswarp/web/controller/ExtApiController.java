@@ -8,7 +8,8 @@ import java.net.http.HttpRequest.BodyPublishers;
 import java.net.http.HttpRequest.Builder;
 import java.net.http.HttpResponse;
 import java.time.Duration;
-import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -23,6 +24,7 @@ import jakarta.annotation.PostConstruct;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -84,6 +86,9 @@ public class ExtApiController extends AbstractService {
     @Autowired
     RedisService redisService;
 
+    @Autowired
+    ZoneId zoneId;
+
     private HttpClient httpClient;
 
     private String REMOTE_CODE_RUNNER_TIMEOUT = "{\"timeout\":true,\"error\":false,\"truncated\":false,\"output\":\"\"}";
@@ -97,6 +102,23 @@ public class ExtApiController extends AbstractService {
     }
 
     // call chat-gpt //////////////////////////////////////////////////////////
+
+    boolean isGptRateLimitExceeded() {
+        User user = HttpContext.getCurrentUser();
+        if (user == null) {
+            return true;
+        }
+        String key = "_cgpt_" + ZonedDateTime.now(this.zoneId).toLocalDate() + "_" + user.id;
+        long times = redisService.executeSync(command -> {
+            return command.incr(key);
+        });
+        return times > this.chatGptRateLimit;
+    }
+
+    @GetMapping("/gpt/ratelimit")
+    public Map<String, Boolean> chatGptRateLimit() {
+        return Map.of("result", !this.chatGptEnabled || isGptRateLimitExceeded());
+    }
 
     @PostMapping("/gpt")
     @ResponseBody
@@ -115,11 +137,7 @@ public class ExtApiController extends AbstractService {
             throw new ApiException(ApiError.PARAMETER_INVALID, "content", "Invalid content.");
         }
         // check rate limit:
-        String key = "_cgpt_" + LocalDate.now() + "_" + user.id;
-        long times = redisService.executeSync(command -> {
-            return command.incr(key);
-        });
-        if (times > this.chatGptRateLimit) {
+        if (isGptRateLimitExceeded()) {
             throw new ApiException(ApiError.RATE_LIMIT, null, "Maximum reached.");
         }
         List<Map<String, String>> messages = new ArrayList<>(2);

@@ -103,16 +103,20 @@ public class ExtApiController extends AbstractService {
 
     // call chat-gpt //////////////////////////////////////////////////////////
 
+    String gptRateLimitKey(User user) {
+        return "_cgpt_" + ZonedDateTime.now(this.zoneId).toLocalDate() + "_" + user.id;
+    }
+
     boolean isGptRateLimitExceeded(long increment) {
         User user = HttpContext.getCurrentUser();
         if (user == null) {
             return true;
         }
-        String key = "_cgpt_" + ZonedDateTime.now(this.zoneId).toLocalDate() + "_" + user.id;
-        long times = redisService.executeSync(command -> {
-            return command.incrby(key, increment);
+        String key = gptRateLimitKey(user);
+        String value = redisService.executeSync(command -> {
+            return command.get(key);
         });
-        return times > this.chatGptRateLimit;
+        return value != null && Long.valueOf(value) > this.chatGptRateLimit;
     }
 
     @GetMapping("/gpt/ratelimit")
@@ -129,15 +133,19 @@ public class ExtApiController extends AbstractService {
         if (this.chatGptUrl == null || this.chatGptUrl.isEmpty()) {
             throw new ApiException(ApiError.OPERATION_FAILED, null, "ChatGPT URL is not set.");
         }
+        if (input.content == null || input.content.isBlank() || input.content.length() > 500) {
+            throw new ApiException(ApiError.PARAMETER_INVALID, "content", "Invalid content.");
+        }
         User user = HttpContext.getCurrentUser();
         if (user == null) {
             throw new ApiException(ApiError.AUTH_SIGNIN_REQUIRED, null, "Signin required.");
         }
-        if (input.content == null || input.content.isBlank() || input.content.length() > 500) {
-            throw new ApiException(ApiError.PARAMETER_INVALID, "content", "Invalid content.");
-        }
+        String key = gptRateLimitKey(user);
         // check rate limit:
-        if (isGptRateLimitExceeded(1)) {
+        long times = redisService.executeSync(command -> {
+            return command.incr(key);
+        });
+        if (times > this.chatGptRateLimit) {
             throw new ApiException(ApiError.RATE_LIMIT, null, "Maximum reached.");
         }
         List<Map<String, String>> messages = new ArrayList<>(2);

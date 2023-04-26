@@ -59,7 +59,38 @@ function execute_java(tid, btn) {
 }
 
 function execute_python(tid, btn) {
-	execute_remote(tid, btn, 'python');
+	let
+		outputId = 'execOutputId' + tid,
+		code = _mdGetCode(tid),
+		$btn = $(btn),
+		$i = $btn.find('i'),
+		$r = $btn.next('div.x-code-result');
+	if ($r.get(0) === undefined) {
+		$btn.attr('outputId', outputId);
+		$btn.after('<div id="' + outputId + '" class="x-code-result x-code uk-alert"></div>');
+		$r = $(btn).next('div.x-code-result');
+	} else {
+		$r.text('');
+		$r.removeClass('uk-alert-danger');
+	}
+	if (!window.__pyscript_ready__) {
+		$r.text('PyScript未加载完毕，请稍后再试。');
+		$r.addClass('uk-alert-danger');
+		return;
+	}
+
+	$btn.attr('disabled', 'disabled');
+	$i.addClass('uk-icon-spinner');
+	$i.addClass('uk-icon-spin');
+	
+	// attach py-script:
+	let pys = document.createElement("py-script");
+	pys.setAttribute("output", outputId);
+	pys.setAttribute("stderr", outputId);
+	pys.style.display = 'none';
+	pys.appendChild(document.createTextNode(code));
+	document.body.appendChild(pys);
+	// let pyscript run...
 }
 
 function execute_scheme(tid, btn) {

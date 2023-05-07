@@ -337,9 +337,10 @@ public class SchemaBuilder {
         board.name = "Discuss Sample";
         board.description = "Discuss Sample.";
         board.tag = "sample";
+        board.topicNumber = 20;
         entities.add(board);
 
-        for (int i = 0; i < 20; i++) {
+        for (int i = 0; i < board.topicNumber; i++) {
             Topic topic = new Topic();
             topic.id = nextId.incrementAndGet();
             topic.boardId = board.id;

@@ -83,7 +83,7 @@ spring:
 
   # signin configurations:
   signin:
-    default-image: ${DEFAULT_IMAGE:/static/img/user.png}
+    default-image: ${DEFAULT_IMAGE:/avatar/{name}}
     # local email / password signin:
     password:
       enabled: ${SIGNIN_PASSWORD_ENABLED:true}

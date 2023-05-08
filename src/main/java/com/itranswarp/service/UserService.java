@@ -26,13 +26,20 @@ import com.itranswarp.util.JsonUtil;
 import com.itranswarp.util.RandomUtil;
 import com.itranswarp.warpdb.PagedResults;
 
+import jakarta.annotation.PostConstruct;
+
 @Component
 public class UserService extends AbstractDbService<User> {
 
-    @Value("${spring.signin.default-image:/static/img/user.png}")
+    @Value("${spring.signin.default-image:/avatar/{name}}")
     String defaultImage;
 
     static final String KEY_USERS = "__users__";
+
+    @PostConstruct
+    void init() {
+        logger.info("set default image: {}", this.defaultImage);
+    }
 
     public String getOAuthImageUrl(boolean ignoreImage, OAuthAuthentication auth) {
         if (ignoreImage) {

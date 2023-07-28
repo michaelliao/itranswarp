@@ -91,6 +91,7 @@ $(function () {
         }
     };
     $window.resize(autoResizeNavBar);
+    window.addEventListener('orientationchange', autoResizeNavBar);
 });
 
 function deleteTopic(topicId) {

@@ -95,7 +95,7 @@ public class ExtApiController extends AbstractService {
 
     @PostConstruct
     public void init() {
-        Executor executor = new ThreadPoolExecutor(1, this.remoteCodeRunnerMaxConcurrent, 60L, TimeUnit.SECONDS, new LinkedBlockingQueue<Runnable>());
+        Executor executor = new ThreadPoolExecutor(1, this.remoteCodeRunnerMaxConcurrent, 60L, TimeUnit.SECONDS, new LinkedBlockingQueue<>());
         this.httpClient = HttpClient.newBuilder() // builder
                 .connectTimeout(Duration.ofSeconds(2)) // connect timeout
                 .executor(executor).build();

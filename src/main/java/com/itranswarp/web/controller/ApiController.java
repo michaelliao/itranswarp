@@ -570,6 +570,7 @@ public class ApiController extends AbstractController {
     ///////////////////////////////////////////////////////////////////////////////////////////////
 
     @PostMapping("/setting/website")
+    @RoleWith(Role.ADMIN)
     public Map<String, Boolean> settingWebsiteUpdate(@RequestBody Website bean) {
         this.settingService.setWebsite(bean);
         this.settingService.deleteWebsiteFromCache();
@@ -577,6 +578,7 @@ public class ApiController extends AbstractController {
     }
 
     @PostMapping("/setting/snippet")
+    @RoleWith(Role.ADMIN)
     public Map<String, Boolean> settingSnippetUpdate(@RequestBody Snippet bean) {
         this.settingService.setSnippet(bean);
         this.settingService.deleteSnippetFromCache();
@@ -584,6 +586,7 @@ public class ApiController extends AbstractController {
     }
 
     @PostMapping("/setting/follow")
+    @RoleWith(Role.ADMIN)
     public Map<String, Boolean> settingFollowUpdate(@RequestBody Follow bean) {
         this.settingService.setFollow(bean);
         this.settingService.deleteFollowFromCache();
@@ -591,6 +594,7 @@ public class ApiController extends AbstractController {
     }
 
     @PostMapping("/setting/security")
+    @RoleWith(Role.ADMIN)
     public Map<String, Boolean> settingSecurityUpdate(@RequestBody Security bean) {
         this.settingService.setSecurity(bean);
         return API_RESULT_TRUE;

@@ -1,7 +1,6 @@
 package com.itranswarp.util;
 
 import java.security.SecureRandom;
-import java.util.Random;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,8 +13,6 @@ public class RandomUtil {
     static final Logger logger = LoggerFactory.getLogger(RandomUtil.class);
 
     static final SecureRandom SECURE_RANDOM = createSecureRandom();
-
-    static final Random RANDOM = new Random();
 
     /**
      * Holds "A-Z".
@@ -83,5 +80,4 @@ public class RandomUtil {
     public static String createRandomString(int length) {
         return createRandomString(WORDS, length);
     }
-
 }

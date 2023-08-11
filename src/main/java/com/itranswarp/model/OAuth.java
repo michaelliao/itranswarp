@@ -7,7 +7,7 @@ import jakarta.persistence.Transient;
 import jakarta.persistence.UniqueConstraint;
 
 @Entity
-@Table(name = "oauths", uniqueConstraints = @UniqueConstraint(name = "UNI_AUTH", columnNames = { "authProviderId,authId" }))
+@Table(name = "oauths", uniqueConstraints = @UniqueConstraint(name = "UNI_AUTH", columnNames = { "authProviderId", "authId" }))
 public class OAuth extends AbstractEntity {
 
     @Column(nullable = false, updatable = false)

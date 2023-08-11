@@ -198,7 +198,7 @@ CREATE TABLE oauths (
   authProviderId VARCHAR(32) NOT NULL,
   authId VARCHAR(255) NOT NULL,
   authToken VARCHAR(255) NOT NULL,
-  CONSTRAINT UNI_AUTH UNIQUE (authProviderId,authId),
+  CONSTRAINT UNI_AUTH UNIQUE (authProviderId, authId),
   PRIMARY KEY(id)
 ) Engine=INNODB DEFAULT CHARSET=UTF8;
 

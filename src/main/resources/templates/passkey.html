@@ -1,0 +1,135 @@
+{% extends '_base.html' %}
+
+{% block layout %}
+{% set __sidebar_left__ = true %}
+{% endblock %}
+
+{% block nav %} /none {% endblock %}
+
+{% block title %}{{ user.name }}{% endblock %}
+
+{% block meta %}
+<meta property="og:type" content="webpage" />
+<meta property="og:url" content="{{ __url__ }}" />
+<meta property="og:title" content="{{ user.name }}" />
+{% endblock %}
+
+{% block head %}
+
+<style>
+    .x-user-visible {
+        display: block;
+    }
+</style>
+
+<script>
+function createPasskey() {
+    doAsync(
+        async () => {
+            if (!navigator.credentials) {
+	            throw 'Your browser does not support passkey!';
+	        }
+            const options = await getJson(`/api/passkey/create/options?t=${Date.now()}`);
+	        console.log(options);
+	        options.challenge = base64_urlsafe_decode(options.challenge);
+	        options.user.id = base64_urlsafe_decode(options.user.id);
+	        const cred = await navigator.credentials.create({
+	            publicKey: options
+	        });
+	        console.log(cred);
+	        const credential = {
+	            id: cred.id,
+	            rawId: base64_urlsafe_encode(cred.rawId),
+	            type: cred.type,
+	            response: {
+	                clientDataJSON: base64_urlsafe_encode(cred.response.clientDataJSON),
+	                attestationObject: base64_urlsafe_encode(cred.response.attestationObject),
+	                transports: cred.response.getTransports ? cred.response.getTransports() : []
+	            }
+	        };
+	        if (cred.authenticatorAttachment) {
+	            credential.authenticatorAttachment = cred.authenticatorAttachment;
+	        }
+	        console.log(credential);
+	        let createResult = await postJson('/api/passkey/register', credential);
+	        console.log(createResult);
+        },
+        () => refresh(),
+        err => UIkit.modal.alert(translateError(err))
+    );
+}
+
+function deletePasskey(id, device) {
+    UIkit.modal.confirm(`Are you sure to delete this passkey from "${device}"?`, () => {
+        doAsync(
+            async () => {
+                await postJson(`/api/users/passkeys/${id}/delete`);
+                console.log('passkey delete ok');
+            },
+            () => refresh(),
+            err => UIkit.modal.alert(translateError(err))
+        );
+    });
+}
+</script>
+
+{% endblock %}
+
+{% block sidebar_left_content %}
+<h3>{{ user.name }}</h3>
+<div class="uk-clearfix">
+    <img src="{{ user.imageUrl }}" class="uk-comment-avatar uk-border-circle x-avatar" style="width:100px;height:100px">
+</div>
+
+<h3 class="uk-margin-top">{{ _('Registration Date') }}</h3>
+<p><span class="x-smart-datetime" data="{{ user.createdAt }}"></span></p>
+{% endblock %}
+
+{% block content %}
+
+<h3>{{ _('Registered passkeys') }}</h3>
+<table class="uk-table uk-table-hover">
+    <thead>
+        <tr>
+            <th>
+                {{ _('Device') }}
+            </th>
+            <th>
+                {{ _('Created at') }}
+            </th>
+            <th>
+                {{ _('Last used') }}
+            </th>
+            <th>
+            </th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for pk in passkeys %}
+        <tr>
+            <td>
+                {{ pk.device }}
+            </td>
+            <td>
+                <span class="x-smart-datetime" data="{{ pk.createdAt }}">...</span>
+            </td>
+            <td>
+                {% if pk.updatedAt > pk.createdAt %}
+                <span class="x-smart-datetime" data="{{ pk.updatedAt }}">...</span>
+                {% endif %}
+            </td>
+            <td>
+                <a href="#0" onclick="deletePasskey('{{ pk.id }}', '{{ pk.device }}')"><i class="uk-icon-trash"></i></a>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+{% if passkeys.size() < 10 %}
+    <button type="button" onclick="createPasskey()" class="uk-button uk-button-success">
+        <i class="uk-icon-key"></i> {{ _('Register New Passkey') }}
+    </button>
+{% endif %}
+
+{% endblock %}

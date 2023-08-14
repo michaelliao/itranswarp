@@ -4,19 +4,19 @@
 
 {% block head %}
 <script>
-    $(function () {
-        getJSON('/api/replies', {
-            page: parseInt('{{ page }}')
-        }, function (err, data) {
-            if (err) {
-                return showError(err);
-            }
-            initVM({
-            	replies: data.results,
-            	page: data.page
-            });
-        });
-    });
+$(() => {
+	doAsync(
+		async () => {
+			let resp = await getJson('/api/replies', { page: parseInt('{{ page }}') });
+            return {
+                replies: resp.results,
+                page: resp.page
+            };
+		},
+		data => initVM(data),
+		err => UIkit.modal.alert('Load replies failed.')
+	);
+});
 
     function initVM(data) {
         var vm = new Vue({
@@ -27,14 +27,15 @@
             },
             methods: {
                 deleteReply: function (r) {
-                    if (confirm('Reply will be deleted. Continue?')) {
-                        postJSON('/api/replies/' + r.id + '/delete', function (err, result) {
-                            if (err) {
-                                return error(err);
-                            }
+                    UIkit.modal.confirm(`Reply will be deleted. Continue?`, () => {
+                        doAsync(async () => {
+                            await postJson(`/api/replies/${r.id}/delete`);
+                        }, () => {
                             refresh();
+                        }, (err) => {
+                            UIkit.modal.alert(translateError(err));
                         });
-                    }
+                    });
                 }
             }
         });

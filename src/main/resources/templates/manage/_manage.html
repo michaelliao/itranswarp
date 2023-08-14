@@ -49,7 +49,7 @@
 
     <script>
 
-        var g_timestamp = parseInt('{{ __timestamp__ }}');
+        const g_timestamp = parseInt('{{ __timestamp__ }}');
 
         function timestampToDateTimeLocal(ts) {
             return moment(ts).format('YYYY-MM-DDTHH:mm');
@@ -61,15 +61,15 @@
 
         // FIX: jQuery $(xxx).show() cannot display 'uk-hidden':
         (function () {
-            var _jShow = $.fn.show;
-            var _jHide = $.fn.hide;
+            let _jShow = $.fn.show;
+            let _jHide = $.fn.hide;
             $.fn.show = function () {
                 var r = _jShow.apply(this);
                 this.removeClass('uk-hidden');
                 return r;
             };
             $.fn.hide = function () {
-                var r = _jHide.apply(this);
+                let r = _jHide.apply(this);
                 this.addClass('uk-hidden');
                 return r;
             };
@@ -78,9 +78,9 @@
 
         // active nav-bar item:
         $(function () {
-            var p = location.pathname;
+            let p = location.pathname;
             $('#ul-navbar>li>a').each(function (index, a) {
-                var href = $(a).attr('href');
+                let href = $(a).attr('href');
                 if (p.startsWith(href)) {
                     $(a).parent().addClass('uk-active');
                 }
@@ -89,7 +89,7 @@
 
         // find a jQuery form object that within a #vm scope:
         function findForm(vmId) {
-            var $form = $('#' + (vmId || 'vm'));
+            let $form = $('#' + (vmId || 'vm'));
             if (!$form.is('form')) {
                 $form = $form.find('form');
             }
@@ -101,8 +101,8 @@
 
         // show form error whtin a #vm scope:
         function showFormError(err, vmId) {
-            var $form = findForm(vmId);
-            var $alert = $form.find('.uk-alert-danger');
+            let $form = findForm(vmId);
+            let $alert = $form.find('.uk-alert-danger');
             $alert.text(err.message || err.error).show();
             if (err.error === 'parameter:invalid') {
                 if (err.data) {
@@ -116,8 +116,8 @@
         }
 
         function clearFormError(vmId) {
-            var $form = findForm(vmId);
-            var $err = $form.find('.uk-alert-danger');
+            let $form = findForm(vmId);
+            let $err = $form.find('.uk-alert-danger');
             $err.text('').hide();
             $form.find('input').removeClass('uk-form-danger');
             $form.find('select').removeClass('uk-form-danger');
@@ -144,11 +144,10 @@
                 UIkit.modal.alert('File is not a valid image!');
                 return;
             }
-            var reader = new FileReader();
+            let reader = new FileReader();
             reader.onload = function (e) {
-                var
-                    data = e.target.result;
-                index = data.indexOf(';base64,');
+                let data = e.target.result;
+                let index = data.indexOf(';base64,');
                 if ((index >= 0) && (index < 100)) {
                     callback({
                         image: data,

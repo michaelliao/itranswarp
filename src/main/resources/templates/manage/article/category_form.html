@@ -6,25 +6,26 @@
 
 <script>
 
-$(function() {
-    var id = parseInt('{{ id }}');
-    if (id > 0) {
-        getJSON('/api/categories/' + id, function (err, resp) {
-            if (err) {
-                return showError(err);
-            }
-            initVM({
-        		title: 'Edit Category',
-            	category: resp
-            });
-        });
-    }
-    else {
-        initVM({
-        	title: 'New Category',
-        	category: {}
-        });
-    }
+$(() => {
+    doAsync(
+        async () => {
+            let id = parseInt('{{ id }}');
+            if (id > 0) {
+	            let resp = await getJson(`/api/categories/${id}`);
+	            return {
+	    		    title: 'Edit Category',
+	                category: resp
+	            };
+	        } else {
+	            return {
+                    title: 'New Category',
+                    category: {}
+                };
+	        }
+        },
+    	data => initVM(data),
+        err => UIkit.modal.alert(translateError(err))
+    );
 });
 
 function initVM(data) {
@@ -39,13 +40,14 @@ function initVM(data) {
             $('#vm').show();
         },
         methods: {
-            submit: function() {
+            submit: async function() {
                 clearFormError();
-                this.$resource('{{ action }}').save(this.category).then(function (resp) {
-                    resp.json().then(function (result) {
-                        location.assign('/manage/article/category_list');
-                    });
-                }, onJsonFormError);
+                try {
+                    await postJson('{{ action }}', this.category);
+                    location.assign('/manage/article/category_list');
+                } catch (err) {
+                    onJsonFormError(err);
+                }
             },
             cancel: function () {
                 location.assign('/manage/article/category_list');

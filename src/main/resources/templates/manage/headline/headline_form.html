@@ -6,17 +6,19 @@
 
 <script>
 
-$(function() {
-    var id = parseInt('{{ id }}');
-    getJSON('/api/headlines/' + id, function (err, resp) {
-        if (err) {
-            return showError(err);
-        }
-        initVM({
-    		title: 'Edit Headline',
-        		headline: resp
-        });
-    });
+$(() => {
+    doAsync(
+        async () => {
+            let id = parseInt('{{ id }}');
+            let resp = await getJson(`/api/headlines/${id}`);
+            return {
+    		    title: 'Edit Headline',
+                headline: resp
+            };
+        },
+    	data => initVM(data),
+        err => UIkit.modal.alert(translateError(err))
+    );
 });
 
 function initVM(data) {

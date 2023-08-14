@@ -6,35 +6,34 @@
 
 <script>
 
-    $(function () {
-        getJSON('/api/navigations/urls', function (err, resp) {
-            if (err) {
-                return showError(err);
-            }
-            var urls = resp.results;
-            var id = parseInt('{{ id }}');
-            if (id > 0) {
-                getJSON('/api/navigations/' + id, function (err, resp) {
-                    if (err) {
-                        return showError(err);
-                    }
-                    initVM({
-                        urls: urls,
-                        title: 'Edit Navigation',
-                        navigation: resp
-                    });
-                });
+$(() => {
+    doAsync(
+    	async () => {
+    		let urlResp = await getJson('/api/navigations/urls');
+    		let urls = urlResp.results;
+    		let id = parseInt('{{ id }}');
+    		if (id > 0) {
+    		    let resp = await getJson(`/api/navigations/${id}`);
+    		    return {
+                    urls: urls,
+                    title: 'Edit Navigation',
+                    navigation: resp
+                };
             } else {
-                initVM({
+                return {
                     urls: urls,
                     title: 'New Navigation',
                     navigation: {
                         icon: ''
                     }
-                });
+                };
             }
-        });
-    });
+    	},
+    	data => initVM(data),
+    	err => UIkit.modal.alert(translateError(err))
+    );
+});
+
 
     function initVM(data) {
         window.vm = new Vue({
@@ -63,21 +62,21 @@
             },
             methods: {
                 selectMenu: function () {
-                    var index = this.urls.findIndex(u => u.url === this.selectedUrl);
-                    var u = this.urls[index];
+                    let index = this.urls.findIndex(u => u.url === this.selectedUrl);
+                    let u = this.urls[index];
                     this.navigation.name = u.name;
                     this.navigation.url = u.url;
                 },
                 selectIcon: function () {
                     $('#icon').html('<i class="uk-icon-' + this.navigation.icon + '"></i>');
                 },
-                submit: function () {
-                    var that = this;
-                    that.$resource('{{ action }}').save(this.navigation).then(function (resp) {
-                        resp.json().then(function (result) {
-                            location.assign('/manage/navigation/');
-                        });
-                    }, onJsonFormError);
+                submit: async function () {
+                    try {
+                        await postJson('{{ action }}', this.navigation);
+                        location.assign('/manage/navigation/');
+                    } catch (err) {
+                        UIkit.modal.alert(translateError(err));
+                    }
                 }
             }
         });

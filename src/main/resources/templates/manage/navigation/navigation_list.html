@@ -4,14 +4,16 @@
 
 {% block head %}
 <script>
-    $(function () {
-        getJSON('/api/navigations', function (err, resp) {
-            if (err) {
-                return showError(err);
-            }
-            initVM(resp.results);
-        });
-    });
+$(() => {
+    doAsync(
+    	async () => {
+    		let resp = await getJson('/api/navigations');
+    		return resp.results;
+    	},
+    	data => initVM(data),
+    	err => UIkit.modal.alert(translateError(err))
+    );
+});
 
     function initVM(navigations) {
         var vm = new Vue({
@@ -43,26 +45,28 @@
                     }
                     this.swap(index, index + 1);
                 },
-                sort: function () {
-                    var ids = this.navigations.map(n => n.id);
-                    var that = this;
-                    that.$resource('/api/navigations/sort').save({ ids: ids }).then(function (resp) {
-                        resp.json().then(function (result) {
-                            refresh();
-                        });
-                    }, onJsonError);
+                sort: async function () {
+                    let ids = this.navigations.map(n => n.id);
+                    try {
+                        await postJson('/api/navigations/sort', { ids: ids });
+                        refresh();
+                    } catch(err) {
+                    	UIkit.modal.alert(translateError(err));
+                    }
                 },
                 editNavigation: function (n) {
-                    location.assign('/manage/navigation/navigation_update?id=' + n.id);
+                    location.assign(`/manage/navigation/navigation_update?id=${n.id}`);
                 },
                 deleteNavigation: function (n) {
                     var that = this;
-                    UIkit.modal.confirm('Navigation \"' + n.name + '\" will be deleted. Continue?', function () {
-                        that.$resource('/api/navigations/' + n.id + '/delete').save({}).then(function (resp) {
-                            resp.json().then(function (result) {
-                                refresh();
-                            });
-                        }, onJsonError);
+                    UIkit.modal.confirm(`Navigation "${n.name}" will be deleted. Continue?`, () => {
+                    	doAsync(
+                    		async () => {
+                    			await postJson(`/api/navigations/${n.id}/delete`);
+                    		},
+                    		() => refresh(),
+                    		err => UIkit.modal.alert(translateError(err))
+                    	);
                     });
                 }
             }

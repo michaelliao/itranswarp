@@ -4,32 +4,28 @@
 
 {% block head %}
 <script>
-    $(function () {
-    	let published = '{{ published }}' === 'true';
-        getJSON('/api/headlines', { published: published, page: '{{ page }}' }, function (err, resp) {
-            if (err) {
-                return showError(err);
-            }
-            let
+    $(() => {
+    	doAsync(
+    	    async () => {
+                let published = '{{ published }}' === 'true';
+    	        let resp = await getJson('/api/headlines', { published: published, page: '{{ page }}' });
+    	        let
             		page = resp.page,
-            		headlines = resp.results,
-            		userIds = headlines.map(h => h.userId).filter(function (element, index, self) {
-    				return self.indexOf(element) === index;
-				});
-            getJSON('/api/users/ids?' + userIds.map(id=>'id='+id).join('&'), function (err, resp) {
-                	if (err) {
-                		return showError(err);
-                	}
-	            headlines.map(h => {
-	            		h.user = resp[h.userId];
+            	    headlines = resp.results,
+            	    userIds = headlines.map(h => h.userId).filter((element, index, self) => self.indexOf(element) === index);
+    	        let userResp = await getJson('/api/users/ids?' + userIds.map(id=>'id='+id).join('&'));
+    	        headlines.map(h => {
+	            	h.user = userResp[h.userId];
 			    });
-                	initVM({
-                		published: published,
-                		page: page,
+			    return {
+                	published: published,
+                	page: page,
                     headlines: headlines
-                	});
-            });
-        });
+                };
+			},
+    	    data => initVM(data),
+    	    err => UIkit.modal.alert(translateError(err))
+    	);
     });
 
     function initVM(data) {
@@ -49,25 +45,27 @@
                 		location.assign('/manage/headline/headline_update?id='+id);
                 },
                 publishHeadline: function (id) {
-                    var that = this;
-                    var a = that.headlines.find(a => a.id === id);
-                    UIkit.modal.confirm('Headline \"' + a.name + '\" will be published. Continue?', function () {
-                        that.$resource('/api/headlines/' + a.id + '/publish').save({}).then(function (resp) {
-                            resp.json().then(function (result) {
-                                refresh();
-                            });
-                        }, onJsonError);
+                    let a = this.headlines.find(a => a.id === id);
+                    UIkit.modal.confirm(`Headline "${a.name}" will be published. Continue?`, () => {
+                        doAsync(
+                            async () => {
+                                await postJson(`/api/headlines/${a.id}/publish`);
+                            },
+                            () => refresh(),
+    	                    err => UIkit.modal.alert(translateError(err))
+                        );
                     });
                 },
                 deleteHeadline: function (id) {
-                    var that = this;
-                    var a = that.headlines.find(a => a.id === id);
-                    UIkit.modal.confirm('Headline \"' + a.name + '\" will be deleted. Continue?', function () {
-                        that.$resource('/api/headlines/' + a.id + '/delete').save({}).then(function (resp) {
-                            resp.json().then(function (result) {
-                                refresh();
-                            });
-                        }, onJsonError);
+                    let a = this.headlines.find(a => a.id === id);
+                    UIkit.modal.confirm(`Headline "${a.name}" will be deleted. Continue?`, () => {
+                        doAsync(
+                            async () => {
+                                await postJson(`/api/headlines/${a.id}/delete`);
+                            },
+                            () => refresh(),
+    	                    err => UIkit.modal.alert(translateError(err))
+                        );
                     });
                 },
             }

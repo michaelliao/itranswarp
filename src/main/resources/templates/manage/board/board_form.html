@@ -5,20 +5,21 @@
 {% block head %}
 
 <script>
-$(function() {
-    var id = parseInt('{{ id }}');
+$(() => {
+    const id = parseInt('{{ id }}');
     if (id > 0) {
-        getJSON('/api/boards/' + id, function (err, resp) {
-            if (err) {
-                return showError(err);
-            }
-            initVM({
-	        	title: 'Edit Board',
-        		board: resp
-        	});
-        });
-    }
-    else {
+        doAsync(
+            async () => {
+                let resp = await getJson(`/api/boards/${id}`);
+                return {
+                    title: 'Edit Board',
+                    board: resp
+                };
+	        },
+	        data => initVM(data),
+		    err => UIkit.modal.alert(translateError(err))
+		);
+    } else {
         initVM({
         	title: 'New Board',
         	board: {}
@@ -38,13 +39,13 @@ function initVM(data) {
             $('#vm').show();
         },
         methods: {
-            submit: function() {
-                var that = this;
-                that.$resource('{{ action }}').save(this.board).then(function (resp) {
-                    resp.json().then(function (result) {
-                        location.assign('/manage/board/');
-                    });
-                }, onJsonFormError);
+            submit: async function() {
+                try {
+                    await postJson('{{ action }}', this.board);
+                    location.assign('/manage/board/');
+                } catch (err) {
+                    UIkit.modal.alert(translateError(err));
+                }
             }
         }
     });

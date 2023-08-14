@@ -4,35 +4,29 @@
 
 {% block head %}
 <script>
-    $(function () {
-        getJSON('/api/boards', function (err, resp) {
-            if (err) {
-                return showError(err);
-            }
-            var boards = resp.results.reduce((obj, b) => {
+$(() => {
+	doAsync(
+		async () => {
+			let boardsResp = await getJson('/api/boards');
+			let boards = boardsResp.results.reduce((obj, b) => {
             	obj[b.id] = b;
             	return obj;
             }, {});
-            getJSON('/api/topics', {
-                page: parseInt('{{ page }}')
-            }, function (err, resp) {
-                if (err) {
-                    return showError(err);
-                }
-                var
-                	page = resp.page,
-                	topics = resp.results;
-                topics.map(t => {
-                	t.board = boards[t.boardId];
-                });
-
-                initVM({
-                	topics: topics,
-                	page: page
-                });
+            let topicResponse = await getJson('/api/topics', { page: parseInt('{{ page }}') });
+            let page = topicResponse.page;
+            let topics = topicResponse.results;
+            topics.map(t => {
+                t.board = boards[t.boardId];
             });
-        });
-    });
+            return {
+                topics: topics,
+                page: page
+            };
+		},
+		data => initVM(data),
+		err => UIkit.modal.alert(translateError(err))
+	);
+});
 
     function initVM(data) {
         var vm = new Vue({
@@ -50,27 +44,26 @@
                     UIkit.modal.alert('unsupported yet.');
                 },
                 deleteTopic: function (t) {
-                    var that = this;
-                    UIkit.modal.confirm('Topic \"' + t.name + '\" will be deleted. Continue?', function () {
-                        that.$resource('/api/topics/' + t.id + '/delete').save({}).then(function (resp) {
-                            resp.json().then(function (result) {
-                                refresh();
-                            });
-                        }, onJsonError);
+                    UIkit.modal.confirm(`Topic "${t.name}" will be deleted. Continue?`, () => {
+                        doAsync(async () => {
+                            await postJson(`/api/topics/${t.id}/delete`);
+                        }, () => {
+                            refresh();
+                        }, (err) => {
+                            UIkit.modal.alert(translateError(err));
+                        });
                     });
                 },
                 deleteTopicAndLock: function (t) {
-                    var that = this;
-                    UIkit.modal.confirm('Topic \"' + t.name + '\" will be deleted, and user \"' + t.userName + '\" will be locked. Continue?', function () {
-                    	that.$resource('/api/users/' + t.userId + '/lock/5000000000000').save({}).then(function (resp) {
-                    		resp.json().then(function (result) {
-		                        that.$resource('/api/topics/' + t.id + '/delete').save({}).then(function (resp) {
-        		                    resp.json().then(function (result) {
-                		                refresh();
-                        		    });
-                        		}, onJsonError);
-                        	});
-                        }, onJsonError);
+                    UIkit.modal.confirm(`Topic "${t.name}" will be deleted, and user "${t.userName}" will be locked. Continue?`, () => {
+                        doAsync(async () => {
+                            await postJson(`/api/users/${t.userId}/lock/5000000000000`);
+                            await postJson(`/api/topics/${t.id}/delete`);
+                        }, () => {
+                            refresh();
+                        }, (err) => {
+                            UIkit.modal.alert(translateError(err));
+                        });
                     });
                 }
             }

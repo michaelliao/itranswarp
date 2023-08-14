@@ -4,20 +4,20 @@
 
 {% block head %}
 <script>
-var page = parseInt('{{ page }}');
 
-$(function() {
-    getJSON('/api/attachments', {
-        page: page
-    }, function (err, resp) {
-        if (err) {
-            return showError(err);
-        }
-        initVM({
-        	page: resp.page,
-        	attachments: resp.results
-        });
-    });
+$(() => {
+    doAsync(
+        async () => {
+            let page = parseInt('{{ page }}');
+            let resp = await getJson('/api/attachments', { page: page });
+            return {
+                page: resp.page,
+                attachments: resp.results
+            };
+        },
+        data => initVM(data),
+        err => UIkit.modal.alert(translateError(err))
+    );
 });
 
 function initVM(data) {
@@ -33,13 +33,14 @@ function initVM(data) {
         },
         methods: {
             deleteAttachment: function(a) {
-                var that = this;
-                UIkit.modal.confirm('Attachment \"' + a.name + '\" will be deleted. Continue?', function() {
-                    that.$resource('/api/attachments/' + a.id + '/delete').save({}).then(function (resp) {
-                        resp.json().then(function (result) {
-                            refresh();
-                        });
-                    }, onJsonError);
+                UIkit.modal.confirm(`Attachment "${a.name}" will be deleted. Continue?`, () => {
+                    doAsync(
+                        async () => {
+                            await postJson(`/api/attachments/${a.id}/delete`);
+                        },
+                        () => refresh(),
+                        err => UIkit.modal.alert(translateError(err))
+                    );
                 });
             }
         }

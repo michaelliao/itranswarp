@@ -5,19 +5,20 @@
 {% block head %}
 
 <script>
-
-$(function() {
-	var id = parseInt('{{ id }}');
+$(() => {
+	const id = parseInt('{{ id }}');
 	if (id > 0) {
-	    getJSON('/api/links/' + id, function (err, resp) {
-	        if (err) {
-	            return showError(err);
-		    }
-		    initVM({
-		        link: resp,
-		        title: 'Edit Link'
-	        });
-	    });
+	    doAsync(
+	        async () => {
+	            let resp = await getJson(`/api/links/${id}`);
+	            return {
+	                link: resp,
+	                title: 'Edit Link'
+	            };
+	        },
+	        data => initVM(data),
+	        err => UIkit.modal.alert(translateError(err))
+	    );
 	} else {
 		initVM({
 	        link: {},
@@ -38,13 +39,13 @@ function initVM(data) {
             $('#vm').show();
         },
         methods: {
-            submit: function () {
-                var that = this;
-                that.$resource('{{ action }}').save(this.link).then(function (resp) {
-                    resp.json().then(function (result) {
-                        location.assign('/manage/link/');
-                    });
-                }, onJsonFormError);
+            submit: async function () {
+                try {
+                    await postJson('{{ action }}', this.link);
+                    location.assign('/manage/link/');
+                } catch (err) {
+                    UIkit.modal.alert(translateError(err));
+                }
             }
         }
     });

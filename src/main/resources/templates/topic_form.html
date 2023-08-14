@@ -17,7 +17,7 @@
 
 <script>
     $(function () {
-        var
+        let
             $form = $('#topic-form'),
             $name = $form.find('input[name=name]'),
             $content = $form.find('textarea[name=content]'),
@@ -29,7 +29,7 @@
             });
         $form.submit(function (e) {
             e.preventDefault();
-            var
+            let
                 name = $name.val().trim(),
                 content = $content.val().trim();
             if (name === '') {
@@ -44,7 +44,7 @@
                 content: html2md(content)
             }, function (err, r) {
                 if (err) {
-                    return;
+                    return $form.showFormError(translateError(err));
                 }
                 location.assign('/discuss/{{ board.id }}');
             });

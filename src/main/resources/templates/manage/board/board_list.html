@@ -4,13 +4,14 @@
 
 {% block head %}
 <script>
-$(function() {
-    getJSON('/api/boards', function (err, data) {
-        if (err) {
-            return showError(err);
-        }
-        initVM(data.results);
-    });
+$(() => {
+	doAsync(
+		async () => {
+			return await getJson('/api/boards');
+		},
+		data => initVM(data.results),
+		err => UIkit.modal.alert('Load boards failed.')
+	);
 });
 
 function initVM(boards) {
@@ -47,37 +48,27 @@ function initVM(boards) {
                 }
                 this.swap(index, index + 1);
             },
-            sort: function () {
-                var ids = this.boards.map(b => b.id);
-                var that = this;
-                that.$resource('/api/boards/sort').save({ ids: ids }).then(function (resp) {
-                    resp.json().then(function (result) {
-                        refresh();
-                    });
-                }, onJsonError);
+            sort: async function () {
+                try {
+                    let ids = this.boards.map(b => b.id);
+                    let result = await postJson('/api/boards/sort', { ids: ids });
+                    refresh();
+                } catch (err) {
+                    UIkit.modal.alert(translateError(err));
+                }
             },
             editBoard: function (id) {
                 location.assign('board_update?id=' + id);
             },
             deleteBoard: function (b) {
-                var that = this;
-                UIkit.modal.confirm('Board \"' + b.name + '\" will be deleted. Continue?', function () {
-                    that.$resource('/api/boards/' + b.id + '/delete').save({}).then(function (resp) {
-                        resp.json().then(function (result) {
-                            location.assign('/manage/board/');
-                        });
-                    }, onJsonError);
-                });
-            },
-            lockBoard: function(id, locked) {
-                var b = this.boards[this.find(id)];
-                var that = this;
-                UIkit.modal.confirm('Board \"' + b.name + '\" will be ' + (locked ? 'locked' : 'unlocked') + '. Continue?', function () {
-                    that.$resource('/api/boards/' + b.id + (locked ? '/lock' : '/unlock')).save({}).then(function (resp) {
-                        resp.json().then(function (result) {
-                            location.assign('/manage/board/');
-                        });
-                    }, onJsonFormError);
+                UIkit.modal.confirm(`Board "${b.name}" will be deleted. Continue?`, () => {
+                    doAsync(async () => {
+                        await postJson(`/api/boards/${b.id}/delete`);
+                    }, () => {
+                    	refresh();
+                    }, (err) => {
+                        UIkit.modal.alert(translateError(err));
+                    });
                 });
             }
         }
@@ -130,8 +121,6 @@ function initVM(boards) {
                         <a v-on:click="moveDown(b.id)" title="Move this board down" href="#0" class="x-btn"><i class="uk-icon-arrow-down"></i></a>
                         <a v-on:click="editBoard(b.id)" title="Edit this board" href="#0" class="x-btn"><i class="uk-icon-edit"></i></a>
                         <a v-on:click="deleteBoard(b)" title="Delete this board" href="#0" class="x-btn"><i class="uk-icon-trash"></i></a>
-                        <a v-if="!b.locked" v-on:click="lockBoard(b.id, true)" title="Lock this board" href="#0" class="x-btn"><i class="uk-icon-ban"></i></a>
-                        <a v-if="b.locked" v-on:click="lockBoard(b.id, false)" title="Unock this board" href="#0" class="x-btn"><i class="uk-icon-circle-o"></i></a>
                     </td>
                 </tr>
             </tbody>

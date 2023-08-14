@@ -4,13 +4,15 @@
 
 {% block head %}
 <script>
-$(function() {
-    getJSON('/api/links', function (err, resp) {
-        if (err) {
-            return showError(err);
-        }
-        initVM(resp.results);
-    });
+$(() => {
+    doAsync(
+    	async () => {
+    		let resp = await getJson('/api/links');
+    		return resp.results;
+    	},
+    	data => initVM(data),
+    	err => UIkit.modal.alert(translateError(err))
+    );
 });
 
 function initVM(links) {
@@ -27,16 +29,17 @@ function initVM(links) {
             	return this.links.findIndex(n => n.id === id);
             },
             editLink: function (n) {
-                location.assign('/manage/link/link_update?id=' + n.id);
+                location.assign(`/manage/link/link_update?id=${n.id}`);
             },
             deleteLink: function (n) {
-                var that = this;
-                UIkit.modal.confirm('Link \"' + n.name + '\" will be deleted. Continue?', function() {
-                    that.$resource('/api/links/' + n.id + '/delete').save({}).then(function (resp) {
-                        resp.json().then(function (result) {
-                            refresh();
-                        });
-                    }, onJsonError);
+                UIkit.modal.confirm(`Link "${n.name}" will be deleted. Continue?`, () => {
+                	doAsync(
+                		async () => {
+                			await postJson(`/api/links/${n.id}/delete`);
+                		},
+                		() => refresh(),
+                		err => UIkit.modal.alert(translateError(err))
+                	);
                 });
             }
         }
@@ -74,11 +77,9 @@ function initVM(links) {
             </thead>
             <tbody>
                 <tr v-for="n in links">
-                    <td><a v-bind:href="n.shortenUrl" target="_blank"><span v-text="n.name"></span></a></td>
+                    <td><span v-text="n.name"></span></td>
                     <td>
-                    	<form class="uk-form">
-                    		<input onclick="this.select()" v-model="n.shortenUrl" readonly class="uk-form-width-medium">
-                    	</form>
+                    	<a v-bind:href="n.shortenUrl" target="_blank" v-text="n.shortenUrl"></a></td>
 					</td>
                     <td><a v-text="n.url" v-bind:href="n.url" target="_blank"></a></td>
                     <td><span v-text="n.createdAt.toDateTime()"></span></td>

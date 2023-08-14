@@ -4,29 +4,31 @@
 
 {% block head %}
 <script>
-$(function() {
-    var id = parseInt('{{ id }}');
-    if (id > 0) {
-        getJSON('/api/singlePages/' + id, function (err, singlePage) {
-            if (err) {
-                return showError(err);
+$(() => {
+    doAsync(
+        async () => {
+        	let id = parseInt('{{ id }}');
+        	if (id > 0) {
+                let singlePage = await getJson(`/api/singlePages/${id}`);
+                singlePage.publishAtLocal = timestampToDateTimeLocal(singlePage.publishAt);
+                return {
+                    title: 'Edit Single Page',
+                    singlePage: singlePage
+                };
+            } else {
+                return {
+                    title: 'New Single Page',
+                    singlePage: {
+                        publishAtLocal: timestampToDateTimeLocal(Date.now())
+                    }
+                };
             }
-            singlePage.publishAtLocal = timestampToDateTimeLocal(singlePage.publishAt);
-            initVM({
-            	title: 'Edit Single Page',
-            	singlePage: singlePage
-            });
-        });
-    }
-    else {
-        initVM({
-        	title: 'New Single Page',
-        	singlePage: {
-        		publishAtLocal: timestampToDateTimeLocal(Date.now())
-        	}
-        });
-    }
+        },
+    	data => initVM(data),
+    	err => UIkit.modal.alert(translateError(err))
+    );
 });
+
 
 function initVM(data) {
     window.vm = new Vue({
@@ -40,16 +42,16 @@ function initVM(data) {
             $('#vm').show();
         },
         methods: {
-            submit: function() {
+            submit: async function() {
             	this.singlePage.publishAt = dateTimeLocalToTimestamp(this.singlePage.publishAtLocal);
                 this.singlePage.content = $('#content-editor').val();
-                var that = this;
-                this.$resource('{{ action }}').save(this.singlePage).then(function (resp) {
-                    resp.json().then(function (result) {
-                        that.saved = true;
-                        location.assign('/manage/single/');
-                    });
-                }, onJsonFormError);
+                try {
+                    await postJson('{{ action }}', this.singlePage);
+                    this.saved = true;
+                    location.assign('/manage/single/');
+                } catch (err) {
+                    UIkit.modal.alert(translateError(err));
+                }
             }
         }
     });

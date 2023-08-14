@@ -51,19 +51,6 @@ function getWeb3Provider() {
     return window.web3Provider;
 }
 
-function translateError(err) {
-    if (typeof (err) === 'string') {
-        return err;
-    }
-    if (err.code && err.message && err.data) {
-        return `Error (${err.code}): ${err.message} Data: ${err.data}`;
-    }
-    if (err.code && err.message) {
-        return `Error (${err.code}): ${err.message}`;
-    }
-    return err.message || err.toString();
-}
-
 function ethAuth() {
 	if (!ethereum.isMetaMask) {
 		UIkit.modal.alert('MetaMask is not installed.');
@@ -101,25 +88,70 @@ async function doEthAuth() {
 	};
 }
 
-function showOAuth() {
+function passkeyAuth() {
+	doPasskeyAuth().then(r => {
+		console.log('passkey sign ok');
+		location.assign(r.url);
+	}).catch(err => {
+		console.error(err);
+	    UIkit.modal.alert(translateError(err))
+	});
+}
+
+async function doPasskeyAuth() {
+	const getResponse = await fetch(`/api/passkey/get/options?t=${Date.now()}`);
+	const getOptions = await getResponse.json();
+	console.log(getOptions);
+	getOptions.challenge = base64_urlsafe_decode(getOptions.challenge);
+	const cred = await navigator.credentials.get({
+        publicKey: getOptions
+    });
+    const credential = {
+        id: cred.id,
+        type: cred.type,
+        rawId: base64_urlsafe_encode(cred.rawId),
+        response: {
+            clientDataJSON: base64_urlsafe_encode(cred.response.clientDataJSON),
+            authenticatorData: base64_urlsafe_encode(cred.response.authenticatorData),
+            signature: base64_urlsafe_encode(cred.response.signature),
+            userHandle: base64_urlsafe_encode(cred.response.userHandle)
+        }
+    };
+    const signinResponse = await fetch('/api/passkey/signin', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(credential)
+    });
+    const signinResult = await signinResponse.json();
+    if (!signinResponse.ok) {
+        throw signinResult;
+    }
+    return signinResult;
+}
+
+function showTab(type) {
 	$('#signin .x-tab').removeClass('uk-active');
-	$('#signin .x-tab-oauth').addClass('uk-active');
+	$('#signin .x-tab-' + type).addClass('uk-active');
 	$('#signin .uk-panel').hide();
-	$('#signin .x-panel-oauth').show();
+	$('#signin .x-panel-' + type).show();
+}
+
+function showOAuth() {
+	showTab('oauth');
 }
 
 function showPasswordAuth() {
-	$('#signin .x-tab').removeClass('uk-active');
-	$('#signin .x-tab-passauth').addClass('uk-active');
-	$('#signin .uk-panel').hide();
-	$('#signin .x-panel-passauth').show();
+	showTab('passauth');
 }
 
 function showEthAuth() {
-	$('#signin .x-tab').removeClass('uk-active');
-	$('#signin .x-tab-ethauth').addClass('uk-active');
-	$('#signin .uk-panel').hide();
-	$('#signin .x-panel-ethauth').show();
+	showTab('ethauth');
+}
+
+function showPasskeyAuth() {
+	showTab('passkeyauth');
 }
 
 function onPasswordAuth() {
@@ -137,12 +169,18 @@ $(function () {
 		showPasswordAuth();
 	{% elseif type == "ethauth" %}
 		showEthAuth();
+	{% elseif type == "passkeyauth" %}
+		showPasskeyAuth();
 	{% endif %}
 
 	if (!window.ethereum) {
 		$('#signin .x-tab-ethauth').hide();
 		$('#signin .x-panel-ethauth').hide();
-		return;
+	}
+
+	if (!navigator.credentials) {
+		$('#signin .x-tab-passkeyauth').hide();
+		$('#signin .x-panel-passkeyauth').hide();
 	}
 
 	{% if error %}
@@ -164,6 +202,9 @@ $(function () {
     		{% endif %}
 			{% if ethauthEnabled %}
     		<li class="x-tab x-tab-ethauth"><a href="#0" onclick="showEthAuth()">Web3</a></li>
+    		{% endif %}
+			{% if passkeyauthEnabled %}
+    		<li class="x-tab x-tab-passkeyauth"><a href="#0" onclick="showPasskeyAuth()">Passkey</a></li>
     		{% endif %}
 		</ul>
 
@@ -211,6 +252,16 @@ $(function () {
 	                </div>
 	            </div>
 	        </form>
+		</div>
+
+		<div style="display:none" class="x-panel-passkeyauth uk-panel uk-panel-box uk-panel-box-secondary x-signin-panel x-passkeyauth-signin-panel">
+			<h3>Please signin with Passkey:</h3>
+			<p>
+				<button class="uk-button uk-button-primary uk-button-large" onclick="passkeyAuth()">
+					<i class="uk-icon-key"></i>
+					{{ _('Sign in with %1$s', 'Passkey') }}
+				</button>
+			</p>
 		</div>
 
 		<div style="display:none" class="x-panel-ethauth uk-panel uk-panel-box uk-panel-box-secondary x-signin-panel x-ethauth-signin-panel">

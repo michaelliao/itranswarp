@@ -1,13 +1,6 @@
 
 // global object patch ////////////////////////////////////////////////////////////////////////////
 
-if (!window.console) {
-    window.console = {
-        log: function (s) {
-        }
-    };
-}
-
 if (!String.prototype.trim) {
     String.prototype.trim = function () {
         return this.replace(/^\s+|\s+$/g, '');
@@ -136,6 +129,17 @@ if (!Number.prototype.toFileSize) {
 
 // functions //////////////////////////////////////////////////////////////////////////////////////
 
+function doAsync(asyncFn, callbackFn, errorFn, finallyFn) {
+	asyncFn().then(r => {
+		callbackFn && callbackFn(r);
+	}).catch(err => {
+		console.error(err);
+		errorFn && errorFn(err);
+	}).finally(() => {
+	    finallyFn && finallyFn();
+	});
+}
+
 function nextId() {
     if (!window.__nextId__) {
         window.__nextId__ = 0;
@@ -176,6 +180,21 @@ function Template(tpl) {
 }
 
 // global functions:
+
+function base64_urlsafe_encode(buffer) {
+    const base64 = window.btoa(String.fromCharCode(...new Uint8Array(buffer)));
+    return base64.replace(/=/g, '').replace(/\+/g, '-').replace(/\//g, '_');
+}
+
+function base64_urlsafe_decode(base64url) {
+    const base64 = base64url.replace(/-/g, '+').replace(/_/g, '/');
+    const binStr = window.atob(base64);
+    const bin = new Uint8Array(binStr.length);
+    for (let i = 0; i < binStr.length; i++) {
+        bin[i] = binStr.charCodeAt(i);
+    }
+    return bin.buffer;
+}
 
 function getCookie(key) {
     var keyValue = document.cookie.match('(^|;) ?' + key + '=([^;]*)(;|$)');
@@ -320,7 +339,7 @@ var parseDateTime = (function () {
 // parse query string as object:
 
 function parseQueryString() {
-    var
+    let
         q = location.search,
         r = {},
         i, pos, s, qs;
@@ -345,12 +364,45 @@ function gotoPage(i) {
 }
 
 function refresh() {
-    var r = parseQueryString();
+    let r = parseQueryString();
     r.t = Date.now();
     location.assign('?' + $.param(r));
 }
 
 // ajax submit form:
+
+async function getJson(url, data) {
+	if (typeof (data) === 'object') {
+        let arr = [];
+        $.each(data, function (k, v) {
+            arr.push(k + '=' + encodeURIComponent(v));
+        });
+        url = url + (url.indexOf('?') >= 0 ? '&' : '?') + arr.join('&');
+    }
+    let resp = await fetch(url);
+    let result = await resp.json();
+    if (resp.ok) {
+        return result;
+    } else {
+        throw result;
+    }
+}
+
+async function postJson(url, data) {
+    let resp = await fetch(url, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data===undefined ? '{}' : data)
+    });
+    let result = await resp.json();
+    if (resp.ok) {
+        return result;
+    } else {
+        throw result;
+    }    
+}
 
 function _httpJSON(method, url, data, callback) {
     var opt = {
@@ -400,6 +452,22 @@ function postJSON(url, data, callback) {
         data = {};
     }
     _httpJSON('POST', url, data, callback);
+}
+
+function translateError(err) {
+    if (typeof (err) === 'string') {
+        return err;
+    }
+    if (err.code && err.message && err.data) {
+        return `Error (${err.code}): ${err.message} Data: ${err.data}`;
+    }
+    if (err.code && err.message) {
+        return `Error (${err.code}): ${err.message}`;
+    }
+    if (err.status && err.error) {
+        return `Error ${err.status}: ${err.error}`;
+    }
+    return err.message || err.error || err.toString();
 }
 
 function showError(err) {

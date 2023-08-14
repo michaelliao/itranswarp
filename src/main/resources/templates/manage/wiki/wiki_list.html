@@ -5,15 +5,15 @@
 {% block head %}
 <script>
 
-var g_timestamp = parseInt('{{ __timestamp__ }}');
-
-$(function() {
-    getJSON('/api/wikis', function (err, resp) {
-        if (err) {
-            return showError(err);
-        }
-        initVM(resp.results);
-    });
+$(() => {
+    doAsync(
+        async () => {
+            let resp = await getJson('/api/wikis');
+            return resp.results;
+        },
+    	data => initVM(data),
+    	err => UIkit.modal.alert(translateError(err))
+    );
 });
 
 function initVM(wikis) {

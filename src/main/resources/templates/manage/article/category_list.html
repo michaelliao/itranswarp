@@ -5,14 +5,16 @@
 {% block head %}
 <script>
 
-    $(function () {
-        getJSON('/api/categories', function (err, data) {
-            if (err) {
-                return showError(err);
-            }
-            initVM(data.results);
-        });
-    });
+$(() => {
+    doAsync(
+        async () => {
+            let resp = await getJson('/api/categories');
+            return resp.results;
+        },
+    	data => initVM(data),
+    	err => UIkit.modal.alert(translateError(err))
+    );
+});
 
     function initVM(data) {
         window.vm = new Vue({
@@ -48,24 +50,26 @@
                     }
                     this.swap(index, index + 1);
                 },
-                sort: function (event) {
-                    this.$resource('/api/categories/sort').save({ids: this.categories.map(c=>c.id)}).then(function (resp) {
-                        resp.json().then(function (result) {
-                            refresh();
-                        });
-                    }, onJsonError);
+                sort: async function (event) {
+                    try {
+                        await postJson('/api/categories/sort', {ids: this.categories.map(c=>c.id)});
+                        refresh();
+                    } catch (err) {
+                        UIkit.modal.alert(translateError(err));
+                    }
                 },
                 editCategory: function (id) {
-                    location.assign('category_update?id=' + id);
+                    location.assign(`category_update?id=${id}`);
                 },
                 deleteCategory: function (c) {
-                    var that = this;
-                    UIkit.modal.confirm('Category \"' + c.name + '\" will be deleted. Continue?', function () {
-                        that.$resource('/api/categories/' + c.id + '/delete').save({}).then(function (resp) {
-                            resp.json().then(function (result) {
-                                refresh();
-                            });
-                        }, onJsonError);
+                    UIkit.modal.confirm(`Category "${c.name}" will be deleted. Continue?`, () => {
+                        doAsync(
+                            async () => {
+                                await postJson(`/api/categories/${c.id}/delete`);
+                            },
+                            () => {},
+                            err => UIkit.modal.alert(translateError(err))
+                        );
                     });
                 }
             }

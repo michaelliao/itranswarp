@@ -24,21 +24,21 @@
 
 <script>
 
-var definitions = {{ definitions|json|raw }};
-var settings = JSON.parse(decodeURIComponent('{{ settings|json|url|raw }}'));
+const definitions = {{ definitions|json|raw }};
+const settings = JSON.parse(decodeURIComponent('{{ settings|json|url|raw }}'));
 
 $(function () {
 	initVM();
 });
 
 function initVM() {
-    var templates = {
+    let templates = {
         TEXT: new Template($('#field-text').html()),
         TEXTAREA: new Template($('#field-textarea').html())
     };
-    var fields = [];
+    let fields = [];
     definitions.forEach(definition => {
-        var html = templates[definition.type].render(definition);
+        let html = templates[definition.type].render(definition);
         fields.push(html);
     });
     $('#vm form .x-replace').after(fields.join(''));
@@ -46,16 +46,16 @@ function initVM() {
         el: '#vm',
         data: settings,
         methods: {
-            submit: function(event) {
+            submit: async function(event) {
                 event.preventDefault();
                 $('#vm form .uk-alert-success').hide();
-                var that = this;
-                this.$resource('/api/setting/{{ tab }}').save(this.$data).then(function (resp) {
-                    resp.json().then(function (result) {
-                        $('#vm form .uk-alert-success').show();
-                    	location.assign('#');
-                    });
-                }, onJsonFormError);
+                try {
+                    await postJson('/api/setting/{{ tab }}', this.$data);
+                    $('#vm form .uk-alert-success').show();
+                    location.assign('#');
+                } catch (err) {
+                    UIkit.modal.alert(translateError(err));
+                }
             }
         }
     });

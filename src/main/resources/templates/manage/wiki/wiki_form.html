@@ -4,36 +4,35 @@
 
 {% block head %}
 <script>
+const id = parseInt('{{ id }}');
 
-var id = parseInt('{{ id }}');
-
-$(function () {
-    if (id > 0) {
-        getJSON('/api/wikis/' + id, function (err, wiki) {
-            if (err) {
-                return showError(err);
+$(() => {
+    doAsync(
+        async () => {
+            if (id > 0) {
+                let wiki = await getJson(`/api/wikis/${id}`);
+                return {
+                    title: 'Edit Wiki',
+                    wiki: wiki
+                };
+            } else {
+                return {
+                    title: 'New Wiki',
+                    wiki: {
+                        publishAtLocal: timestampToDateTimeLocal(Date.now()),
+                        content: ''
+                    }
+                };
             }
-            wiki.publishAtLocal = timestampToDateTimeLocal(wiki.publishAt);
-            initVM({
-            	title: 'Edit Wiki',
-            	wiki: wiki
-            });
-        });
-    }
-    else {
-        initVM({
-        	title: 'New Wiki',
-            wiki: {
-            	publishAtLocal: timestampToDateTimeLocal(Date.now()),
-            	content: ''
-            }
-        });
-    }
+        },
+    	data => initVM(data),
+    	err => UIkit.modal.alert(translateError(err))
+    );
 });
 
 function initVM(data) {
     if (data.wiki.imageId) {
-        $('#image-preview').css('background-image', 'url(/files/attachments/' + data.wiki.imageId + '/l)');
+        $('#image-preview').css('background-image', `url(/files/attachments/${data.wiki.imageId}/l)`);
     }
     window.vm = new Vue({
         el: '#vm',
@@ -46,17 +45,17 @@ function initVM(data) {
             $('#vm').show();
         },
         methods: {
-            submit: function() {
-                var that = this;
+            submit: async function() {
                 clearFormError();
                 this.wiki.publishAt = dateTimeLocalToTimestamp(this.wiki.publishAtLocal);
                 this.wiki.content = $('#content-editor').val();
-                that.$resource('{{ action }}').save(this.wiki).then(function (resp) {
-                    resp.json().then(function (result) {
-                        that.saved = true;
-                        location.assign(id > 0 ? '/manage/wiki/wiki_tree?id=' + id : '/manage/wiki/');
-                    });
-                }, onJsonFormError);
+                try {
+                    await postJson('{{ action }}', this.wiki);
+                    this.saved = true;
+                    location.assign(id > 0 ? `/manage/wiki/wiki_tree?id=${id}` : '/manage/wiki/');
+                } catch (err) {
+                    UIkit.modal.alert(translateError(err));
+                }
             }
         }
     });
@@ -92,7 +91,7 @@ function initVM(data) {
     // watch file change:
     $('#file').change(function (evt) {
         evt.preventDefault();
-        var f = $('#file').val();
+        let f = $('#file').val();
         if (f === '') {
             // user cancelled selected file:
             vm.wiki.image = null;
@@ -100,10 +99,10 @@ function initVM(data) {
             return;
         }
         try {
-            var file = $('#file').get(0).files[0];
+            let file = $('#file').get(0).files[0];
             processImageFile(file, function (r) {
                 vm.wiki.image = r.data;
-                $('#image-preview').css('background-image', 'url(' + r.image + ')');
+                $('#image-preview').css('background-image', `url(${r.image})`);
             });
         }
         catch (e) {

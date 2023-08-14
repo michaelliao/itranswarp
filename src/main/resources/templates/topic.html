@@ -51,15 +51,15 @@
 
 function initReplyArea(topic_id) {
     $('#x-reply-area').html($('#tplReplyArea').html());
-    var $makeReply = $('#reply-make-button');
-    var $replyForm = $('#reply-form');
-    var $postReply = $replyForm.find('button[type=submit]');
-    var $cancelReply = $replyForm.find('button.x-cancel');
+    let $makeReply = $('#reply-make-button');
+    let $replyForm = $('#reply-form');
+    let $postReply = $replyForm.find('button[type=submit]');
+    let $cancelReply = $replyForm.find('button.x-cancel');
     $makeReply.click(function () {
         $replyForm.showFormError();
         $replyForm.show();
         $replyForm.find('div.x-textarea').html('<textarea></textarea>');
-        var editor = new Simditor({
+        let editor = new Simditor({
 			textarea: $replyForm.find('textarea'),
 			toolbarFloatOffset: 50,
 			toolbar: ['title', '|', 'bold', 'italic', 'strikethrough', '|', 'blockquote', 'code', 'link', '|', 'ol', 'ul']

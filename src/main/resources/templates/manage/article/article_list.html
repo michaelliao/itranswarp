@@ -4,44 +4,33 @@
 
 {% block head %}
 <script>
-
-    $(function () {
-        getJSON('/api/categories', function (err, resp) {
-            if (err) {
-                return showError(err);
-            }
-            var categories = resp.results.reduce((obj, cat)=>{
+$(() => {
+    doAsync(
+        async () => {
+            let catResp = await getJson('/api/categories');
+            let categories = catResp.results.reduce((obj, cat)=>{
             	obj[cat.id] = cat;
             	return obj;
             }, {});
-            getJSON('/api/articles', {
-                page: '{{ page }}'
-            }, function (err, resp) {
-                if (err) {
-                    return showError(err);
-                }
-                var page = resp.page;
-                var articles = resp.results;
-                var userIds = articles.map(a => a.userId).filter(function (element, index, self) {
-    				return self.indexOf(element) === index;
-				});
-                getJSON('/api/users/ids?' + userIds.map(id=>'id='+id).join('&'), function (err, resp) {
-                	if (err) {
-                		return showError(err);
-                	}
-	                articles.map(a => {
-	                	a.user = resp[a.userId];
-			        	a.category = categories[a.categoryId];
-        				a.tags = a.tags ? a.tags.split(',') : [];
-		    	    });
-                	initVM({
-                		page: page,
-                    	articles: articles
-                	});
-                });
-            });
-        });
-    });
+            let articlesResp = await getJson('/api/articles', { page: '{{ page }}' });
+            let page = articlesResp.page;
+            let articles = articlesResp.results;
+            let userIds = articles.map(a => a.userId).filter((element, index, self) => self.indexOf(element) === index);
+            let resp = await getJson('/api/users/ids?' + userIds.map(id=>'id='+id).join('&'));
+            articles.map(a => {
+	            a.user = resp[a.userId];
+			    a.category = categories[a.categoryId];
+        		a.tags = a.tags ? a.tags.split(',') : [];
+		    });
+		    return {
+                page: page,
+                articles: articles
+            };
+        },
+    	data => initVM(data),
+        err => UIkit.modal.alert(translateError(err))
+    );
+});
 
     function initVM(data) {
         var vm = new Vue({
@@ -59,14 +48,15 @@
                     location.assign('article_update?id=' + id);
                 },
                 deleteArticle: function (id) {
-                    var that = this;
-                    var a = that.articles.find(a => a.id === id);
-                    UIkit.modal.confirm('Article \"' + a.name + '\" will be deleted. Continue?', function () {
-                        that.$resource('/api/articles/' + a.id + '/delete').save({}).then(function (resp) {
-                            resp.json().then(function (result) {
-                                refresh();
-                            });
-                        }, onJsonError);
+                    let a = this.articles.find(a => a.id === id);
+                    UIkit.modal.confirm(`Article "${a.name}" will be deleted. Continue?`, () => {
+                        doAsync(
+                            async () => {
+                                await postJson(`/api/articles/${a.id}/delete`);
+                            },
+                            () => refresh(),
+                            err => UIkit.modal.alert(translateError(err))
+                        );
                     });
                 },
             }

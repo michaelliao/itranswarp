@@ -5,17 +5,19 @@
 {% block head %}
 <script>
 
-$(function() {
-    getJSON('/api/singlePages', function (err, data) {
-        if (err) {
-            return showError(err);
-        }
-        var singlePages = data.results;
-        singlePages.map(p => {
-        	p.tags = p.tags ? p.tags.split(',') : [];
-        });
-        initVM(singlePages);
-    });
+$(() => {
+    doAsync(
+        async () => {
+            let resp = await getJson('/api/singlePages');
+            let singlePages = resp.results;
+            singlePages.map(p => {
+                p.tags = p.tags ? p.tags.split(',') : [];
+            });
+            return singlePages;
+        },
+    	data => initVM(data),
+    	err => UIkit.modal.alert(translateError(err))
+    );
 });
 
 function initVM(singlePages) {
@@ -32,15 +34,16 @@ function initVM(singlePages) {
             editWebpage: function (id) {
                 location.assign('/manage/single/update?id=' + id);
             },
-            deleteWebpage: function (id) {
-                var p = this.singlePages.filter(p => p.id === id)[0];
-                var that = this;
-                UIkit.modal.confirm('Single page \"' + p.name + '\" will be deleted. Continue?', function() {
-                    that.$resource('/api/singlePages/' + p.id + '/delete').save({}).then(function(resp) {
-                        resp.json().then(function (result) {
-                            refresh();
-                        });
-                    }, onJsonError);
+            deleteWebpage: async function (id) {
+                let p = this.singlePages.filter(p => p.id === id)[0];
+                UIkit.modal.confirm(`Single page "${p.name}" will be deleted. Continue?`, () => {
+                    doAsync(
+                        async () => {
+                            await postJson(`/api/singlePages/${p.id}/delete`);
+                        },
+                        () => refresh(),
+                        err => UIkit.modal.alert(translateError(err))
+                    );
                 });
             }
         }

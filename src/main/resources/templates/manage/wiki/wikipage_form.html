@@ -5,47 +5,48 @@
 {% block head %}
 <script>
 
-var id = parseInt('{{ id }}');
+const id = parseInt('{{ id }}');
 
-$(function () {
-	getJSON('/api/wikiPages/' + id, function (err, wp) {
-        if (err) {
-            return showError(err);
-        }
-		getJSON('/api/wikis/' + wp.wikiId, function (err, wiki) {
-    	    if (err) {
-        	    return showError(err);
-        	}
-	        wp.publishAtLocal = timestampToDateTimeLocal(wp.publishAt);
-    	    initVM(wiki, wp);
-    	});
-    });
+$(() => {
+    doAsync(
+        async () => {
+            let wp = await getJson(`/api/wikiPages/${id}`);
+            let wiki = await getJson(`/api/wikis/${wp.wikiId}`);
+            wp.publishAtLocal = timestampToDateTimeLocal(wp.publishAt);
+            return {
+                wp: wp,
+                wiki: wiki
+            };
+        },
+    	data => initVM(data),
+    	err => UIkit.modal.alert(translateError(err))
+    );
 });
 
-function initVM(wiki, wp) {
+function initVM(data) {
     window.vm = new Vue({
         el: '#vm',
         data: {
-        	wiki: wiki,
-            wikiPage: wp
+        	wiki: data.wiki,
+            wikiPage: data.wp
         },
         created: function () {
             $('#loading').hide();
             $('#vm').show();
         },
         methods: {
-            submit: function(event) {
+            submit: async function(event) {
                 event.preventDefault();
                 clearFormError();
                 this.wikiPage.publishAt = dateTimeLocalToTimestamp(this.wikiPage.publishAtLocal);
                 this.wikiPage.content = $('#content-editor').val();
-                var that = this;
-                that.$resource('/api/wikiPages/' + this.wikiPage.id).save(this.wikiPage).then(function (resp) {
-                    resp.json().then(function (result) {
-                        that.saved = true;
-                        location.assign('/manage/wiki/wiki_tree?id=' + that.wikiPage.wikiId);
-                    });
-                }, onJsonFormError);
+                try {
+                    await postJson(`/api/wikiPages/${this.wikiPage.id}`, this.wikiPage);
+                    this.saved = true;
+                    location.assign(`/manage/wiki/wiki_tree?id=${this.wikiPage.wikiId}`);
+                } catch (err) {
+                    UIkit.modal.alert(translateError(err));
+                }
             }
         }
     });

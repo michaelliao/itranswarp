@@ -1,5 +1,6 @@
 package com.itranswarp.service;
 
+import java.time.Duration;
 import java.util.Arrays;
 import java.util.List;
 import java.util.StringJoiner;
@@ -18,6 +19,8 @@ import com.itranswarp.model.AbstractEntity;
 import com.itranswarp.model.EthAuth;
 import com.itranswarp.model.LocalAuth;
 import com.itranswarp.model.OAuth;
+import com.itranswarp.model.PasskeyAuth;
+import com.itranswarp.model.PasskeyChallenge;
 import com.itranswarp.model.User;
 import com.itranswarp.oauth.OAuthAuthentication;
 import com.itranswarp.util.HashUtil;
@@ -25,6 +28,7 @@ import com.itranswarp.util.IdUtil;
 import com.itranswarp.util.JsonUtil;
 import com.itranswarp.util.RandomUtil;
 import com.itranswarp.warpdb.PagedResults;
+import com.webauthn4j.util.Base64UrlUtil;
 
 import jakarta.annotation.PostConstruct;
 
@@ -33,6 +37,12 @@ public class UserService extends AbstractDbService<User> {
 
     @Value("${spring.signin.default-image:/avatar/{name}}")
     String defaultImage;
+
+    @Value("${spring.signin.passkey.challenge-timeout}")
+    Duration passKeyChallengeTimeout = Duration.ofMinutes(1);
+
+    @Value("${spring.signin.passkey.max}")
+    int passkeyMax = 5;
 
     static final String KEY_USERS = "__users__";
 
@@ -143,6 +153,74 @@ public class UserService extends AbstractDbService<User> {
             this.db.update(auth);
         }
         return auth;
+    }
+
+    public PasskeyAuth fetchPasskeyAuth(long id) {
+        return this.db.fetch(PasskeyAuth.class, id);
+    }
+
+    public PasskeyAuth fetchPasskeyAuthByCredentialId(long userId, String credentialId) {
+        return this.db.from(PasskeyAuth.class).where("userId = ? AND credentialId = ?", userId, credentialId).first();
+    }
+
+    public List<PasskeyAuth> getPasskeyAuths(long userId) {
+        return this.db.from(PasskeyAuth.class).where("userId = ?", userId).list();
+    }
+
+    @Transactional
+    public PasskeyAuth createPasskeyAuth(User user, String device, int alg, String credentialId, String pubKey, String[] transports) {
+        int count = this.db.from(PasskeyAuth.class).where("userId = ?", user.id).count();
+        if (count >= this.passkeyMax) {
+            throw new ApiException(ApiError.OPERATION_FAILED, null, "Maximum passkeys.");
+        }
+        var pkAuth = new PasskeyAuth();
+        pkAuth.userId = user.id;
+        pkAuth.credentialId = credentialId;
+        pkAuth.pubKey = pubKey;
+        pkAuth.device = device;
+        pkAuth.alg = alg;
+        pkAuth.transports = transports == null ? "" : String.join(",", transports);
+        this.db.insert(pkAuth);
+        return pkAuth;
+    }
+
+    @Transactional
+    public void updatePasskeyLastUsed(PasskeyAuth pkAuth) {
+        pkAuth.updatedAt = System.currentTimeMillis();
+        this.db.updateProperties(pkAuth, "updatedAt");
+    }
+
+    @Transactional
+    public void deletePasskeyAuth(long userId, long id) {
+        var pkAuth = this.db.fetch(PasskeyAuth.class, id);
+        if (pkAuth == null || pkAuth.userId != userId) {
+            throw new ApiException(ApiError.ENTITY_NOT_FOUND, "PasskeyAuth", "Passkey not found.");
+        }
+        this.db.remove(pkAuth);
+    }
+
+    @Transactional
+    public PasskeyChallenge createPasskeyChallenge() {
+        byte[] rnd = RandomUtil.createRandomBytes(32);
+        var pkc = new PasskeyChallenge();
+        pkc.expiresAt = System.currentTimeMillis() + this.passKeyChallengeTimeout.toMillis();
+        pkc.challenge = Base64UrlUtil.encodeToString(rnd);
+        this.db.insert(pkc);
+        return pkc;
+    }
+
+    public PasskeyChallenge fetchNonExpiredPasskeyChallenge(String challenge) {
+        var pkc = this.db.from(PasskeyChallenge.class).where("challenge = ?", challenge).first();
+        if (pkc != null && pkc.expiresAt > System.currentTimeMillis()) {
+            return pkc;
+        }
+        return null;
+    }
+
+    @Transactional
+    public void deleteExpiresPassKeyChallenge() {
+        long current = System.currentTimeMillis();
+        this.db.updateSql("DELETE FROM passkey_challenges WHERE expiresAt < ?", current);
     }
 
     @Transactional

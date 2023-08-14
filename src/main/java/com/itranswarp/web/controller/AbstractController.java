@@ -2,6 +2,8 @@ package com.itranswarp.web.controller;
 
 import jakarta.annotation.PostConstruct;
 
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
@@ -26,6 +28,9 @@ import com.itranswarp.service.WikiService;
 import com.itranswarp.web.view.i18n.Translators;
 
 public abstract class AbstractController extends AbstractService {
+
+    protected static final String RESULTS = "results";
+    protected static final Map<String, Boolean> API_RESULT_TRUE = Map.of("result", Boolean.TRUE);
 
     protected static final String ID = "{id:[0-9]{1,17}}";
     protected static final String ID2 = "{id2:[0-9]{1,17}}";

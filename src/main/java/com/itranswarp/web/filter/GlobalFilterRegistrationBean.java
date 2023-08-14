@@ -26,6 +26,7 @@ import com.itranswarp.enums.Role;
 import com.itranswarp.model.EthAuth;
 import com.itranswarp.model.LocalAuth;
 import com.itranswarp.model.OAuth;
+import com.itranswarp.model.PasskeyAuth;
 import com.itranswarp.model.User;
 import com.itranswarp.oauth.OAuthProviders;
 import com.itranswarp.service.AntiSpamService;
@@ -124,6 +125,13 @@ public class GlobalFilterRegistrationBean extends FilterRegistrationBean<Filter>
                     } else if ("eth".equals(session.authProvider)) {
                         EthAuth auth = userService.fetchEthAuthById(session.id);
                         if (auth != null && session.validate(auth.address, encryptService.getSessionHmacKey())) {
+                            user = userService.getEnabledUserById(auth.userId);
+                        } else {
+                            CookieUtil.deleteSessionCookie(request, response);
+                        }
+                    } else if ("passkey".equals(session.authProvider)) {
+                        PasskeyAuth auth = userService.fetchPasskeyAuth(session.id);
+                        if (auth != null && session.validate(auth.pubKey, encryptService.getSessionHmacKey())) {
                             user = userService.getEnabledUserById(auth.userId);
                         } else {
                             CookieUtil.deleteSessionCookie(request, response);

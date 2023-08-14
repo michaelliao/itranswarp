@@ -14,6 +14,7 @@ import com.itranswarp.bean.SessionCookieBean;
 import com.itranswarp.model.EthAuth;
 import com.itranswarp.model.LocalAuth;
 import com.itranswarp.model.OAuth;
+import com.itranswarp.model.PasskeyAuth;
 
 public class CookieUtil {
 
@@ -31,6 +32,10 @@ public class CookieUtil {
 
     public static String encodeSessionCookie(EthAuth auth, long expiresAt, String hmacKey) {
         return encodeSessionCookie("eth", auth.id, expiresAt, auth.address, hmacKey);
+    }
+
+    public static String encodeSessionCookie(PasskeyAuth auth, long expiresAt, String hmacKey) {
+        return encodeSessionCookie("passkey", auth.id, expiresAt, auth.pubKey, hmacKey);
     }
 
     public static SessionCookieBean decodeSessionCookie(String str) {

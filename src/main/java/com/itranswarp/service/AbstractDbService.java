@@ -31,7 +31,11 @@ public class AbstractDbService<T extends AbstractEntity> extends AbstractService
     protected RedisService redisService;
 
     public AbstractDbService() {
-        this.entityClass = ClassUtil.getParameterizedType(this.getClass());
+        Class<?> clazz = this.getClass();
+        if (clazz.getSuperclass() != AbstractDbService.class) {
+            clazz = clazz.getSuperclass();
+        }
+        this.entityClass = ClassUtil.getParameterizedType(clazz);
     }
 
     public T getById(long id) {

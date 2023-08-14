@@ -1,8 +1,46 @@
 package com.itranswarp.util;
 
+import java.util.regex.Pattern;
+
 import jakarta.servlet.http.HttpServletRequest;
 
 public class HttpUtil {
+
+    public static String getOrigin(HttpServletRequest request) {
+        String scheme = getScheme(request);
+        String host = getHost(request);
+        return scheme + "://" + host;
+    }
+
+    /**
+     * Get host as "localhost:8080".
+     */
+    public static String getHost(HttpServletRequest request) {
+        String host = request.getHeader("HOST");
+        if (host == null) {
+            host = "localhost";
+        } else {
+            host = host.toLowerCase();
+        }
+        return host;
+    }
+
+    /**
+     * Get hostname only as "localhost".
+     */
+    public static String getHostname(HttpServletRequest request) {
+        String host = request.getHeader("HOST");
+        if (host == null) {
+            host = "localhost";
+        } else {
+            host = host.toLowerCase();
+        }
+        int n = host.indexOf(':');
+        if (n > 0) {
+            host = host.substring(0, n);
+        }
+        return host;
+    }
 
     public static String getScheme(HttpServletRequest request) {
         if ("https".equals(request.getHeader("X-FORWARDED-PROTO"))) {
@@ -23,10 +61,45 @@ public class HttpUtil {
             }
             url = url.substring(n);
         }
-        if (url.startsWith("/auth/")) {
+        if (url.startsWith("/auth/") || url.startsWith("/api/")) {
             return "/";
         }
         return url;
+    }
+
+    static class DevicePattern {
+        final String name;
+        final Pattern pattern;
+
+        DevicePattern(String name, String pattern) {
+            this.name = name;
+            this.pattern = Pattern.compile(pattern);
+        }
+
+        boolean matches(String s) {
+            return this.pattern.matcher(s).find();
+        }
+    }
+
+    static DevicePattern[] devicePatterns = new DevicePattern[] { //
+            new DevicePattern("Windows", "\\Wwindows\\snt\\W"), //
+            new DevicePattern("macOS", "\\Wmacintosh\\W"), //
+            new DevicePattern("Android", "\\Wandroid\\W"), //
+            new DevicePattern("iPhone", "\\Wiphone\\W"), //
+            new DevicePattern("iPad", "\\Wipad\\W"), //
+            new DevicePattern("Linux", "\\Wlinux\\W"), };
+
+    public static String getDevice(HttpServletRequest request) {
+        String ua = request.getHeader("USER-AGENT");
+        if (ua != null) {
+            ua = ua.toLowerCase();
+            for (var device : devicePatterns) {
+                if (device.matches(ua)) {
+                    return device.name;
+                }
+            }
+        }
+        return "Unknown";
     }
 
     public static boolean isSecure(HttpServletRequest request) {

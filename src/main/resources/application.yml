@@ -90,6 +90,13 @@ spring:
     # web3 metamask signin:
     eth:
       enabled: ${SIGNIN_ETH_ENABLED:true}
+    # passkey signin:
+    passkey:
+      enabled: ${SIGNIN_PASSKEY_ENABLED:true}
+      # challenge timeout, default to 1 min:
+      challenge-timeout: ${SIGNIN_PASSKEY_TIMEOUT:PT1M}
+      # maximum passkeys per user:
+      max: ${SIGNIN_PASSKEY_MAX:5}
     # oauth signin configuration:
     # {provider}: oauth provider id
     #   - name: display name

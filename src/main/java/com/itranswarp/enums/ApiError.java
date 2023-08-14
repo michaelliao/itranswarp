@@ -16,6 +16,8 @@ public enum ApiError {
 
     AUTH_SIGNIN_FAILED,
 
+    AUTH_SIGNIN_NO_PASSKEY,
+
     PERMISSION_DENIED,
 
     USER_FORBIDDEN,

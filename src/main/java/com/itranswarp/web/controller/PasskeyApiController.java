@@ -85,7 +85,7 @@ public class PasskeyApiController extends AbstractController {
         var options = new RegisterOptionsBean();
         options.challenge = userService.createPasskeyChallenge().challenge;
         options.rp = Map.of("name", website.name, "id", host);
-        options.user = Map.of("id", userId, "name", user.email, "displayName", user.name);
+        options.user = Map.of("id", userId, "name", user.name, "displayName", user.name);
         options.timeout = passKeyChallengeTimeout.toMillis();
         if (!existPks.isEmpty()) {
             options.excludeCredentials = existPks.stream().map(pk -> {

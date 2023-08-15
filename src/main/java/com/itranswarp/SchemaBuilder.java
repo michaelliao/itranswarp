@@ -28,6 +28,8 @@ import com.itranswarp.model.Headline;
 import com.itranswarp.model.LocalAuth;
 import com.itranswarp.model.Navigation;
 import com.itranswarp.model.OAuth;
+import com.itranswarp.model.PasskeyAuth;
+import com.itranswarp.model.PasskeyChallenge;
 import com.itranswarp.model.Reply;
 import com.itranswarp.model.Resource;
 import com.itranswarp.model.Setting;
@@ -89,7 +91,7 @@ public class SchemaBuilder {
     }
 
     String generateTable(Class<?> clazz) {
-        Set<Class<?>> classesWithUtf8 = Set.of(OAuth.class, LocalAuth.class, Resource.class);
+        Set<Class<?>> classesWithUtf8 = Set.of(OAuth.class, LocalAuth.class, PasskeyAuth.class, PasskeyChallenge.class, Resource.class);
         String charset = classesWithUtf8.contains(clazz) ? "UTF8" : "UTF8MB4";
         return db.getDDL(clazz).replace(" BIT ", " BOOL ").replace(");", ") Engine=INNODB DEFAULT CHARSET=" + charset + ";\n");
     }

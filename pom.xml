@@ -1,9 +1,11 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 
 	<groupId>com.itranswarp.web</groupId>
 	<artifactId>itranswarp</artifactId>
-	<version>2.14</version>
+	<version>2.15</version>
 	<packaging>jar</packaging>
 
 	<parent>
@@ -37,6 +39,7 @@
 		<pebble.version>3.2.0</pebble.version>
 		<warpdb.version>6.0.0</warpdb.version>
 		<web3j.version>4.8.4</web3j.version>
+		<webauthn4j.version>0.21.5.RELEASE</webauthn4j.version>
 	</properties>
 
 	<dependencies>
@@ -113,6 +116,13 @@
 			<version>${warpdb.version}</version>
 		</dependency>
 
+		<!-- webauthn -->
+		<dependency>
+			<groupId>com.webauthn4j</groupId>
+			<artifactId>webauthn4j-core</artifactId>
+			<version>${webauthn4j.version}</version>
+		</dependency>
+
 		<!-- web3 -->
 		<dependency>
 			<groupId>org.web3j</groupId>
@@ -162,7 +172,8 @@
 							<addDefaultImplementationEntries>true</addDefaultImplementationEntries>
 						</manifest>
 						<manifestEntries>
-							<Implementation-Version>${project.version}-${buildNumber}-${maven.build.timestamp}</Implementation-Version>
+							<Implementation-Version>
+								${project.version}-${buildNumber}-${maven.build.timestamp}</Implementation-Version>
 						</manifestEntries>
 					</archive>
 				</configuration>

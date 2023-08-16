@@ -17,7 +17,7 @@ public class PasskeyAuth extends AbstractEntity {
     @Column(nullable = false, updatable = false)
     public long userId;
 
-    @Column(nullable = false, updatable = false, length = VAR_ENUM)
+    @Column(nullable = false, updatable = false, length = VAR_CHAR_NAME)
     public String credentialId;
 
     @Column(nullable = false, updatable = false, length = VAR_CHAR_NAME)

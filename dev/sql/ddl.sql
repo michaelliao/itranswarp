@@ -210,7 +210,7 @@ CREATE TABLE passkey_auths (
   updatedAt BIGINT NOT NULL,
   userId BIGINT NOT NULL,
   version BIGINT NOT NULL,
-  credentialId VARCHAR(32) NOT NULL,
+  credentialId VARCHAR(100) NOT NULL,
   device VARCHAR(100) NOT NULL,
   pubKey VARCHAR(255) NOT NULL,
   transports VARCHAR(100) NOT NULL,

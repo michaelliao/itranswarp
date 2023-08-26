@@ -72,7 +72,7 @@ spring:
       # convert securities to TradingView chart, e.g. $$NASDAQ:AAPL$$
       # search valid symbol name at https://www.tradingview.com/widget/advanced-chart/
       trading-view:
-        enabled: ${MARKDOWN_TRADING_VIEW_ENABLED:true}
+        enabled: ${MARKDOWN_TRADING_VIEW_ENABLED:false}
         width:   ${MARKDOWN_TRADING_VIEW_WIDTH:100%}
         height:  ${MARKDOWN_TRADING_VIEW_HEIGHT:480px}
 

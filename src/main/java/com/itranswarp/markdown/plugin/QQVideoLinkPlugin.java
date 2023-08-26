@@ -25,7 +25,7 @@ import com.itranswarp.markdown.PatternLinkRenderer;
  *     plugins:
  *       qq-video:
  *         enabled: true # default is none
- *         width:   100% # default is "100%"
+ *         width: 100%   # default is "100%"
  *         height: 480px # default is "480px"
  * </code>
  * 

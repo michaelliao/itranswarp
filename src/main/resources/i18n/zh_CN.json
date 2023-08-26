@@ -37,7 +37,7 @@
 
     "Back": "返回",
     "Bad email or password.": "无效的邮箱或口令。",
-    "Blank": "Blank",
+    "Blank": "空",
     "Board": "板块",
     "Boards": "板块",
 
@@ -51,14 +51,15 @@
     "Contributor": "贡献者",
     "Created": "Created",
     "Created at": "Created At",
-    "Creator": "Creator",
+    "Creator": "创建者",
 
     "Delete": "删除",
     "Delete All": "删除全部",
-    "Delete All and Lock User": "Delete All and Lock User",
+    "Delete All and Lock User": "删除全部并锁定用户",
     "Delete and Lock User": "删除并锁定用户",
     "Deleted": "已删除",
     "Description": "描述",
+    "Device": "设备",
     "Discuss": "讨论",
     "Display Order": "显示顺序",
 
@@ -94,6 +95,7 @@
 
     "Last replied at": "最后回复于",
     "Last updated": "最后更新",
+    "Last used": "Last used",
     "License": "使用许可",
     "Links": "链接",
     "Loading": "正在加载",
@@ -112,7 +114,7 @@
     "New Article": "新文章",
     "New Board": "新板块",
     "New Category": "新分类",
-    "New Headline": "New Headline",
+    "New Headline": "新头条",
     "New Link": "新链接",
     "New Navigation": "新导航",
     "New Single Page": "新页面",
@@ -130,6 +132,7 @@
 
     "Page": "页面",
     "Pages": "页面",
+    "Passkey": "通行密钥",
     "Password": "口令",
     "Pending": "等待",
     "Please sign in": "请登录",
@@ -140,7 +143,7 @@
     "Previous Page": "上一页",
     "Price": "价格",
     "Profile": "个人资料",
-    "Publish At": "Publish at",
+    "Publish At": "发布时间",
     "Published Headlines": "已发布头条",
 
     "Read more": "继续阅读",
@@ -151,6 +154,8 @@
     "Recent Replies": "最新回复",
     "Recent Topics": "最新帖子",
     "Refresh": "刷新",
+    "Register New Passkey": "注册新通行密钥",
+    "Registered passkeys": "已注册的通行密钥",
     "Registration Date": "注册日期",
     "Replies": "回复",
     "Reply": "回复",
@@ -187,7 +192,7 @@
     "Timezone": "时区",
     "Title": "标题",
     "Topic": "话题",
-    "Topic Number": "Topic Number",
+    "Topic Number": "话题数量",
     "Topic source": "问题来源",
     "Topics": "话题",
     "Type": "类型",

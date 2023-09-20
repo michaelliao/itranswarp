@@ -113,7 +113,7 @@ public class ArticleService extends AbstractDbService<Article> {
         sortEntities(categories, ids);
     }
 
-    public List<Article> getPublishedArticles(int maxResults) {
+    public List<Article> getPublishedArticlesFromCache(int maxResults) {
         List<Article> articles = this.redisService.get(KEY_RECENT_ARTICLES, TYPE_LIST_ARTICLE);
         if (articles == null) {
             articles = db.from(Article.class).where("publishAt < ?", System.currentTimeMillis()).orderBy("publishAt").desc().orderBy("id").desc()

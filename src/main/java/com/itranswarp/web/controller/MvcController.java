@@ -98,7 +98,7 @@ public class MvcController extends AbstractController {
 
     @GetMapping("/")
     public ModelAndView index() {
-        List<Article> recentArticles = this.articleService.getPublishedArticles(10);
+        List<Article> recentArticles = this.articleService.getPublishedArticlesFromCache(10);
         List<Topic> recentTopics = this.boardService.getRecentTopicsFromCache();
         return prepareModelAndView("index.html", Map.of("recentArticles", recentArticles, "recentTopics", recentTopics));
     }

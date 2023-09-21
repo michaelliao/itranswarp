@@ -55,7 +55,8 @@ function execute_remote(tid, btn, language) {
 }
 
 function execute_java(tid, btn) {
-	execute_remote(tid, btn, 'java');
+	// execute_remote(tid, btn, 'java');
+	_mdShowCodeError(btn, 'Java远程代码执行服务维护中，暂时不可用。', false);
 }
 
 function execute_python(tid, btn) {

@@ -341,8 +341,8 @@ pre {
 }
 
 pre.ascii {
-    font-size: 14px;
-    line-height: 14px;
+    font-size: 16px;
+    line-height: 19px;
     padding: 10px 0;
     border: none;
     background-color: transparent;
